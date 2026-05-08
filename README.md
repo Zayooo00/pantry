@@ -129,4 +129,4 @@ Tests use a real SQLite database (no mocks except `auth()`).
 
 ## License
 
-MIT
+[MIT](LICENSE)

@@ -1,0 +1,11 @@
+node_modules
+.next
+.env
+.env.local
+local.db
+local.db-journal
+test.db
+test.db-journal
+*.log
+.vercel
+drizzle/.snapshot

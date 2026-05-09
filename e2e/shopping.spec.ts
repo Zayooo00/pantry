@@ -8,7 +8,7 @@ test("adds a manual shopping item — appears in the list and the input clears",
   await page.goto("/shopping");
 
   const itemName = `Test paper towels ${Date.now()}`;
-  const nameInput = page.locator('input[name="name"]');
+  const nameInput = page.getByRole("main").locator('input[name="name"]').first();
   await nameInput.click();
   await nameInput.press("ControlOrMeta+a");
   await nameInput.fill(itemName);
@@ -18,12 +18,31 @@ test("adds a manual shopping item — appears in the list and the input clears",
   await expect(nameInput).toHaveValue("");
 });
 
+test("manual add increments the sidebar shopping count badge", async ({ page }) => {
+  await loginAs(page);
+  await page.goto("/shopping");
+
+  const shoppingLink = page.locator("aside").getByRole("link", { name: /Shopping list/ });
+  const countText = (await shoppingLink.textContent()) ?? "";
+  const before = Number((countText.match(/\d+/) ?? ["0"])[0]);
+
+  const itemName = `Sidebar count ${Date.now()}`;
+  const nameInput = page.getByRole("main").locator('input[name="name"]').first();
+  await nameInput.click();
+  await nameInput.press("ControlOrMeta+a");
+  await nameInput.fill(itemName);
+  await page.getByRole("button", { name: /^＋ Add$/ }).click();
+
+  await expect(page.getByText(itemName)).toBeVisible();
+  await expect(shoppingLink).toContainText(String(before + 1));
+});
+
 test("checks an item off and completing a trip clears it from the list", async ({ page }) => {
   await loginAs(page);
   await page.goto("/shopping");
 
   const itemName = `Trip clear ${Date.now()}`;
-  const nameInput = page.locator('input[name="name"]');
+  const nameInput = page.getByRole("main").locator('input[name="name"]').first();
   await nameInput.click();
   await nameInput.press("ControlOrMeta+a");
   await nameInput.fill(itemName);

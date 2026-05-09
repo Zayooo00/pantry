@@ -8,7 +8,7 @@ test("renames profile — sidebar updates with the new name; restores afterwards
   await page.goto("/settings");
 
   const newName = `Alexa Test ${Date.now() % 100000}`;
-  const nameInput = page.locator('input[name="name"]').first();
+  const nameInput = page.getByRole("main").locator('input[name="name"]').first();
   await nameInput.click();
   await nameInput.press("ControlOrMeta+a");
   await nameInput.fill(newName);

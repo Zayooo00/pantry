@@ -100,6 +100,27 @@ test("deletes an empty room via confirm dialog — gone from list and sidebar", 
   await expect(page.getByRole("link", { name: name, exact: true })).toHaveCount(0);
 });
 
+test("restores an archived room — reappears in sidebar and on the All tab", async ({ page }) => {
+  await loginAs(page);
+  await page.goto("/rooms");
+
+  const name = `Restore test ${Date.now()}`;
+  await createRoom(page, name);
+
+  await page.getByRole("link", { name: name, exact: true }).click();
+  await page.waitForURL(/\/rooms\/[^/]+$/);
+  await page.getByRole("main").getByRole("button", { name: /^Archive room$/ }).click();
+  await expect(page.getByText("This room is archived")).toBeVisible();
+
+  await page.getByRole("main").getByRole("button", { name: /^Restore room$/ }).click();
+  await expect(page.getByText("This room is archived")).toHaveCount(0);
+
+  await expect(page.locator("aside").getByRole("link", { name: name })).toBeVisible();
+
+  await page.goto("/rooms");
+  await expect(page.getByRole("link", { name: name, exact: true })).toBeVisible();
+});
+
 test("blocks deleting a non-empty seeded room with a clear message", async ({ page }) => {
   await loginAs(page);
   await page.goto("/rooms/pantry");

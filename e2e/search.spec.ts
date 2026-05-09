@@ -12,8 +12,15 @@ test("finds a seeded item by name and clicking the result navigates to it", asyn
   await expect(result).toBeVisible();
 
   await result.click();
-  await expect(page).toHaveURL(/\/items\/[^/]+$/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Frantoio olive oil/i);
+  await page.waitForURL(/\/items\/[^/]+$/);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Frantoio/i);
+});
+
+test("status=low filter shows only low-stock items", async ({ page }) => {
+  await loginAs(page);
+  await page.goto("/search?status=low");
+
+  await expect(page.getByRole("link", { name: /Frantoio olive oil/i }).first()).toBeVisible();
 });
 
 test("clearing the search restores the empty state cue", async ({ page }) => {

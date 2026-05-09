@@ -45,7 +45,11 @@ export function SignInForm() {
       redirect: false,
     });
     if (res?.error) {
-      setServerError("That email and password don't match. Try again.");
+      if (res.code === "too_many_attempts") {
+        setServerError("Too many attempts. Try again in a few minutes.");
+      } else {
+        setServerError("That email and password don't match. Try again.");
+      }
       return;
     }
     router.push(next);
@@ -82,7 +86,7 @@ export function SignInForm() {
         className={cn(button({ variant: "primary", size: "lg" }), "w-full")}
         disabled={isSubmitting}
       >
-        {isSubmitting ? "SignIng in…" : "Sign in"}
+        {isSubmitting ? "Signing in…" : "Sign in"}
       </button>
     </form>
   );

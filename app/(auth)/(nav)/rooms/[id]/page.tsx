@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { auth } from "@/auth";
-import { canViewRoom, getRoleInRoom, requireUserId } from "@/lib/access";
+import { getRoomWithRole } from "@/lib/access";
 import { RoomViews } from "./room-views";
 import { RoomDetailHeader } from "./room-detail-header";
 import { RoomMembersPanel } from "./room-members-panel";
-import { getItemsForRoom, getRoom, getRoomsWithCounts } from "@/lib/queries";
+import { getItemsForRoom, getRoomsWithCounts } from "@/lib/queries";
 import { itemStatus, formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { level } from "@/components/level";
@@ -14,28 +14,26 @@ import { level } from "@/components/level";
 export const dynamic = "force-dynamic";
 
 export default async function RoomPage({ params }: { params: Promise<{ id: string }> }) {
-  const userId = await requireUserId();
   const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/sign-in");
+  }
+  const userId = session.user.id;
   const { id } = await params;
-  const room = await getRoom(id);
-  if (!room) {
+  const access = await getRoomWithRole(userId, id);
+  if (!access) {
     notFound();
   }
-  if (!(await canViewRoom(userId, id))) {
-    notFound();
-  }
-  const role = await getRoleInRoom(userId, id);
+  const { room, role } = access;
   const isOwner = role === "owner";
   const isArchived = room.archivedAt !== null;
 
-  const items = await getItemsForRoom(id);
+  const [items, allRooms] = await Promise.all([getItemsForRoom(id), getRoomsWithCounts(userId)]);
   const enriched = items.map((i) => ({
     ...i,
     status: itemStatus({ count: i.count, threshold: i.threshold, expiresAt: i.expiresAt }),
     upd: formatDate(i.updatedAt, { dotted: true }),
   }));
-
-  const allRooms = await getRoomsWithCounts(userId);
   const ix = allRooms.findIndex((r) => r.id === id);
   const idx = String(ix + 1).padStart(2, "0");
   const total = String(allRooms.length).padStart(2, "0");
@@ -43,11 +41,14 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
   const lowCount = enriched.filter((i) => i.status === "low").length;
   const soonCount = enriched.filter((i) => i.status === "soon").length;
 
-  const categories = Array.from(new Set(items.map((i) => i.category).filter(Boolean))) as string[];
+  const categories = Array.from(
+    new Set(items.map((i) => i.category).filter((c): c is string => c != null)),
+  );
   const catCounts = categories.map((c) => ({
     name: c,
     count: items.filter((i) => i.category === c).length,
   }));
+  const maxCatCount = Math.max(...catCounts.map((x) => x.count), 1);
 
   return (
     <AppShell>
@@ -74,7 +75,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
         idx={idx}
         total={total}
         itemCount={items.length}
-        role={role ?? "viewer"}
+        role={role}
         archived={isArchived}
       />
 
@@ -100,8 +101,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
               <div className="font-display text-md text-ink-3 italic">Nothing categorized yet.</div>
             )}
             {catCounts.map((c, i) => {
-              const max = Math.max(...catCounts.map((x) => x.count), 1);
-              const pct = Math.round((c.count / max) * 100);
+              const pct = Math.round((c.count / maxCatCount) * 100);
               const colors = ["bg-olive", "bg-amber-pantry", "bg-plum", "bg-tomato"];
               return (
                 <div

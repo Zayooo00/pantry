@@ -1,5 +1,5 @@
 import { and, eq, inArray, or } from "drizzle-orm";
-import { db, items, roomMembers, rooms, type RoomRole } from "@/db";
+import { db, items, roomMembers, rooms, type Room, type RoomRole } from "@/db";
 import { auth } from "@/auth";
 
 export type AccessRole = RoomRole | "owner";
@@ -94,6 +94,31 @@ export async function getRoomRolesForUser(userId: string): Promise<Map<string, A
     map.set(r.id, r.role as RoomRole);
   }
   return map;
+}
+
+export async function getRoomWithRole(
+  userId: string,
+  roomId: string,
+): Promise<{ room: Room; role: AccessRole } | null> {
+  const [roomRows, memberRows] = await Promise.all([
+    db.select().from(rooms).where(eq(rooms.id, roomId)).limit(1),
+    db
+      .select({ role: roomMembers.role })
+      .from(roomMembers)
+      .where(and(eq(roomMembers.roomId, roomId), eq(roomMembers.userId, userId)))
+      .limit(1),
+  ]);
+  if (roomRows.length === 0) {
+    return null;
+  }
+  const room = roomRows[0];
+  if (room.ownerId === userId) {
+    return { room, role: "owner" };
+  }
+  if (memberRows.length === 0) {
+    return null;
+  }
+  return { room, role: memberRows[0].role as RoomRole };
 }
 
 export async function getItemRoomId(itemId: string): Promise<string | null> {

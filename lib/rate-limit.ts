@@ -14,7 +14,7 @@ export type RateLimitResult =
   | { allowed: false; remaining: 0; retryAfterSec: number };
 
 export function rateLimit(args: RateLimitArgs): RateLimitResult {
-  if (process.env.E2E_BYPASS_RATE_LIMIT === "1") {
+  if (process.env.E2E_BYPASS_RATE_LIMIT === "1" && process.env.NODE_ENV !== "production") {
     return { allowed: true, remaining: args.max, retryAfterSec: 0 };
   }
   const composite = `${args.bucket}:${args.key}`;

@@ -125,7 +125,7 @@ async function seed() {
     { roomId: "pantry", name: "Ghee", category: "Oils & vinegars", unit: "jars", count: 1, threshold: 1, shelf: "C-07" },
     { roomId: "pantry", name: "White truffle oil", category: "Oils & vinegars", unit: "ml", count: 90, threshold: 30, shelf: "C-09" },
     // Kitchen — the demo "hero" item.
-    { roomId: "kitchen", name: "Frantoio olive oil", brand: "Az. Agr. Pruneti", category: "Oils & vinegars", unit: "L", count: 0.4, threshold: 1, reorderAmount: 2, shelf: "Top shelf", expiresAt: day(99), openedAt: day(-10), purchasedAt: day(-12), lastPrice: 24.50, barcode: "8014203778124", notes: "From the Tuscan trip — picked it up at the mill near Greve. Keep out of light.", tags: "Imported,Unfiltered,Extra virgin" },
+    { roomId: "kitchen", name: "Frantoio olive oil", brand: "Az. Agr. Pruneti", category: "Oils & vinegars", unit: "L", count: 0.4, threshold: 1, reorderAmount: 2, shelf: "Top shelf", expiresAt: day(99), openedAt: day(-10), purchasedAt: day(-12), lastPrice: 24.50, barcode: "8014203778124", notes: "From the Tuscan trip — picked it up at the mill near Greve. Keep out of light.", tags: "Imported,Unfiltered,Extra virgin", photoUrl: "https://picsum.photos/seed/pantry-frantoio/800/600" },
     { roomId: "kitchen", name: "Coffee beans", brand: "Heart", category: "Drinks", unit: "g", count: 250, threshold: 200, shelf: "Counter" },
     { roomId: "kitchen", name: "Sourdough loaf", category: "Baking", unit: "ea", count: 1, threshold: 1, shelf: "Bread box", expiresAt: day(2) },
     // Basement
@@ -157,7 +157,7 @@ async function seed() {
   type SeedItem = typeof itemData[number] & {
     brand?: string; barcode?: string; notes?: string; tags?: string;
     expiresAt?: Date; openedAt?: Date; purchasedAt?: Date;
-    lastPrice?: number; reorderAmount?: number;
+    lastPrice?: number; reorderAmount?: number; photoUrl?: string;
   };
   const enriched = (itemData as SeedItem[]).map((d) => ({
     id: randomUUID(),
@@ -177,7 +177,7 @@ async function seed() {
     barcode: d.barcode ?? null,
     notes: d.notes ?? null,
     tags: d.tags ?? null,
-    photoUrl: null,
+    photoUrl: d.photoUrl ?? null,
     createdAt: today,
     updatedAt: today,
   }));
@@ -251,7 +251,6 @@ async function seed() {
       });
     }
   }
-  // Manual entries — all outstanding so the user can demo checking them off.
   await db.insert(shoppingItems).values([
     {
       id: randomUUID(),
@@ -276,8 +275,9 @@ async function seed() {
       reason: "MANUAL",
       groupName: "Other",
       estPrice: 6.50,
-      done: false,
+      done: true,
       source: "manual",
+      createdAt: day(-2),
     },
     {
       id: randomUUID(),
@@ -289,9 +289,16 @@ async function seed() {
       reason: "MANUAL · For lasagna Sunday",
       groupName: "Cold & dairy",
       estPrice: 5.00,
-      done: false,
+      done: true,
       source: "manual",
+      createdAt: day(-2),
     },
+  ]);
+
+  await db.insert(shoppingTrips).values([
+    { id: randomUUID(), userId: alexId, itemCount: 8, completedAt: day(-7) },
+    { id: randomUUID(), userId: alexId, itemCount: 5, completedAt: day(-14) },
+    { id: randomUUID(), userId: alexId, itemCount: 11, completedAt: day(-22) },
   ]);
 
   if (oliveOil) {

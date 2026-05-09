@@ -3,7 +3,7 @@ import { loginAs } from "./auth";
 
 async function addItem(page: Page, roomId: string, name: string) {
   await page.goto(`/items/new?room=${roomId}`);
-  const nameInput = page.locator('input[name="name"]');
+  const nameInput = page.getByRole("main").locator('input[name="name"]');
   await nameInput.click();
   await nameInput.press("ControlOrMeta+a");
   await nameInput.fill(name);
@@ -19,7 +19,9 @@ test("adds an item to a room — lands on item detail and shows up in the room l
   await addItem(page, "pantry", itemName);
 
   await expect(page).toHaveURL(/\/items\/[^/]+$/);
-  await expect(page.getByRole("heading", { level: 1, name: new RegExp(itemName, "i") })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 1, name: new RegExp(itemName, "i") }),
+  ).toBeVisible();
 
   await page.locator("aside").getByRole("link", { name: "Pantry", exact: true }).click();
   await expect(page).toHaveURL(/\/rooms\/pantry$/);
@@ -42,13 +44,11 @@ test("deletes an item — confirm dialog → redirects to room → item gone fro
   await expect(page.getByRole("link", { name: new RegExp(itemName, "i") })).toHaveCount(0);
 });
 
-test("marks an item as opened — button label flips and toast appears", async ({ page }) => {
+test("marks an item as opened — button label flips", async ({ page }) => {
   await loginAs(page);
   const itemName = `Open-me item ${Date.now()}`;
   await addItem(page, "pantry", itemName);
 
-  const openBtn = page.getByRole("button", { name: /^Mark opened$/ });
-  await openBtn.click();
-
+  await page.getByRole("button", { name: /^Mark opened$/ }).click();
   await expect(page.getByRole("button", { name: /^Re-mark opened$/ })).toBeVisible();
 });

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { mutate as globalMutate } from "swr";
 import { useRouter } from "next/navigation";
 import {
   DndContext,
@@ -31,7 +30,7 @@ import { cn } from "@/lib/cn";
 import { badge } from "@/components/badge";
 import { button } from "@/components/button";
 import { roleBadge } from "@/components/role-badge";
-import { useMutation } from "@/lib/api/client";
+import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Room as RoomRow } from "@/db/schema";
 
 type Room = Pick<RoomRow, "id" | "name" | "glyph" | "subtitle" | "tinted"> & {
@@ -85,8 +84,11 @@ const palettes: Record<string, string[]> = {
 export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
   const router = useRouter();
   const { toast } = useToast();
-  const [rooms, setRooms] = useState(initialRooms);
-  const [reordering, setReordering] = useState(false);
+  // Local draft only used while reordering; otherwise mirror server props so
+  // adds/edits/deletes (which trigger router.refresh) appear immediately.
+  const [reorderDraft, setReorderDraft] = useState<Room[] | null>(null);
+  const reordering = reorderDraft !== null;
+  const rooms = reorderDraft ?? initialRooms;
   const [newRoomOpen, setNewRoomOpen] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>("all");
@@ -107,27 +109,31 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
     if (!over || active.id === over.id) {
       return;
     }
-    setRooms((current) => {
-      const oldIndex = current.findIndex((r) => r.id === active.id);
-      const newIndex = current.findIndex((r) => r.id === over.id);
+    setReorderDraft((current) => {
+      const list = current ?? initialRooms;
+      const oldIndex = list.findIndex((r) => r.id === active.id);
+      const newIndex = list.findIndex((r) => r.id === over.id);
       if (oldIndex === -1 || newIndex === -1) {
-        return current;
+        return list;
       }
-      return arrayMove(current, oldIndex, newIndex);
+      return arrayMove(list, oldIndex, newIndex);
     });
   }
 
   const { trigger: triggerReorder } = useMutation("post", "/api/rooms/reorder");
 
   async function saveOrder() {
+    if (!reorderDraft) {
+      return;
+    }
     setSavingOrder(true);
     try {
-      await triggerReorder({ body: { order: rooms.map((r) => r.id) } });
+      await triggerReorder({ body: { order: reorderDraft.map((r) => r.id) } });
     } finally {
       setSavingOrder(false);
     }
-    setReordering(false);
-    globalMutate(["pantry", "/api/sidebar"]);
+    setReorderDraft(null);
+    await invalidateApi("/api/sidebar");
     toast(<>Order <em>saved</em>.</>);
     router.refresh();
   }
@@ -151,10 +157,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
             <>
               <button
                 type="button"
-                onClick={() => {
-                  setRooms(initialRooms);
-                  setReordering(false);
-                }}
+                onClick={() => setReorderDraft(null)}
                 className={button({ variant: "ghost" })}
                 disabled={savingOrder}
               >
@@ -173,7 +176,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
             <>
               <button
                 type="button"
-                onClick={() => setReordering(true)}
+                onClick={() => setReorderDraft(initialRooms)}
                 className={button({ variant: "secondary" })}
               >
                 Reorder
@@ -190,7 +193,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
         <div
           role="tablist"
           aria-label="Filter rooms"
-          className="-mx-4 mb-6 flex items-center gap-1 overflow-x-auto border-b border-paper-3 px-4 md:mx-0 md:mb-8 md:px-0"
+          className="-mx-4 mb-6 flex items-center gap-1 overflow-x-auto overflow-y-hidden border-b border-paper-3 px-4 md:mx-0 md:mb-8 md:px-0"
         >
           {tabs.map((t) => {
             const isActive = activeTab === t.key;

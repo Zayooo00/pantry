@@ -31,9 +31,11 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: `npx next dev --turbopack --port ${PORT}`,
+    command: process.env.CI
+      ? `npx next build && npx next start --port ${PORT}`
+      : `npx next dev --turbopack --port ${PORT}`,
     url: BASE_URL,
-    timeout: 180_000,
+    timeout: 420_000,
     reuseExistingServer: false,
     env: {
       ...process.env,
@@ -41,7 +43,6 @@ export default defineConfig({
       AUTH_SECRET: "test-secret-not-for-production-use-only-32b",
       AUTH_TRUST_HOST: "true",
       APP_URL: BASE_URL,
-      E2E_BYPASS_RATE_LIMIT: "1",
     },
   },
 });

@@ -12,6 +12,7 @@ const STATE_FILE = resolve("e2e/.test-db-path");
 const env = {
   ...process.env,
   DATABASE_URL: DB_URL,
+  DATABASE_AUTH_TOKEN: "unused-for-file-url-but-required-by-drizzle-kit",
 };
 
 const push = spawnSync("npx", ["drizzle-kit", "push", "--force"], {

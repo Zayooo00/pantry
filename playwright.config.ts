@@ -19,7 +19,7 @@ export default defineConfig({
   testDir: "./e2e",
   testIgnore: ["**/setup-db.ts", "**/global-setup.ts", "**/auth.ts"],
   fullyParallel: false,
-  workers: 1,
+  workers: 3,
   retries: 0,
   timeout: 180_000,
   expect: { timeout: 10_000 },
@@ -43,6 +43,7 @@ export default defineConfig({
       AUTH_SECRET: "test-secret-not-for-production-use-only-32b",
       AUTH_TRUST_HOST: "true",
       APP_URL: BASE_URL,
+      E2E_BYPASS_RATE_LIMIT: "1",
     },
   },
 });

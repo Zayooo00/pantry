@@ -3,18 +3,25 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { Item } from "@/db/schema";
-import { formatCount, ItemStatus, shortLabel } from "@/lib/format";
+import { formatCount, ItemStatus } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { badge } from "@/components/badge";
 import { chip } from "@/components/chip";
 import { level } from "@/components/level";
 import { stamp } from "@/components/stamp";
 import { Select } from "@/components/select";
+import { ItemThumbnail } from "@/components/item-thumbnail";
 
 type EnrichedItem = Item & { status: ItemStatus; upd: string };
 
 type Layout = "grid" | "list" | "shelf";
 type SortKey = "recent" | "name" | "count-asc" | "count-desc" | "expires";
+
+const SHELF_GRAIN_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 14' preserveAspectRatio='none'><line x1='0' y1='2.5' x2='240' y2='2.5' stroke='black' stroke-opacity='0.22' stroke-width='0.6'/><line x1='0' y1='5.5' x2='240' y2='5.5' stroke='black' stroke-opacity='0.14' stroke-width='0.5'/><line x1='0' y1='8.5' x2='240' y2='8.5' stroke='black' stroke-opacity='0.18' stroke-width='0.4'/><line x1='0' y1='11.5' x2='240' y2='11.5' stroke='black' stroke-opacity='0.12' stroke-width='0.5'/><ellipse cx='50' cy='7' rx='4' ry='1.4' fill='black' fill-opacity='0.22'/><ellipse cx='195' cy='9.5' rx='3' ry='1' fill='black' fill-opacity='0.18'/></svg>`;
+const SHELF_GRAIN_BG = `url("data:image/svg+xml;utf8,${SHELF_GRAIN_SVG}"), linear-gradient(to bottom, var(--color-paper-3), var(--color-paper-4))`;
+
+const SHELF_WALL_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180' preserveAspectRatio='none'><line x1='60' y1='0' x2='60' y2='180' stroke='black' stroke-opacity='0.16' stroke-width='1'/><line x1='120' y1='0' x2='120' y2='180' stroke='black' stroke-opacity='0.16' stroke-width='1'/><line x1='18' y1='0' x2='18' y2='180' stroke='black' stroke-opacity='0.06' stroke-width='0.5'/><line x1='38' y1='0' x2='38' y2='180' stroke='black' stroke-opacity='0.04' stroke-width='0.4'/><line x1='80' y1='0' x2='80' y2='180' stroke='black' stroke-opacity='0.05' stroke-width='0.4'/><line x1='100' y1='0' x2='100' y2='180' stroke='black' stroke-opacity='0.07' stroke-width='0.5'/><line x1='142' y1='0' x2='142' y2='180' stroke='black' stroke-opacity='0.05' stroke-width='0.4'/><line x1='160' y1='0' x2='160' y2='180' stroke='black' stroke-opacity='0.06' stroke-width='0.5'/><ellipse cx='30' cy='62' rx='3' ry='5' fill='black' fill-opacity='0.10'/><ellipse cx='90' cy='130' rx='3.5' ry='5.5' fill='black' fill-opacity='0.09'/><ellipse cx='150' cy='40' rx='2.5' ry='4' fill='black' fill-opacity='0.10'/></svg>`;
+const SHELF_WALL_BG = `url("data:image/svg+xml;utf8,${SHELF_WALL_SVG}"), linear-gradient(to bottom, var(--color-paper-2), var(--color-paper-3))`;
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: "recent", label: "Recently updated" },
@@ -189,9 +196,7 @@ function GridView({ items }: { items: EnrichedItem[] }) {
               <span className={stamp({ tone: "tomato" })}>RESTOCK</span>
             </span>
           )}
-          <div className="relative grid h-35 w-full place-items-center overflow-hidden rounded-md border border-paper-3 bg-[repeating-linear-gradient(45deg,var(--color-paper-2)_0_6px,var(--color-paper-1)_6px_12px)] font-mono text-2xs tracking-widest text-ink-4 uppercase">
-            {shortLabel(it.name, 6)}
-          </div>
+          <ItemThumbnail name={it.name} photoUrl={it.photoUrl} className="h-35 w-full" abbrevLength={6} sizes="(max-width: 768px) 200px, 320px" />
           <div className="caption">
             {(it.category ?? "").toUpperCase()}
             {it.shelf ? ` · ${it.shelf}` : ""}
@@ -232,9 +237,7 @@ function ListView({ items }: { items: EnrichedItem[] }) {
             href={`/items/${it.id}`}
             className="grid grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-dashed border-paper-3 px-4 py-3 text-inherit transition-[background,transform,box-shadow] duration-150 ease-pantry last:border-0 hover:bg-paper-1 lg:grid-cols-[56px_2fr_100px_140px_120px_80px] lg:gap-4"
           >
-            <div className="relative grid h-14 w-14 place-items-center overflow-hidden rounded-md border border-paper-3 bg-[repeating-linear-gradient(45deg,var(--color-paper-2)_0_6px,var(--color-paper-1)_6px_12px)] font-mono text-2xs tracking-widest text-ink-4 uppercase">
-              {shortLabel(it.name, 3)}
-            </div>
+            <ItemThumbnail name={it.name} photoUrl={it.photoUrl} className="h-14 w-14" sizes="56px" />
             <div className="min-w-0">
               <div className="truncate font-display text-lg">{it.name}</div>
               <div className={cn("caption","mt-0.5 truncate")}>
@@ -311,7 +314,14 @@ function ShelfView({ items }: { items: EnrichedItem[] }) {
             <span>{s.tag}</span>
             <span>{s.items.length} ITEMS</span>
           </div>
-          <div className="flex min-h-45 items-end gap-1.5 overflow-x-auto px-4">
+          <div
+            className="flex min-h-45 items-end gap-1.5 overflow-x-auto rounded-t-sm border-x border-t border-paper-3 px-4 pt-5"
+            style={{
+              backgroundImage: SHELF_WALL_BG,
+              backgroundSize: "180px 100%, 100% 100%",
+              backgroundRepeat: "repeat-x, no-repeat",
+            }}
+          >
             {s.items.map((it) => {
               const sz =
                 it.unit === "kg" || it.unit === "L"
@@ -328,7 +338,7 @@ function ShelfView({ items }: { items: EnrichedItem[] }) {
                   key={it.id}
                   href={`/items/${it.id}`}
                   className={cn(
-                    "relative flex w-21 shrink-0 flex-col items-center gap-1.5 border-[1.5px] bg-paper-0 p-3 px-2 text-center text-inherit transition-transform hover:-translate-y-1",
+                    "relative flex w-21 shrink-0 flex-col items-center gap-1.5 border-[1.5px] bg-paper-0 p-3 px-2 text-center text-inherit shadow-[0_2px_3px_rgba(26,24,20,0.06),0_1px_0_rgba(26,24,20,0.04)] transition-transform duration-200 ease-pantry hover:-translate-y-1 hover:shadow-[0_10px_18px_rgba(26,24,20,0.14),0_2px_4px_rgba(26,24,20,0.06)]",
                     isBox ? "rounded-sm" : "rounded-t rounded-b-md",
                     lo ? "border-tomato-2" : so ? "border-amber-pantry-2" : "border-ink-1",
                     heightMap[sz as keyof typeof heightMap],
@@ -360,7 +370,14 @@ function ShelfView({ items }: { items: EnrichedItem[] }) {
               );
             })}
           </div>
-          <div className="-mt-px h-3.5 rounded-sm border border-ink-2 bg-linear-to-b from-paper-3 to-paper-4 shadow-[0_4px_8px_rgba(26,24,20,0.08)]" />
+          <div
+            className="-mt-px h-3.5 rounded-sm border border-ink-2 shadow-[0_10px_20px_rgba(26,24,20,0.18),0_3px_6px_rgba(26,24,20,0.1)]"
+            style={{
+              backgroundImage: SHELF_GRAIN_BG,
+              backgroundSize: "240px 100%, 100% 100%",
+              backgroundRepeat: "repeat-x, no-repeat",
+            }}
+          />
         </div>
       ))}
     </div>

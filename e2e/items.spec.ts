@@ -128,7 +128,9 @@ test("moves an item to another room — appears in target, gone from source", as
   await dialog.getByRole("combobox").first().click();
   const option = page.getByRole("option", { name: /^Kitchen$/i });
   await expect(option).toBeVisible();
-  await option.click({ force: true });
+  await option.evaluate((el) => (el as HTMLElement).click());
+
+  await expect(dialog.getByRole("combobox").first()).toContainText(/Kitchen/i);
   await dialog.getByRole("button", { name: /^Move item$/ }).click();
   await expect(dialog).not.toBeVisible();
 

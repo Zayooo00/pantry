@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { PatchMeRequest } from "@/lib/api/schemas";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,11 @@ export async function PATCH(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
-  const parsed = PatchMeRequest.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = PatchMeRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

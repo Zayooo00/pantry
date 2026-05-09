@@ -3,6 +3,7 @@ import { db, shoppingItems } from "@/db";
 import { and, eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { PatchShoppingRequest } from "@/lib/api/schemas";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
   const { id } = await params;
-  const parsed = PatchShoppingRequest.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = PatchShoppingRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

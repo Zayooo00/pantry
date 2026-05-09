@@ -4,6 +4,7 @@ import { db, roomMembers } from "@/db";
 import { auth } from "@/auth";
 import { isRoomOwner } from "@/lib/access";
 import { PatchMemberRequest } from "@/lib/api/schemas";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,11 @@ export async function PATCH(
   if (!(await isRoomOwner(session.user.id, id))) {
     return NextResponse.json({ error: "Only the owner can change roles." }, { status: 403 });
   }
-  const parsed = PatchMemberRequest.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = PatchMemberRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

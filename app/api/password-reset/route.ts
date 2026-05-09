@@ -6,6 +6,7 @@ import { db, users, passwordResets } from "@/db";
 import { appUrl, emailLayout, escapeHtml, isEmailConfigured, sendEmail } from "@/lib/email";
 import { generateToken, hashToken } from "@/lib/tokens";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,11 @@ const Body = z.object({
 const TOKEN_TTL_MS = 60 * 60 * 1000;
 
 export async function POST(req: NextRequest) {
-  const parsed = Body.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = Body.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { auth } from "@/auth";
 import { canEditRoom } from "@/lib/access";
 import { CreateItemRequest } from "@/lib/api/schemas";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,11 @@ export async function POST(req: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
-  const parsed = CreateItemRequest.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = CreateItemRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

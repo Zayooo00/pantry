@@ -5,11 +5,16 @@ import { db, users } from "@/db";
 import { hashPassword } from "@/lib/password";
 import { SignupRequest } from "@/lib/api/schemas";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  const parsed = SignupRequest.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = SignupRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Invalid input. Email must be valid; password ≥ 8 chars." },

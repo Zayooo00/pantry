@@ -8,6 +8,7 @@ import { InviteMemberRequest } from "@/lib/api/schemas";
 import { appUrl, emailLayout, escapeHtml, isEmailConfigured, sendEmail } from "@/lib/email";
 import { generateToken, hashToken } from "@/lib/tokens";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
+import { readJsonOr400 } from "@/lib/json";
 
 const INVITE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 
@@ -64,7 +65,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!(await isRoomOwner(session.user.id, id))) {
     return NextResponse.json({ error: "Only the owner can invite members." }, { status: 403 });
   }
-  const parsed = InviteMemberRequest.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = InviteMemberRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

@@ -3,6 +3,7 @@ import { db, rooms } from "@/db";
 import { and, eq, inArray } from "drizzle-orm";
 import { auth } from "@/auth";
 import { ReorderRoomsRequest } from "@/lib/api/schemas";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
   const userId = session.user.id;
-  const parsed = ReorderRoomsRequest.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = ReorderRoomsRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

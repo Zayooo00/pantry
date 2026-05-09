@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db, passwordResets, users } from "@/db";
 import { hashToken } from "@/lib/tokens";
 import { hashPassword } from "@/lib/password";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,11 @@ const Body = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const parsed = Body.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = Body.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }

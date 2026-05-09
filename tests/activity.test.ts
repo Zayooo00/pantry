@@ -23,7 +23,7 @@ describe("GET /api/activity", () => {
       { id: "e2", itemId: "i1", kind: "consume", delta: -10, countAfter: 90, createdAt: new Date(2026, 0, 2) },
     ]);
 
-    const res = await GET();
+    const res = await GET(new Request("http://localhost/api/activity") as never);
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.events).toHaveLength(2);
@@ -46,7 +46,7 @@ describe("GET /api/activity", () => {
       { id: "e1", itemId: "i1", kind: "created" },
       { id: "e2", itemId: "i2", kind: "created" },
     ]);
-    const res = await GET();
+    const res = await GET(new Request("http://localhost/api/activity") as never);
     const json = await res.json();
     expect(json.events.map((e: { id: string }) => e.id)).toEqual(["e1"]);
   });

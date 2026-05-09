@@ -19,11 +19,11 @@ export default defineConfig({
   testDir: "./e2e",
   testIgnore: ["**/setup-db.ts", "**/global-setup.ts", "**/auth.ts"],
   fullyParallel: false,
-  workers: 3,
+  workers: 1,
   retries: process.env.CI ? 3 : 0,
   timeout: 180_000,
   expect: { timeout: 10_000 },
-  reporter: process.env.CI ? "github" : "list",
+  reporter: process.env.CI ? [["list"], ["github"]] : "list",
   use: {
     baseURL: BASE_URL,
     trace: "retain-on-failure",

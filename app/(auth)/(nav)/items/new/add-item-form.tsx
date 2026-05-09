@@ -56,7 +56,7 @@ const AddItemSchema = z.object({
   lastPrice: numericString,
   barcode: z.string().trim(),
   notes: z.string().trim(),
-  tags: z.array(z.string()),
+  tags: z.array(z.string().trim().min(1)),
   photoUrl: z.string().nullable(),
 });
 
@@ -229,7 +229,7 @@ export function AddItemForm({
             Have a barcode? <em className="italic">Type it in.</em>
           </div>
           <div className="mt-1 font-mono text-2xs tracking-[0.14em] text-paper-3 uppercase">
-            Live barcode lookup is on the roadmap.
+            Stored alongside the item — searchable from anywhere.
           </div>
         </div>
         <div className="flex justify-end gap-2">

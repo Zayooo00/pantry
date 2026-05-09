@@ -83,18 +83,13 @@ export function Stepper({
 
   function onTypedChange(raw: string) {
     if (raw === "") {
-      setCount(0);
-      pendingRef.current = 0;
-    } else {
-      const parsed = Number(raw);
-      if (Number.isFinite(parsed)) {
-        setNext(parsed);
-      }
+      setNext(0);
+      return;
     }
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+    const parsed = Number(raw);
+    if (Number.isFinite(parsed)) {
+      setNext(parsed);
     }
-    timerRef.current = setTimeout(flush, SAVE_DEBOUNCE_MS);
   }
 
   function onTypedKey(e: React.KeyboardEvent<HTMLInputElement>) {

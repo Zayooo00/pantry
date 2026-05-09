@@ -28,10 +28,12 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
   if (!(await canViewRoom(userId, item.roomId))) {
     notFound();
   }
-  const canEdit = await canEditRoom(userId, item.roomId);
-  const room = await getRoom(item.roomId);
-  const events = await getItemEvents(item.id);
-  const allRooms = await getRoomsWithCounts(userId);
+  const [canEdit, room, events, allRooms] = await Promise.all([
+    canEditRoom(userId, item.roomId),
+    getRoom(item.roomId),
+    getItemEvents(item.id),
+    getRoomsWithCounts(userId),
+  ]);
 
   const status = itemStatus({
     count: item.count,
@@ -104,9 +106,13 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
               </div>
             )}
             {item.barcode && (
-              <div className="absolute right-4 bottom-4 rounded-sm border border-ink-1 bg-paper-0 px-2 py-1.5">
-                <Barcode />
-                <div className={cn("caption","mt-1 text-3xs")}>{item.barcode}</div>
+              <div className="absolute right-4 bottom-4 flex items-center gap-2 rounded-sm border border-ink-1 bg-paper-0 px-2.5 py-1.5">
+                <span aria-hidden className="font-mono text-base leading-none tracking-[0.35em] text-ink-1">
+                  ║║║▌║║
+                </span>
+                <span className="font-mono text-2xs tracking-[0.12em] text-ink-2">
+                  {item.barcode}
+                </span>
               </div>
             )}
           </div>
@@ -307,13 +313,3 @@ function Fact({
   );
 }
 
-function Barcode() {
-  const widths = [2, 1, 3, 2, 2, 2, 3, 1, 2, 2, 1, 3, 2, 2];
-  return (
-    <div className="flex items-end gap-px">
-      {widths.map((w, i) => (
-        <i key={i} className="inline-block bg-ink-1" style={{ width: w, height: 18 }} />
-      ))}
-    </div>
-  );
-}

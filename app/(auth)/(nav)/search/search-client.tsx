@@ -34,6 +34,7 @@ export function SearchClient({
 }) {
   const [q, setQ] = useState(initialQuery);
   const [activeRooms, setActiveRooms] = useState<Set<string>>(new Set());
+  const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set());
   const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatus);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -47,6 +48,9 @@ export function SearchClient({
     const needle = q.trim().toLowerCase();
     return items.filter((i) => {
       if (activeRooms.size > 0 && !activeRooms.has(i.roomId)) {
+        return false;
+      }
+      if (activeCategories.size > 0 && (!i.category || !activeCategories.has(i.category))) {
         return false;
       }
       if (statusFilter !== "all" && i.status !== statusFilter) {
@@ -70,7 +74,7 @@ export function SearchClient({
       }
       return true;
     });
-  }, [items, q, activeRooms, statusFilter, roomById]);
+  }, [items, q, activeRooms, activeCategories, statusFilter, roomById]);
 
   function toggleRoom(id: string) {
     setActiveRooms((s) => {
@@ -79,6 +83,18 @@ export function SearchClient({
         next.delete(id);
       } else {
         next.add(id);
+      }
+      return next;
+    });
+  }
+
+  function toggleCategory(name: string) {
+    setActiveCategories((s) => {
+      const next = new Set(s);
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
       }
       return next;
     });
@@ -363,7 +379,8 @@ export function SearchClient({
                   key={c}
                   label={c}
                   count={items.filter((i) => i.category === c).length}
-                  checked
+                  checked={activeCategories.size === 0 || activeCategories.has(c)}
+                  onChange={() => toggleCategory(c)}
                 />
               ))}
             </Facet>

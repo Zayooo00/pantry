@@ -81,7 +81,7 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
       <section>
         <div className="mb-2 flex items-baseline justify-between border-t border-ink-1 pt-3">
           <div className="flex items-baseline gap-3">
-            <span className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4">04</span>
+            <span className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4">05</span>
             <h2 className="m-0 font-display text-2xl tracking-[-0.01em]">Sharing</h2>
           </div>
         </div>

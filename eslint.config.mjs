@@ -42,5 +42,7 @@ export default defineConfig([
     "test.db",
     "local.db",
     "tsconfig.tsbuildinfo",
+    "lib/api/openapi.d.ts",
+    "lib/api/openapi.json",
   ]),
 ]);

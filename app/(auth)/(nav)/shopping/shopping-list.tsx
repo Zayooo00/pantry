@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { mutate as globalMutate } from "swr";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { groupBy, sumBy } from "lodash-es";
 import { Checkbox } from "@/components/checkbox";
 import { ConfirmDialog } from "@/components/confirm-dialog";
@@ -12,10 +15,24 @@ import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
 import { chip } from "@/components/chip";
 import { stamp } from "@/components/stamp";
+import { TextInput } from "@/components/text-input";
+import { Select } from "@/components/select";
 import { formatCount } from "@/lib/format";
 import { useMutation } from "@/lib/api/client";
 
 const TOGGLE_DEBOUNCE_MS = 400;
+
+const MANUAL_UNITS = ["ea", "pkts", "box", "tins", "jars", "bags", "L", "ml", "kg", "g"];
+const MANUAL_GROUPS = ["Produce", "Dry goods", "Cold & dairy", "Oils & condiments", "Other"];
+
+const ManualSchema = z.object({
+  name: z.string().trim().min(1, "Name what you need."),
+  quantity: z.coerce.number().min(0.01, "Must be > 0."),
+  unit: z.string().min(1),
+  groupName: z.string().min(1),
+});
+
+type ManualValues = z.infer<typeof ManualSchema>;
 
 type Row = {
   id: string;
@@ -43,10 +60,11 @@ export function ShoppingList({
   const [items, setItems] = useState<Row[]>(initialItems);
   const [view, setView] = useState<"all" | "outstanding">("all");
   const [completeOpen, setCompleteOpen] = useState(false);
-  const [todayLabel, setTodayLabel] = useState("");
-  useEffect(() => {
-    setTodayLabel(new Date().toLocaleDateString());
-  }, []);
+  const todayLabel = useSyncExternalStore(
+    () => () => {},
+    () => new Date().toLocaleDateString(),
+    () => "",
+  );
 
   const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const pendingDoneRef = useRef<Map<string, boolean>>(new Map());
@@ -58,6 +76,41 @@ export function ShoppingList({
   const { trigger: triggerClear } = useMutation("post", "/api/shopping/clear-done", {
     onSuccess: () => globalMutate(["pantry", "/api/sidebar"]),
   });
+  const { trigger: triggerManualAdd } = useMutation("post", "/api/shopping", {
+    onSuccess: () => globalMutate(["pantry", "/api/sidebar"]),
+  });
+
+  const manualForm = useForm<ManualValues>({
+    resolver: zodResolver(ManualSchema),
+    defaultValues: { name: "", quantity: 1, unit: "ea", groupName: "Other" },
+  });
+
+  async function addManual(values: ManualValues) {
+    let res: { id: string } | undefined;
+    try {
+      res = (await triggerManualAdd({ body: values })) as { id: string };
+    } catch (err) {
+      toast(<>Couldn't add: {err instanceof Error ? err.message : "unknown error"}</>);
+      return;
+    }
+    setItems((current) => [
+      ...current,
+      {
+        id: res!.id,
+        name: values.name,
+        quantity: values.quantity,
+        unit: values.unit,
+        reason: "MANUAL",
+        groupName: values.groupName,
+        estPrice: null,
+        done: false,
+        source: "manual",
+      },
+    ]);
+    manualForm.reset({ name: "", quantity: 1, unit: values.unit, groupName: values.groupName });
+    toast(<>Added <em>{values.name}</em>.</>);
+    router.refresh();
+  }
 
   function flushToggle(id: string): Promise<unknown> | undefined {
     const timers = timersRef.current;
@@ -78,18 +131,40 @@ export function ShoppingList({
     return p;
   }
 
+  function flushAllOnPageHide() {
+    const timers = timersRef.current;
+    const pending = pendingDoneRef.current;
+    for (const id of Array.from(timers.keys())) {
+      const timer = timers.get(id);
+      if (timer) {
+        clearTimeout(timer);
+        timers.delete(id);
+      }
+      const done = pending.get(id);
+      if (done === undefined) {
+        continue;
+      }
+      pending.delete(id);
+      // `keepalive` lets the request outlive the page unload (~64KB cap is fine here).
+      void fetch(`/api/shopping/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ done }),
+        keepalive: true,
+      });
+    }
+  }
+
   useEffect(() => {
-    function onUnload() {
-      for (const id of timersRef.current.keys()) {
+    window.addEventListener("pagehide", flushAllOnPageHide);
+    const timers = timersRef.current;
+    return () => {
+      window.removeEventListener("pagehide", flushAllOnPageHide);
+      for (const id of Array.from(timers.keys())) {
         flushToggle(id);
       }
-    }
-    window.addEventListener("beforeunload", onUnload);
-    return () => {
-      window.removeEventListener("beforeunload", onUnload);
-      onUnload();
     };
-     
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/unmount-only flush; closures read live refs, not stale deps
   }, []);
 
   const visible = view === "outstanding" ? items.filter((i) => !i.done) : items;
@@ -209,6 +284,60 @@ export function ShoppingList({
           AUTO-ADDED {auto} · MANUAL {manual}
         </span>
       </div>
+
+      <form
+        onSubmit={manualForm.handleSubmit(addManual)}
+        noValidate
+        className="no-print mx-auto mb-6 grid max-w-180 grid-cols-1 gap-2 rounded-md border border-paper-3 bg-paper-1 px-3 py-3 sm:grid-cols-[1fr_88px_96px_140px_auto] sm:items-end"
+      >
+        <div className="sm:col-span-5 sm:mb-1">
+          <span className="caption">ADD A CUSTOM ITEM</span>
+        </div>
+        <div>
+          <TextInput placeholder="Paper towels" {...manualForm.register("name")} />
+          {manualForm.formState.errors.name && (
+            <div className="mt-1 font-display text-sm text-tomato-2">
+              {manualForm.formState.errors.name.message}
+            </div>
+          )}
+        </div>
+        <TextInput
+          type="number"
+          step="0.1"
+          min="0"
+          aria-label="Quantity"
+          {...manualForm.register("quantity", { valueAsNumber: true })}
+        />
+        <Controller
+          control={manualForm.control}
+          name="unit"
+          render={({ field }) => (
+            <Select
+              value={field.value}
+              onChange={field.onChange}
+              options={MANUAL_UNITS.map((u) => ({ value: u, label: u }))}
+            />
+          )}
+        />
+        <Controller
+          control={manualForm.control}
+          name="groupName"
+          render={({ field }) => (
+            <Select
+              value={field.value}
+              onChange={field.onChange}
+              options={MANUAL_GROUPS.map((g) => ({ value: g, label: g }))}
+            />
+          )}
+        />
+        <button
+          type="submit"
+          disabled={manualForm.formState.isSubmitting}
+          className={button({ variant: "primary" })}
+        >
+          {manualForm.formState.isSubmitting ? "Adding…" : "＋ Add"}
+        </button>
+      </form>
 
       <div className="relative mx-auto max-w-180 rounded-xl border border-paper-3 bg-paper-0 bg-[repeating-linear-gradient(0deg,transparent_0_31px,rgba(26,24,20,0.04)_31px_32px)] px-5 py-6 shadow-[0_2px_0_rgba(26,24,20,0.04),0_12px_40px_rgba(26,24,20,0.06)] md:px-12 md:py-12">
         <div className="no-print absolute top-4 right-4 md:top-6 md:right-8">

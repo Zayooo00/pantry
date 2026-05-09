@@ -14,7 +14,6 @@ test("renames profile — sidebar updates with the new name; restores afterwards
   await nameInput.fill(newName);
   await page.getByRole("button", { name: /save profile/i }).click();
 
-  await page.reload();
   await expect(page.locator("aside").getByText(newName)).toBeVisible();
 
   const restoreInput = page.getByRole("main").locator('input[name="name"]').first();
@@ -22,6 +21,5 @@ test("renames profile — sidebar updates with the new name; restores afterwards
   await restoreInput.press("ControlOrMeta+a");
   await restoreInput.fill(SEED_USER.name);
   await page.getByRole("button", { name: /save profile/i }).click();
-  await page.reload();
   await expect(page.locator("aside").getByText(SEED_USER.name)).toBeVisible();
 });

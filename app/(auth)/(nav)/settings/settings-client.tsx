@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -42,6 +42,7 @@ type User = { id: string; name: string; email: string; joined: Date; notifyDiges
 export function SettingsClient({ user }: { user: User }) {
   const { toast } = useToast();
   const router = useRouter();
+  const { update: updateSession } = useSession();
   const [profileError, setProfileError] = useState<string | null>(null);
   const [pwError, setPwError] = useState<string | null>(null);
   const [signOutOpen, setSignOutOpen] = useState(false);
@@ -109,6 +110,7 @@ export function SettingsClient({ user }: { user: User }) {
       </>,
     );
     profileForm.reset(values);
+    await updateSession();
     router.refresh();
   }
 

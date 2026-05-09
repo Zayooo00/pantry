@@ -13,20 +13,26 @@ vi.mock("@/auth", () => ({
   auth: vi.fn(async () => sessionMock.value),
 }));
 
-const fetchMock = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(
-  async () => new Response(JSON.stringify({ id: "msg_1" }), { status: 200 }),
+const sendMailMock = vi.hoisted(() =>
+  vi.fn<(opts: { to?: string | string[] }) => Promise<{ messageId: string }>>(
+    async () => ({ messageId: "msg_1" }),
+  ),
 );
 
+vi.mock("nodemailer", () => ({
+  default: { createTransport: () => ({ sendMail: sendMailMock }) },
+  createTransport: () => ({ sendMail: sendMailMock }),
+}));
+
 beforeEach(() => {
-  fetchMock.mockClear();
-  vi.stubGlobal("fetch", fetchMock);
-  vi.stubEnv("RESEND_API_KEY", "re_test");
+  sendMailMock.mockClear();
+  vi.stubEnv("SMTP_USER", "pantry@example.com");
+  vi.stubEnv("SMTP_PASS", "test-app-password");
   vi.stubEnv("EMAIL_FROM", "Pantry <pantry@example.com>");
   vi.stubEnv("APP_URL", "http://localhost:3000");
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
 
@@ -100,14 +106,13 @@ describe("POST /api/rooms/[id]/members", () => {
     expect(invites[0].role).toBe("editor");
     expect(invites[0].invitedBy).toBe("u1");
     expect(invites[0].acceptedAt).toBeNull();
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe("https://api.resend.com/emails");
-    expect(JSON.parse(init.body as string).to).toBe("stranger@example.com");
+    expect(sendMailMock).toHaveBeenCalledTimes(1);
+    expect(sendMailMock.mock.calls[0][0].to).toBe("stranger@example.com");
   });
 
   it("503s on pending invite when email isn't configured", async () => {
-    vi.stubEnv("RESEND_API_KEY", "");
+    vi.stubEnv("SMTP_USER", "");
+    vi.stubEnv("SMTP_PASS", "");
     vi.stubEnv("EMAIL_FROM", "");
     const res = await inviteMember(
       jsonReq("http://l/api/rooms/r1/members", "POST", {

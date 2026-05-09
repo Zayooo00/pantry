@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error:
-          "Email isn't configured on this server. Ask the owner to set RESEND_API_KEY and EMAIL_FROM.",
+          "Email isn't configured on this server. Ask the owner to set SMTP_USER, SMTP_PASS, and EMAIL_FROM.",
       },
       { status: 503 },
     );

@@ -1,3 +1,5 @@
+import nodemailer, { type Transporter } from "nodemailer";
+
 type SendArgs = {
   to: string | string[];
   subject: string;
@@ -10,7 +12,9 @@ export type EmailSendResult =
   | { ok: false; reason: "not_configured" | "send_failed"; message: string };
 
 export function isEmailConfigured(): boolean {
-  return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+  return Boolean(
+    process.env.SMTP_USER && process.env.SMTP_PASS && process.env.EMAIL_FROM,
+  );
 }
 
 export function appUrl(): string {
@@ -26,41 +30,42 @@ export function appUrl(): string {
   return "http://localhost:3000";
 }
 
+let cachedTransporter: Transporter | null = null;
+
+function getTransporter(): Transporter {
+  if (cachedTransporter) {
+    return cachedTransporter;
+  }
+  const port = Number(process.env.SMTP_PORT ?? 587);
+  cachedTransporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST ?? "smtp.gmail.com",
+    port,
+    secure: port === 465,
+    auth: {
+      user: process.env.SMTP_USER!,
+      pass: process.env.SMTP_PASS!,
+    },
+  });
+  return cachedTransporter;
+}
+
 export async function sendEmail(args: SendArgs): Promise<EmailSendResult> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
-  if (!apiKey || !from) {
+  if (!isEmailConfigured()) {
     return {
       ok: false,
       reason: "not_configured",
-      message: "Email is not configured (RESEND_API_KEY / EMAIL_FROM missing).",
+      message: "Email is not configured (SMTP_USER / SMTP_PASS / EMAIL_FROM missing).",
     };
   }
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: args.to,
-        subject: args.subject,
-        html: args.html,
-        text: args.text,
-      }),
+    const info = await getTransporter().sendMail({
+      from: process.env.EMAIL_FROM,
+      to: args.to,
+      subject: args.subject,
+      html: args.html,
+      text: args.text,
     });
-    if (!res.ok) {
-      const body = await res.text();
-      return {
-        ok: false,
-        reason: "send_failed",
-        message: `Resend ${res.status}: ${body.slice(0, 200)}`,
-      };
-    }
-    const json = (await res.json()) as { id?: string };
-    return { ok: true, id: json.id ?? "" };
+    return { ok: true, id: info.messageId };
   } catch (err) {
     return {
       ok: false,

@@ -44,7 +44,6 @@ export default function WelcomePage() {
             href="/sign-in"
             className={cn(button({ variant: "secondary", size: "lg" }), "w-full text-center")}
           >
-
             Sign in
           </Link>
         </div>

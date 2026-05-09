@@ -294,12 +294,12 @@ export function ShoppingList({
       <form
         onSubmit={manualForm.handleSubmit(addManual)}
         noValidate
-        className="no-print mx-auto mb-6 grid max-w-180 grid-cols-1 gap-2 rounded-md border border-paper-3 bg-paper-1 px-3 py-3 sm:grid-cols-[1fr_auto_96px_140px_auto] sm:items-end"
+        className="no-print mx-auto mb-6 grid max-w-180 grid-cols-1 gap-2 rounded-md border border-paper-3 bg-paper-1 px-3 py-3 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end lg:grid-cols-[minmax(160px,1fr)_auto_88px_128px_auto]"
       >
-        <div className="sm:col-span-5 sm:mb-1">
+        <div className="sm:col-span-4 sm:mb-1 lg:col-span-5">
           <span className="caption">ADD A CUSTOM ITEM</span>
         </div>
-        <div>
+        <div className="sm:col-span-4 lg:col-span-1">
           <TextInput placeholder="Paper towels" {...manualForm.register("name")} />
           {manualForm.formState.errors.name && (
             <div className="mt-1 font-display text-sm text-tomato-2">
@@ -318,7 +318,7 @@ export function ShoppingList({
               step={1}
               min={0.01}
               ariaLabel="Quantity"
-              className="w-26"
+              className="w-full sm:w-26"
             />
           )}
         />
@@ -354,7 +354,7 @@ export function ShoppingList({
       </form>
 
       <div className="relative mx-auto max-w-180 rounded-xl border border-paper-3 bg-paper-0 bg-[repeating-linear-gradient(0deg,transparent_0_31px,rgba(26,24,20,0.04)_31px_32px)] px-5 py-6 shadow-[0_2px_0_rgba(26,24,20,0.04),0_12px_40px_rgba(26,24,20,0.06)] md:px-12 md:py-12">
-        <div className="no-print absolute top-4 right-4 md:top-6 md:right-8">
+        <div className="no-print absolute top-4 right-4 hidden sm:block md:top-6 md:right-8">
           <span className={stamp()}>No. {tripLabel}</span>
         </div>
         <div className="mb-6 border-b-[1.5px] border-ink-1 pb-4 text-center">

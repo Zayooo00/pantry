@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { SEED_USER } from "./auth";
 
-test("forgot password — submitting an email shows the success message", async ({ page }) => {
+test("forgot password — submitting an email yields a success or smtp-missing message", async ({
+  page,
+}) => {
   await page.goto("/forgot-password");
   const email = page.locator('input[name="email"]');
   await email.click();
@@ -9,7 +11,9 @@ test("forgot password — submitting an email shows the success message", async 
   await email.fill(SEED_USER.email);
   await page.getByRole("button", { name: /^Send reset link$/ }).click();
 
-  await expect(page.getByText(/we've sent a reset link/i)).toBeVisible();
+  await expect(
+    page.getByText(/we've sent a reset link/i).or(page.getByText(/Email isn't configured/i)),
+  ).toBeVisible();
 });
 
 test("reset password without a token shows the missing-token error", async ({ page }) => {

@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -42,6 +42,7 @@ type User = { id: string; name: string; email: string; joined: Date; notifyDiges
 export function SettingsClient({ user }: { user: User }) {
   const { toast } = useToast();
   const router = useRouter();
+  const { update: updateSession } = useSession();
   const [profileError, setProfileError] = useState<string | null>(null);
   const [pwError, setPwError] = useState<string | null>(null);
   const [signOutOpen, setSignOutOpen] = useState(false);
@@ -58,9 +59,7 @@ export function SettingsClient({ user }: { user: User }) {
     defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
   });
 
-  const profileValues = profileForm.watch();
-  const profileUnchanged =
-    profileValues.name === user.name && profileValues.email.toLowerCase() === user.email;
+  const profileUnchanged = !profileForm.formState.isDirty;
 
   const { trigger: triggerProfile } = useMutation("patch", "/api/me");
   const { trigger: triggerPassword } = useMutation("patch", "/api/me");
@@ -94,7 +93,7 @@ export function SettingsClient({ user }: { user: User }) {
 
   async function onSaveProfile(values: ProfileValues) {
     setProfileError(null);
-    if (values.name === user.name && values.email === user.email) {
+    if (!profileForm.formState.isDirty) {
       return;
     }
     try {
@@ -109,6 +108,7 @@ export function SettingsClient({ user }: { user: User }) {
       </>,
     );
     profileForm.reset(values);
+    await updateSession({ user: { name: values.name, email: values.email } });
     router.refresh();
   }
 
@@ -320,7 +320,7 @@ export function SettingsClient({ user }: { user: User }) {
       <ConfirmDialog
         open={signOutOpen}
         onClose={() => setSignOutOpen(false)}
-        onConfirm={() => signOut({ callbackUrl: "/welcome" })}
+        onConfirm={() => signOut({ callbackUrl: "/sign-in" })}
         title="Sign out?"
         message={<>You'll need to sign back in to see the pantry.</>}
         confirmLabel="Sign out"

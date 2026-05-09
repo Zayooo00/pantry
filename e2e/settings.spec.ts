@@ -16,9 +16,10 @@ test("renames profile — sidebar updates with the new name; restores afterwards
 
   await expect(page.locator("aside").getByText(newName)).toBeVisible();
 
-  await nameInput.click();
-  await nameInput.press("ControlOrMeta+a");
-  await nameInput.fill(SEED_USER.name);
+  const restoreInput = page.getByRole("main").locator('input[name="name"]').first();
+  await restoreInput.click();
+  await restoreInput.press("ControlOrMeta+a");
+  await restoreInput.fill(SEED_USER.name);
   await page.getByRole("button", { name: /save profile/i }).click();
   await expect(page.locator("aside").getByText(SEED_USER.name)).toBeVisible();
 });

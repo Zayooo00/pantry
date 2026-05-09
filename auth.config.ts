@@ -10,13 +10,13 @@ export const authConfig = {
       const isPublic =
         path === "/" ||
         path.startsWith("/welcome") ||
-        path.startsWith("/signin") ||
-        path.startsWith("/signup") ||
+        path.startsWith("/sign-in") ||
+        path.startsWith("/sign-up") ||
         path.startsWith("/forgot-password") ||
         path.startsWith("/reset-password") ||
         path.startsWith("/invite") ||
         path.startsWith("/api/auth") ||
-        path.startsWith("/api/signup") ||
+        path.startsWith("/api/sign-up") ||
         path.startsWith("/api/password-reset") ||
         path.startsWith("/api/invites") ||
         path.startsWith("/api/cron");
@@ -24,8 +24,8 @@ export const authConfig = {
         const isAuthGate =
           path === "/" ||
           path === "/welcome" ||
-          path === "/signin" ||
-          path === "/signup" ||
+          path === "/sign-in" ||
+          path === "/sign-up" ||
           path.startsWith("/forgot-password") ||
           path.startsWith("/reset-password");
         if (isLoggedIn && isAuthGate) {

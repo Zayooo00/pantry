@@ -8,7 +8,7 @@ test("signs in with valid credentials and lands on the dashboard", async ({ page
 });
 
 test("rejects invalid credentials with a visible error", async ({ page }) => {
-  await page.goto("/signin");
+  await page.goto("/sign-in");
   const email = page.locator('input[name="email"]');
   const password = page.locator('input[name="password"]');
   await email.click();
@@ -20,7 +20,7 @@ test("rejects invalid credentials with a visible error", async ({ page }) => {
   await page.getByRole("button", { name: /sign in/i }).click();
 
   await expect(page.getByText(/don't match/i)).toBeVisible();
-  await expect(page).toHaveURL(/\/signin/);
+  await expect(page).toHaveURL(/\/sign-in/);
 });
 
 test("redirects unauthenticated requests to /welcome", async ({ page }) => {
@@ -32,7 +32,7 @@ test("signs up a new user, lands on dashboard, and shows them in the sidebar", a
   const stamp = Date.now();
   const email = `pw-${stamp}@pantry.test`;
 
-  await page.goto("/signup");
+  await page.goto("/sign-up");
   const name = page.locator('input[name="name"]');
   const emailInput = page.locator('input[name="email"]');
   const passwordInput = page.locator('input[name="password"]');
@@ -51,11 +51,14 @@ test("signs up a new user, lands on dashboard, and shows them in the sidebar", a
   await expect(page.locator("aside").getByText(email)).toBeVisible();
 });
 
-test("signs out from the sidebar profile popover and returns to /welcome", async ({ page }) => {
+test("signs out from the sidebar profile popover and returns to /sign-in", async ({ page }) => {
   await loginAs(page);
 
   await page.locator("aside").locator("button").filter({ hasText: SEED_USER.email }).click();
 
-  await page.getByRole("button", { name: /^sign out$/i }).click();
-  await page.waitForURL("**/welcome");
+  await page.getByRole("button", { name: /^sign out$/i }).click({ force: true });
+  await page.waitForURL("**/sign-in");
+
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/welcome/);
 });

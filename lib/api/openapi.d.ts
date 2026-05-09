@@ -1188,7 +1188,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/signup": {
+  "/api/sign-up": {
     parameters: {
       query?: never;
       header?: never;
@@ -1206,7 +1206,7 @@ export interface paths {
       };
       requestBody?: {
         content: {
-          "application/json": components["schemas"]["SignupRequest"];
+          "application/json": components["schemas"]["SignUpRequest"];
         };
       };
       responses: {
@@ -1520,7 +1520,7 @@ export interface components {
       sharedWithMe: components["schemas"]["SharedWithMeRoom"][];
       iShare: components["schemas"]["IShareEntry"][];
     };
-    SignupRequest: {
+    SignUpRequest: {
       /** Format: email */
       email: string;
       name: string;

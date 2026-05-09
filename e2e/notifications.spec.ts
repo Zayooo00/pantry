@@ -28,16 +28,13 @@ test("clears read notifications via confirm dialog — Clear-read button disable
   await expect(confirm).not.toBeVisible();
 });
 
-test("marks a single notification as read by clicking its row", async ({ page }) => {
+test("clicking a notification navigates to its target", async ({ page }) => {
   await loginAs(page);
   await page.goto("/notifications");
 
-  const firstUnread = page
-    .locator("a, div")
-    .filter({ hasText: /below the floor/i })
-    .first();
-  await firstUnread.click();
+  const firstNotif = page.locator('a[href^="/items/"]').first();
+  await expect(firstNotif).toBeVisible();
+  await firstNotif.click();
 
-  await page.goto("/notifications");
-  await page.getByRole("button", { name: /^Unread \((\d+)\)/ }).click();
+  await expect(page).toHaveURL(/\/items\/[^/]+$/);
 });

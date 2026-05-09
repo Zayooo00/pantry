@@ -7,7 +7,7 @@ export const SEED_USER = {
 };
 
 export async function loginAs(page: Page, user = SEED_USER) {
-  await page.goto("/signin");
+  await page.goto("/sign-in");
   const email = page.locator('input[name="email"]');
   const password = page.locator('input[name="password"]');
   await email.click();

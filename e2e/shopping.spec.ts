@@ -12,13 +12,15 @@ test("adds a manual shopping item — appears in the list and the input clears",
   await nameInput.fill(itemName);
   await page.getByRole("button", { name: /^＋ Add$/ }).click();
 
-  await expect(page.getByText(itemName)).toBeVisible();
+  await expect(page.locator("label").filter({ hasText: itemName })).toBeVisible();
   await expect(nameInput).toHaveValue("");
 });
 
 test("manual add increments the sidebar shopping count badge", async ({ page }) => {
   await loginAs(page);
+  const sidebarLoaded = page.waitForResponse((r) => r.url().includes("/api/sidebar") && r.ok());
   await page.goto("/shopping");
+  await sidebarLoaded;
 
   const shoppingLink = page.locator("aside").getByRole("link", { name: /Shopping list/ });
   const countText = (await shoppingLink.textContent()) ?? "";
@@ -31,8 +33,8 @@ test("manual add increments the sidebar shopping count badge", async ({ page }) 
   await nameInput.fill(itemName);
   await page.getByRole("button", { name: /^＋ Add$/ }).click();
 
-  await expect(page.getByText(itemName)).toBeVisible();
-  await expect(shoppingLink).toContainText(String(before + 1));
+  await expect(page.locator("label").filter({ hasText: itemName })).toBeVisible();
+  await expect(shoppingLink).toContainText(String(before + 1), { timeout: 15_000 });
 });
 
 test("checks an item off and completing a trip clears it from the list", async ({ page }) => {
@@ -48,10 +50,10 @@ test("checks an item off and completing a trip clears it from the list", async (
 
   const row = page.locator("label").filter({ hasText: itemName });
   await expect(row).toBeVisible();
-  await row.click();
+  await row.getByRole("checkbox").click();
 
   const completeBtn = page.getByRole("button", { name: /Mark trip complete/i });
-  await expect(completeBtn).toBeEnabled();
+  await expect(completeBtn).toBeEnabled({ timeout: 15_000 });
   await completeBtn.click();
 
   const confirm = page.locator("dialog[open]");

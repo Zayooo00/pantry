@@ -830,7 +830,7 @@
           "iShare"
         ]
       },
-      "SignupRequest": {
+      "SignUpRequest": {
         "type": "object",
         "properties": {
           "email": {
@@ -1942,13 +1942,13 @@
         }
       }
     },
-    "/api/signup": {
+    "/api/sign-up": {
       "post": {
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SignupRequest"
+                "$ref": "#/components/schemas/SignUpRequest"
               }
             }
           }

@@ -35,13 +35,13 @@ export default function WelcomePage() {
 
         <div className="mt-8 flex flex-col gap-3">
           <Link
-            href="/signup"
+            href="/sign-up"
             className={cn(button({ variant: "primary", size: "lg" }), "w-full text-center")}
           >
             Create an account
           </Link>
           <Link
-            href="/signin"
+            href="/sign-in"
             className={cn(button({ variant: "secondary", size: "lg" }), "w-full text-center")}
           >
             Sign in

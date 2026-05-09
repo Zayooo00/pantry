@@ -56,7 +56,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
       return;
     }
     setDone(true);
-    setTimeout(() => router.push("/signin"), 1500);
+    setTimeout(() => router.push("/sign-in"), 1500);
   }
 
   if (done) {

@@ -9,49 +9,43 @@ import { z } from "zod";
 import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
-import { useMutation } from "@/lib/api/client";
 import { safeNext } from "@/lib/safe-next";
 
-const SignupSchema = z.object({
-  name: z.string().trim().min(1, "Tell us your name."),
+const SignInSchema = z.object({
   email: z.string().trim().toLowerCase().email("Enter a valid email."),
-  password: z.string().min(8, "At least 8 characters."),
+  password: z.string().min(1, "Enter your password."),
 });
 
-type SignupValues = z.infer<typeof SignupSchema>;
+type SignInValues = z.infer<typeof SignInSchema>;
 
-export function SignupForm() {
+const DEV_DEFAULTS: SignInValues =
+  process.env.NODE_ENV === "development"
+    ? { email: "alex@pantry.local", password: "password123" }
+    : { email: "", password: "" };
+
+export function SignInForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
-  const presetEmail = params.get("email") ?? "";
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignupValues>({
-    resolver: zodResolver(SignupSchema),
-    defaultValues: { name: "", email: presetEmail, password: "" },
+  } = useForm<SignInValues>({
+    resolver: zodResolver(SignInSchema),
+    defaultValues: DEV_DEFAULTS,
   });
 
-  const { trigger } = useMutation("post", "/api/signup");
-
-  async function onSubmit(values: SignupValues) {
+  async function onSubmit(values: SignInValues) {
     setServerError(null);
-    try {
-      await trigger({ body: values });
-    } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Could not create account.");
-      return;
-    }
-    const signed = await signIn("credentials", {
+    const res = await signIn("credentials", {
       email: values.email,
       password: values.password,
       redirect: false,
     });
-    if (signed?.error) {
-      setServerError("Account created, but sign-in failed. Try logging in.");
+    if (res?.error) {
+      setServerError("That email and password don't match. Try again.");
       return;
     }
     router.push(next);
@@ -61,22 +55,8 @@ export function SignupForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
       <div>
-        <label className="field-label">Your name</label>
-        <TextInput type="text" autoComplete="name" placeholder="Alex Hsu" {...register("name")} />
-        {errors.name && (
-          <div className="mt-2 rounded-md border border-tomato-2 bg-tomato-3 px-3.5 py-2.5 font-display text-sm text-tomato-2">
-            {errors.name.message}
-          </div>
-        )}
-      </div>
-      <div>
         <label className="field-label">Email</label>
-        <TextInput
-          type="email"
-          autoComplete="email"
-          placeholder="you@household.com"
-          {...register("email")}
-        />
+        <TextInput type="email" autoComplete="email" {...register("email")} />
         {errors.email && (
           <div className="mt-2 rounded-md border border-tomato-2 bg-tomato-3 px-3.5 py-2.5 font-display text-sm text-tomato-2">
             {errors.email.message}
@@ -85,12 +65,7 @@ export function SignupForm() {
       </div>
       <div>
         <label className="field-label">Password</label>
-        <TextInput
-          type="password"
-          autoComplete="new-password"
-          placeholder="At least 8 characters"
-          {...register("password")}
-        />
+        <TextInput type="password" autoComplete="current-password" {...register("password")} />
         {errors.password && (
           <div className="mt-2 rounded-md border border-tomato-2 bg-tomato-3 px-3.5 py-2.5 font-display text-sm text-tomato-2">
             {errors.password.message}
@@ -107,7 +82,7 @@ export function SignupForm() {
         className={cn(button({ variant: "primary", size: "lg" }), "w-full")}
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Creating…" : "Create account"}
+        {isSubmitting ? "SignIng in…" : "Sign in"}
       </button>
     </form>
   );

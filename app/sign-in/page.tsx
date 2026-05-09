@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { JarMark } from "@/icons";
-import { SignupForm } from "./signup-form";
+import { SignInForm } from "./sign-in-form";
 
 export const dynamic = "force-dynamic";
 
-export default function SignupPage() {
+export default function SignInPage() {
   return (
     <div className="grid min-h-screen grid-cols-1 bg-paper-0 md:grid-cols-2">
       <div className="ml-auto flex w-full max-w-140 flex-col justify-center px-[clamp(24px,6vw,96px)] py-12">
@@ -21,24 +21,33 @@ export default function SignupPage() {
         </Link>
 
         <div className="mb-4 font-mono text-xs tracking-mono text-ink-4 uppercase">
-          NEW HOUSEHOLD · NO. 0043
+          SIGN IN · NO. 0042
         </div>
         <h1 className="m-0 mb-3 font-display text-[clamp(56px,7vw,88px)] leading-[0.95] font-light tracking-display [&_em]:font-normal [&_em]:italic">
-          Open the <em>ledger</em>.
+          Welcome <em>back</em>.
         </h1>
         <p className="m-0 mb-10 font-display text-xl font-light text-ink-3 italic">
-          A new pantry, kept honest.
+          The shelf has been waiting.
         </p>
 
-        <SignupForm />
+        <SignInForm />
+
+        <div className="mt-6 text-right">
+          <Link
+            href="/forgot-password"
+            className="font-display text-sm text-ink-3 italic underline-offset-4 transition-colors duration-150 ease-pantry hover:text-olive-2 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         <div className="mt-8 border-t border-dashed border-paper-3 pt-6 font-display text-sm text-ink-3 italic">
-          <span>Already keeping a pantry?</span>{" "}
+          <span>New here?</span>{" "}
           <Link
-            href="/signin"
+            href="/sign-up"
             className="border-b border-ink-1 pb-px text-ink-1 not-italic transition-colors duration-150 ease-pantry hover:border-olive-2 hover:text-olive-2"
           >
-            Sign in →
+            Create an account →
           </Link>
         </div>
       </div>
@@ -48,10 +57,8 @@ export default function SignupPage() {
           <div className="font-mono text-xs tracking-mono text-paper-3 uppercase">
             A QUIET INVENTORY, KEPT HONEST.
           </div>
-          <div className="font-display text-[clamp(36px,5vw,56px)] leading-[1.1] font-light tracking-display-md text-paper-0 [&_em]:font-normal [&_em]:text-amber-pantry-3 [&_em]:italic">
-            Every <em>jar</em>,<br />
-            every <em>bottle</em>,<br />
-            every <em>bag</em>.
+          <div className="font-display text-[clamp(36px,5vw,56px)] leading-[1.1] font-light tracking-display-md text-balance text-paper-0 [&_em]:font-normal [&_em]:text-amber-pantry-3 [&_em]:italic">
+            "Olive oil is at <em>0.4 L</em>. You set the floor at <em>1 L</em>."
           </div>
           <div className="font-mono text-xs tracking-mono text-paper-3 uppercase">
             EST. ONE KITCHEN

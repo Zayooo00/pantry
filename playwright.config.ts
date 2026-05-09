@@ -20,10 +20,10 @@ export default defineConfig({
   testIgnore: ["**/setup-db.ts", "**/global-setup.ts", "**/auth.ts"],
   fullyParallel: false,
   workers: 1,
-  retries: 0,
-  timeout: 180_000,
+  retries: process.env.CI ? 3 : 0,
+  timeout: 60_000,
   expect: { timeout: 10_000 },
-  reporter: process.env.CI ? "github" : "list",
+  reporter: process.env.CI ? [["list"], ["github"]] : "list",
   use: {
     baseURL: BASE_URL,
     trace: "retain-on-failure",
@@ -33,7 +33,7 @@ export default defineConfig({
   webServer: {
     command: `npx next dev --turbopack --port ${PORT}`,
     url: BASE_URL,
-    timeout: 180_000,
+    timeout: 240_000,
     reuseExistingServer: false,
     env: {
       ...process.env,

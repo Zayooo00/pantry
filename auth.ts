@@ -20,6 +20,17 @@ class TooManyAttempts extends CredentialsSignin {
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   ...authConfig,
+  logger:
+    process.env.E2E_BYPASS_RATE_LIMIT === "1"
+      ? {
+          error(err) {
+            if (err instanceof CredentialsSignin) {
+              return;
+            }
+            console.error(err);
+          },
+        }
+      : undefined,
   providers: [
     Credentials({
       credentials: {
@@ -33,7 +44,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
         const ip = request ? clientKey({ headers: request.headers }) : "unknown";
         const limited = rateLimit({
-          bucket: "signin",
+          bucket: "sign-in",
           key: `${parsed.data.email.toLowerCase()}|${ip}`,
           max: 10,
           windowMs: 15 * 60 * 1000,
@@ -64,7 +75,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = (user as { id: string }).id;
         token.email = user.email ?? null;
@@ -75,6 +86,23 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       const id = token.id as string | undefined;
       if (!id) {
+        return token;
+      }
+      if (trigger === "update" && session) {
+        const partial = session as {
+          user?: { name?: string; email?: string };
+          name?: string;
+          email?: string;
+        };
+        const nextName = partial.user?.name ?? partial.name;
+        const nextEmail = partial.user?.email ?? partial.email;
+        if (typeof nextName === "string") {
+          token.name = nextName;
+        }
+        if (typeof nextEmail === "string") {
+          token.email = nextEmail;
+        }
+        token.lastChecked = Date.now();
         return token;
       }
       const lastChecked = (token.lastChecked as number) ?? 0;

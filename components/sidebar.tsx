@@ -341,7 +341,7 @@ export function Sidebar({
                 </Link>
                 <button
                   type="button"
-                  onClick={() => signOut({ callbackUrl: "/welcome" })}
+                  onClick={() => signOut({ callbackUrl: "/sign-in" })}
                   className="block w-full px-3 py-2 text-left text-sm text-tomato-2 transition-colors hover:bg-tomato-3"
                 >
                   Sign out

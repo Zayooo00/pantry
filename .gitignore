@@ -2,6 +2,7 @@ node_modules
 .next
 .env
 .env.local
+.env.production
 local.db
 local.db-journal
 test.db

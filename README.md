@@ -162,7 +162,7 @@ npm run e2e:ui        # same, in Playwright's UI runner
 
 Vitest tests use a real SQLite database (no mocks except `auth()`). Playwright spins up a dedicated dev server against a temp SQLite file under `e2e/.test-db-path`, with rate limiting bypassed via `E2E_BYPASS_RATE_LIMIT=1`.
 
-Both suites run in CI via GitHub Actions on every push to `main`, every pull request, and on demand from the Actions tab. See `.github/workflows/`.
+GitHub Actions runs three workflows on every push to `main`, every pull request, and on demand from the Actions tab: `test.yml` (lint, prettier check, `next build`), `api-tests.yml` (Vitest), and `e2e-tests.yml` (Playwright). See `.github/workflows/`.
 
 ## License
 

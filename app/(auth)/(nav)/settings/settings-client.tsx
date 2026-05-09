@@ -13,6 +13,7 @@ import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
+import { Select } from "@/components/select";
 import { useMutation } from "@/lib/api/client";
 
 const ProfileSchema = z.object({
@@ -35,7 +36,8 @@ const PasswordSchema = z
 
 type PasswordValues = z.infer<typeof PasswordSchema>;
 
-type User = { id: string; name: string; email: string; joined: Date };
+type DigestFreq = "off" | "daily" | "weekly";
+type User = { id: string; name: string; email: string; joined: Date; notifyDigest: DigestFreq };
 
 export function SettingsClient({ user }: { user: User }) {
   const { toast } = useToast();
@@ -43,6 +45,8 @@ export function SettingsClient({ user }: { user: User }) {
   const [profileError, setProfileError] = useState<string | null>(null);
   const [pwError, setPwError] = useState<string | null>(null);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  const [digest, setDigest] = useState<DigestFreq>(user.notifyDigest);
+  const [savingDigest, setSavingDigest] = useState(false);
 
   const profileForm = useForm<ProfileValues>({
     resolver: zodResolver(ProfileSchema),
@@ -60,6 +64,29 @@ export function SettingsClient({ user }: { user: User }) {
 
   const { trigger: triggerProfile } = useMutation("patch", "/api/me");
   const { trigger: triggerPassword } = useMutation("patch", "/api/me");
+  const { trigger: triggerDigest } = useMutation("patch", "/api/me");
+
+  async function onChangeDigest(next: DigestFreq) {
+    const prev = digest;
+    setDigest(next);
+    setSavingDigest(true);
+    try {
+      await triggerDigest({ body: { notifyDigest: next } });
+    } catch (err) {
+      setDigest(prev);
+      toast(<>Couldn't save: {err instanceof Error ? err.message : "unknown error"}</>);
+      setSavingDigest(false);
+      return;
+    }
+    setSavingDigest(false);
+    toast(
+      next === "off" ? (
+        <>Email digest <em>off</em>.</>
+      ) : (
+        <>Email digest set to <em>{next}</em>.</>
+      ),
+    );
+  }
 
   async function onSaveProfile(values: ProfileValues) {
     setProfileError(null);
@@ -221,6 +248,35 @@ export function SettingsClient({ user }: { user: User }) {
 
           <SettingsSection
             num="03"
+            title="Notifications"
+            lede="Email digest of low-stock items. Off by default — you can opt in to daily or weekly reminders."
+          >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-[280px_1fr] md:items-end">
+              <div>
+                <label className="field-label">Low-stock email digest</label>
+                <Select
+                  value={digest}
+                  onChange={(v) => onChangeDigest(v as DigestFreq)}
+                  options={[
+                    { value: "off", label: "Off" },
+                    { value: "daily", label: "Daily" },
+                    { value: "weekly", label: "Weekly" },
+                  ]}
+                  disabled={savingDigest}
+                />
+              </div>
+              <div className="font-display text-sm text-ink-3 italic">
+                {digest === "off"
+                  ? "You won't receive email digests."
+                  : digest === "daily"
+                    ? "We'll email you every morning if anything's below its floor."
+                    : "We'll email you weekly with anything below its floor."}
+              </div>
+            </div>
+          </SettingsSection>
+
+          <SettingsSection
+            num="04"
             title="Session"
             lede="Sign out of this browser. Your pantry will still be here."
           >

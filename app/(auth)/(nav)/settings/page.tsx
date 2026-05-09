@@ -15,7 +15,13 @@ export default async function SettingsPage() {
   return (
     <AppShell>
       <SettingsClient
-        user={{ id: me.id, name: me.name, email: me.email, joined: me.createdAt }}
+        user={{
+          id: me.id,
+          name: me.name,
+          email: me.email,
+          joined: me.createdAt,
+          notifyDigest: (me.notifyDigest as "off" | "daily" | "weekly") ?? "off",
+        }}
       />
     </AppShell>
   );

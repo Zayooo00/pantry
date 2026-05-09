@@ -18,9 +18,6 @@ const SigninSchema = z.object({
 
 type SigninValues = z.infer<typeof SigninSchema>;
 
-// In local dev the seed creates a known demo user; pre-fill so iteration is
-// fast. `process.env.NODE_ENV` is statically replaced by Next.js at build, so
-// this branch is dead-stripped in production.
 const DEV_DEFAULTS: SigninValues =
   process.env.NODE_ENV === "development"
     ? { email: "alex@pantry.local", password: "password123" }

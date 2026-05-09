@@ -12,9 +12,7 @@ test("forgot password — submitting an email yields a success or smtp-missing m
   await page.getByRole("button", { name: /^Send reset link$/ }).click();
 
   await expect(
-    page
-      .getByText(/we've sent a reset link/i)
-      .or(page.getByText(/Email isn't configured/i)),
+    page.getByText(/we've sent a reset link/i).or(page.getByText(/Email isn't configured/i)),
   ).toBeVisible();
 });
 

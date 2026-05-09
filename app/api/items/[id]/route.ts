@@ -3,8 +3,9 @@ import { db, items } from "@/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { canEditRoom, getItemRoomId } from "@/lib/access";
-import { getItem, maybeNotifyThresholdCross, updateItemCount } from "@/lib/queries";
+import { getItem, maybeNotifyThresholdCross, recordCountChange } from "@/lib/queries";
 import { PatchItemRequest } from "@/lib/api/schemas";
+import { readJsonOr400 } from "@/lib/json";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!(await canEditRoom(session.user.id, currentRoomId))) {
     return NextResponse.json({ error: "You can't edit this item." }, { status: 403 });
   }
-  const parsed = PatchItemRequest.safeParse(await req.json());
+  const body = await readJsonOr400(req);
+  if (body instanceof NextResponse) {
+    return body;
+  }
+  const parsed = PatchItemRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
@@ -31,19 +36,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "You can't move items to that room." }, { status: 403 });
     }
   }
-  if (typeof data.count === "number" && Object.keys(data).length === 1) {
-    await updateItemCount(id, data.count, {
-      id: session.user.id,
-      name: session.user.name ?? "Someone",
-    });
-    return NextResponse.json({ ok: true });
-  }
   const before = await getItem(id);
+  if (!before) {
+    return NextResponse.json({ error: "Item not found." }, { status: 404 });
+  }
   await db
     .update(items)
     .set({ ...data, updatedAt: new Date() })
     .where(eq(items.id, id));
-  if (before && (typeof data.count === "number" || data.threshold !== undefined)) {
+  if (typeof data.count === "number") {
+    await recordCountChange({
+      itemId: id,
+      oldCount: before.count,
+      newCount: data.count,
+      user: { id: session.user.id, name: session.user.name ?? "Someone" },
+    });
+  }
+  if (typeof data.count === "number" || data.threshold !== undefined) {
     const newCount = typeof data.count === "number" ? data.count : before.count;
     const newThreshold =
       data.threshold === undefined ? before.threshold : data.threshold;
@@ -51,7 +60,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       itemId: id,
       itemName: data.name ?? before.name,
       roomId: before.roomId,
-      threshold: newThreshold,
+      oldThreshold: before.threshold,
+      newThreshold,
       oldCount: before.count,
       newCount,
       actorId: session.user.id,

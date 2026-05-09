@@ -99,6 +99,7 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with **alex@pant
 | `format` / `format:check` | Prettier (sorts Tailwind classes) |
 | `db:push` | Push Drizzle schema to the DB |
 | `db:seed` | Seed demo users, rooms, items, a pending invite, and sample notifications |
+| `db:seed:prod` | Same demo data, scoped to the three `*@pantry.local` accounts only — leaves real users untouched. Reads `.env.production` (pull with `npx vercel env pull .env.production --environment=production`). |
 | `db:reset` | Wipe local SQLite, push schema, re-seed |
 | `db:studio` | Open Drizzle Studio |
 | `openapi:generate` | Re-generate `lib/api/openapi.{json,d.ts}` from the Zod registry |
@@ -143,7 +144,7 @@ db/
   index.ts                      drizzle client
 
 scripts/                        seed, reset-db, check-db, generate-openapi,
-                                seed-prod-deltas
+                                seed-prod, seed-shared
 tests/                          vitest integration tests
 e2e/                            playwright specs + test-db setup
 auth.ts / auth.config.ts        NextAuth setup
@@ -160,6 +161,8 @@ npm run e2e:ui        # same, in Playwright's UI runner
 ```
 
 Vitest tests use a real SQLite database (no mocks except `auth()`). Playwright spins up a dedicated dev server against a temp SQLite file under `e2e/.test-db-path`, with rate limiting bypassed via `E2E_BYPASS_RATE_LIMIT=1`.
+
+Both suites run in CI via GitHub Actions on every push to `main`, every pull request, and on demand from the Actions tab. See `.github/workflows/`.
 
 ## License
 

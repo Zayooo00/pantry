@@ -1,6 +1,18 @@
 import { beforeAll, beforeEach, afterAll } from "vitest";
 import { unlinkSync, existsSync } from "node:fs";
-import { db, users, rooms, roomMembers, items, shoppingItems, shoppingTrips, itemEvents } from "@/db";
+import {
+  db,
+  users,
+  rooms,
+  roomMembers,
+  items,
+  shoppingItems,
+  shoppingTrips,
+  itemEvents,
+  notifications,
+  passwordResets,
+  pendingInvites,
+} from "@/db";
 import { sql } from "drizzle-orm";
 
 const TEST_DB_FILE = "test.db";
@@ -11,6 +23,9 @@ const SCHEMA_SQL = [
     email TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     password_hash TEXT NOT NULL,
+    password_version INTEGER NOT NULL DEFAULT 1,
+    notify_digest TEXT NOT NULL DEFAULT 'off',
+    last_digest_sent_at INTEGER,
     created_at INTEGER NOT NULL DEFAULT (unixepoch())
   )`,
   `CREATE TABLE IF NOT EXISTS rooms (
@@ -21,6 +36,7 @@ const SCHEMA_SQL = [
     subtitle TEXT,
     tinted INTEGER NOT NULL DEFAULT 0,
     position INTEGER NOT NULL DEFAULT 0,
+    archived_at INTEGER,
     created_at INTEGER NOT NULL DEFAULT (unixepoch())
   )`,
   `CREATE TABLE IF NOT EXISTS room_members (
@@ -86,6 +102,39 @@ const SCHEMA_SQL = [
     actor TEXT,
     created_at INTEGER NOT NULL DEFAULT (unixepoch())
   )`,
+  `CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    body TEXT,
+    link TEXT,
+    item_id TEXT REFERENCES items(id) ON DELETE SET NULL,
+    room_id TEXT REFERENCES rooms(id) ON DELETE SET NULL,
+    read_at INTEGER,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch())
+  )`,
+  `CREATE TABLE IF NOT EXISTS password_resets (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL UNIQUE,
+    expires_at INTEGER NOT NULL,
+    used_at INTEGER,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch())
+  )`,
+  `CREATE TABLE IF NOT EXISTS pending_invites (
+    id TEXT PRIMARY KEY,
+    room_id TEXT NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    email TEXT NOT NULL,
+    role TEXT NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    invited_by TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at INTEGER NOT NULL,
+    accepted_at INTEGER,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch())
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS pending_invites_room_email_unique
+    ON pending_invites (room_id, email)`,
 ];
 
 beforeAll(async () => {
@@ -103,12 +152,15 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await db.delete(notifications);
   await db.delete(itemEvents);
   await db.delete(shoppingTrips);
   await db.delete(shoppingItems);
   await db.delete(items);
+  await db.delete(pendingInvites);
   await db.delete(roomMembers);
   await db.delete(rooms);
+  await db.delete(passwordResets);
   await db.delete(users);
 });
 

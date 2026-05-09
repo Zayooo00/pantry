@@ -6,13 +6,61 @@ export const users = sqliteTable("users", {
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   passwordHash: text("password_hash").notNull(),
+  passwordVersion: integer("password_version").notNull().default(1),
+  notifyDigest: text("notify_digest").notNull().default("off"),
+  lastDigestSentAt: integer("last_digest_sent_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(unixepoch())`),
 });
 
+export type DigestFrequency = "off" | "daily" | "weekly";
+
 export type User = typeof users.$inferSelect;
 export type UserInsert = typeof users.$inferInsert;
+
+export const passwordResets = sqliteTable("password_resets", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  usedAt: integer("used_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+export type PasswordReset = typeof passwordResets.$inferSelect;
+export type PasswordResetInsert = typeof passwordResets.$inferInsert;
+
+export const pendingInvites = sqliteTable(
+  "pending_invites",
+  {
+    id: text("id").primaryKey(),
+    roomId: text("room_id")
+      .notNull()
+      .references(() => rooms.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    role: text("role").notNull(),
+    tokenHash: text("token_hash").notNull().unique(),
+    invitedBy: text("invited_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+    acceptedAt: integer("accepted_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => ({
+    roomEmailUnique: uniqueIndex("pending_invites_room_email_unique").on(t.roomId, t.email),
+  }),
+);
+
+export type PendingInvite = typeof pendingInvites.$inferSelect;
+export type PendingInviteInsert = typeof pendingInvites.$inferInsert;
 
 export const rooms = sqliteTable("rooms", {
   id: text("id").primaryKey(),
@@ -142,3 +190,23 @@ export type ShoppingTrip = typeof shoppingTrips.$inferSelect;
 export type ShoppingTripInsert = typeof shoppingTrips.$inferInsert;
 export type ItemEvent = typeof itemEvents.$inferSelect;
 export type ItemEventInsert = typeof itemEvents.$inferInsert;
+
+export const notifications = sqliteTable("notifications", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(),
+  title: text("title").notNull(),
+  body: text("body"),
+  link: text("link"),
+  itemId: text("item_id").references(() => items.id, { onDelete: "set null" }),
+  roomId: text("room_id").references(() => rooms.id, { onDelete: "set null" }),
+  readAt: integer("read_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+export type Notification = typeof notifications.$inferSelect;
+export type NotificationInsert = typeof notifications.$inferInsert;

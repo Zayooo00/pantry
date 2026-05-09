@@ -93,12 +93,12 @@ export function ThemeToggle({ className }: { className?: string }) {
         <span className="block h-4 w-4" aria-hidden />
       ) : isDark ? (
         <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-          <path d="M14.5 10.5 A6 6 0 0 1 7.5 3.5 A6.5 6.5 0 1 0 14.5 10.5 Z" />
+          <circle cx="9" cy="9" r="3.2" />
+          <path d="M9 1.5 V3 M9 15 V16.5 M1.5 9 H3 M15 9 H16.5 M3.6 3.6 L4.7 4.7 M13.3 13.3 L14.4 14.4 M3.6 14.4 L4.7 13.3 M13.3 4.7 L14.4 3.6" />
         </svg>
       ) : (
         <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-          <circle cx="9" cy="9" r="3.2" />
-          <path d="M9 1.5 V3 M9 15 V16.5 M1.5 9 H3 M15 9 H16.5 M3.6 3.6 L4.7 4.7 M13.3 13.3 L14.4 14.4 M3.6 14.4 L4.7 13.3 M13.3 4.7 L14.4 3.6" />
+          <path d="M14.5 10.5 A6 6 0 0 1 7.5 3.5 A6.5 6.5 0 1 0 14.5 10.5 Z" />
         </svg>
       )}
     </button>

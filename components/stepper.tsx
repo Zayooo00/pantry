@@ -138,7 +138,7 @@ export function NumberStepper({
         <button
           type="button"
           onClick={() => bump(-step)}
-          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center"
+          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center cursor-pointer transition-colors hover:bg-paper-2 active:bg-paper-3"
           aria-label="Decrease"
         >
           −
@@ -147,7 +147,7 @@ export function NumberStepper({
         <button
           type="button"
           onClick={() => bump(step)}
-          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center"
+          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center cursor-pointer transition-colors hover:bg-paper-2 active:bg-paper-3"
           aria-label="Increase"
         >
           +

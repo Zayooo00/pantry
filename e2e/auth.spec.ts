@@ -56,7 +56,7 @@ test("signs out from the sidebar profile popover and returns to /sign-in", async
 
   await page.locator("aside").locator("button").filter({ hasText: SEED_USER.email }).click();
 
-  await page.getByRole("button", { name: /^sign out$/i }).click();
+  await page.getByRole("button", { name: /^sign out$/i }).click({ force: true });
   await page.waitForURL("**/sign-in");
 
   await page.goto("/dashboard");

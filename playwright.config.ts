@@ -36,8 +36,8 @@ export default defineConfig({
     timeout: 180_000,
     reuseExistingServer: false,
     env: {
+      ...process.env,
       DATABASE_URL: DB_URL,
-      DATABASE_AUTH_TOKEN: "",
       AUTH_SECRET: "test-secret-not-for-production-use-only-32b",
       AUTH_TRUST_HOST: "true",
       APP_URL: BASE_URL,

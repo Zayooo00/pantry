@@ -12,7 +12,7 @@ test("adds a manual shopping item — appears in the list and the input clears",
   await nameInput.fill(itemName);
   await page.getByRole("button", { name: /^＋ Add$/ }).click();
 
-  await expect(page.getByText(itemName)).toBeVisible();
+  await expect(page.getByText(itemName).first()).toBeVisible();
   await expect(nameInput).toHaveValue("");
 });
 
@@ -31,7 +31,7 @@ test("manual add increments the sidebar shopping count badge", async ({ page }) 
   await nameInput.fill(itemName);
   await page.getByRole("button", { name: /^＋ Add$/ }).click();
 
-  await expect(page.getByText(itemName)).toBeVisible();
+  await expect(page.getByText(itemName).first()).toBeVisible();
   await expect(shoppingLink).toContainText(String(before + 1));
 });
 

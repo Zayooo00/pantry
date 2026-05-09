@@ -8,7 +8,7 @@ test("dashboard renders greeting, stat cells, and core sections after login", as
 
   await expect(page.getByText("Items on hand")).toBeVisible();
   await expect(page.getByText("Below threshold")).toBeVisible();
-  await expect(page.getByText(/Expiring/)).toBeVisible();
+  await expect(page.getByText("Expiring ≤ 14 days")).toBeVisible();
 
   await expect(page.getByRole("heading", { name: /Below the/i, level: 2 })).toBeVisible();
   await expect(page.getByRole("heading", { name: /Rooms at a glance/i, level: 2 })).toBeVisible();

@@ -2,14 +2,182 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { mutate as globalMutate } from "swr";
 import { button } from "@/components/button";
 import { formatCount } from "@/lib/format";
-import { useMutation } from "@/lib/api/client";
+import { cn } from "@/lib/cn";
+import { invalidateApi, useMutation } from "@/lib/api/client";
 
 type Size = "sm" | "md" | "xl";
 
 const SAVE_DEBOUNCE_MS = 600;
+
+type Variant = "pill" | "native";
+
+export function NumberStepper({
+  value,
+  onChange,
+  step = 1,
+  size = "md",
+  variant = "pill",
+  min = 0,
+  ariaLabel = "Count",
+  onBlur,
+  className,
+}: {
+  value: number;
+  onChange: (next: number) => void;
+  step?: number;
+  size?: Size;
+  variant?: Variant;
+  min?: number;
+  ariaLabel?: string;
+  onBlur?: () => void;
+  className?: string;
+}) {
+  function setNext(raw: number) {
+    const safe = Math.max(min, +raw.toFixed(2));
+    onChange(safe);
+  }
+
+  function bump(delta: number) {
+    setNext(value + delta);
+  }
+
+  function onTypedChange(raw: string) {
+    if (raw === "") {
+      setNext(min);
+      return;
+    }
+    const parsed = Number(raw);
+    if (Number.isFinite(parsed)) {
+      setNext(parsed);
+    }
+  }
+
+  function onTypedKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.currentTarget.blur();
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      bump(step);
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      bump(-step);
+    }
+  }
+
+  if (variant === "native") {
+    return (
+      <div
+        className={cn(
+          "inline-flex items-stretch overflow-hidden rounded-md border border-paper-4 bg-paper-0 transition-[border-color] duration-150 ease-pantry focus-within:border-ink-1 hover:border-ink-3",
+          className,
+        )}
+      >
+        <input
+          type="text"
+          inputMode="decimal"
+          value={formatCount(value)}
+          onChange={(e) => onTypedChange(e.target.value)}
+          onBlur={onBlur}
+          onKeyDown={onTypedKey}
+          aria-label={ariaLabel}
+          className="w-full min-w-0 bg-transparent px-3 py-3 text-center font-sans text-base text-ink-1 outline-none tabular-nums"
+        />
+        <div className="flex flex-col border-l border-paper-4">
+          <button
+            type="button"
+            onClick={() => bump(step)}
+            aria-label="Increase"
+            className="flex h-1/2 w-7 cursor-pointer items-center justify-center border-0 bg-transparent text-ink-3 transition-colors hover:bg-paper-2 hover:text-ink-0"
+          >
+            <svg viewBox="0 0 10 10" width="10" height="10" fill="none">
+              <path d="M2 6.5 L5 3.5 L8 6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => bump(-step)}
+            aria-label="Decrease"
+            className="flex h-1/2 w-7 cursor-pointer items-center justify-center border-0 border-t border-paper-4 bg-transparent text-ink-3 transition-colors hover:bg-paper-2 hover:text-ink-0"
+          >
+            <svg viewBox="0 0 10 10" width="10" height="10" fill="none">
+              <path d="M2 3.5 L5 6.5 L8 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const inputClass =
+    size === "xl"
+      ? "grid place-items-center tabular-nums min-w-22.5 font-mono text-xl font-medium border-l-2 border-r-2 border-ink-1 px-3 bg-transparent text-center outline-none focus:bg-paper-1"
+      : "min-w-9 grid place-items-center font-mono text-sm font-medium border-l border-r border-paper-4 px-2 tabular-nums bg-transparent text-center outline-none focus:bg-paper-1";
+
+  const inputEl = (
+    <input
+      type="text"
+      inputMode="decimal"
+      value={formatCount(value)}
+      onChange={(e) => onTypedChange(e.target.value)}
+      onBlur={onBlur}
+      onKeyDown={onTypedKey}
+      className={inputClass}
+      aria-label={ariaLabel}
+      style={size === "xl" ? { width: "auto" } : { width: "100%" }}
+    />
+  );
+
+  if (size === "xl") {
+    return (
+      <div className={cn("inline-flex items-stretch overflow-hidden border-2 border-ink-1 rounded-full bg-paper-0", className)}>
+        <button
+          type="button"
+          onClick={() => bump(-step)}
+          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center"
+          aria-label="Decrease"
+        >
+          −
+        </button>
+        {inputEl}
+        <button
+          type="button"
+          onClick={() => bump(step)}
+          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center"
+          aria-label="Increase"
+        >
+          +
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("inline-flex items-stretch border border-paper-4 rounded-full overflow-hidden bg-paper-0", className)}>
+      <button
+        type="button"
+        onClick={() => bump(-step)}
+        aria-label="Decrease"
+        className="w-8 h-8 bg-transparent border-0 text-ink-2 text-base grid place-items-center hover:bg-paper-2 hover:text-ink-0"
+      >
+        −
+      </button>
+      {inputEl}
+      <button
+        type="button"
+        onClick={() => bump(step)}
+        aria-label="Increase"
+        className="w-8 h-8 bg-transparent border-0 text-ink-2 text-base grid place-items-center hover:bg-paper-2 hover:text-ink-0"
+      >
+        +
+      </button>
+    </div>
+  );
+}
 
 export function Stepper({
   itemId,
@@ -31,7 +199,7 @@ export function Stepper({
 
   const { trigger } = useMutation("patch", "/api/items/{id}", {
     onSuccess: () => {
-      globalMutate(["pantry", "/api/sidebar"]);
+      invalidateApi("/api/sidebar");
       startTransition(() => router.refresh());
     },
   });
@@ -66,105 +234,30 @@ export function Stepper({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/unmount-only flush; the closures read live refs, not stale deps
   }, []);
 
-  function setNext(next: number) {
-    const safe = Math.max(0, +next.toFixed(2));
-    setCount(safe);
-    pendingRef.current = safe;
+  function handleChange(next: number) {
+    setCount(next);
+    pendingRef.current = next;
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
     timerRef.current = setTimeout(flush, SAVE_DEBOUNCE_MS);
-    return safe;
-  }
-
-  function bump(delta: number) {
-    setNext(count + delta);
-  }
-
-  function onTypedChange(raw: string) {
-    if (raw === "") {
-      setNext(0);
-      return;
-    }
-    const parsed = Number(raw);
-    if (Number.isFinite(parsed)) {
-      setNext(parsed);
-    }
-  }
-
-  function onTypedKey(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      e.currentTarget.blur();
-    }
-  }
-
-  const inputClass =
-    size === "xl"
-      ? "grid place-items-center tabular-nums min-w-22.5 font-mono text-xl font-medium border-l-2 border-r-2 border-ink-1 px-3 bg-transparent text-center outline-none focus:bg-paper-1"
-      : "min-w-9 grid place-items-center font-mono text-sm font-medium border-l border-r border-paper-4 px-2 tabular-nums bg-transparent text-center outline-none focus:bg-paper-1";
-
-  const inputEl = (
-    <input
-      type="text"
-      inputMode="decimal"
-      value={formatCount(count)}
-      onChange={(e) => onTypedChange(e.target.value)}
-      onBlur={flush}
-      onKeyDown={onTypedKey}
-      className={inputClass}
-      aria-label="Count"
-      style={size === "xl" ? { width: "auto" } : { width: "100%" }}
-    />
-  );
-
-  if (size === "xl") {
-    return (
-      <div className="inline-flex items-stretch overflow-hidden border-2 border-ink-1 rounded-full bg-paper-0">
-        <button
-          onClick={() => bump(-step)}
-          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center"
-          aria-label="Decrease"
-        >
-          −
-        </button>
-        {inputEl}
-        <button
-          onClick={() => bump(step)}
-          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center"
-          aria-label="Increase"
-        >
-          +
-        </button>
-      </div>
-    );
   }
 
   return (
-    <div className="inline-flex items-stretch border border-paper-4 rounded-full overflow-hidden bg-paper-0">
-      <button
-        onClick={() => bump(-step)}
-        aria-label="Decrease"
-        className="w-8 h-8 bg-transparent border-0 text-ink-2 text-base grid place-items-center hover:bg-paper-2 hover:text-ink-0"
-      >
-        −
-      </button>
-      {inputEl}
-      <button
-        onClick={() => bump(step)}
-        aria-label="Increase"
-        className="w-8 h-8 bg-transparent border-0 text-ink-2 text-base grid place-items-center hover:bg-paper-2 hover:text-ink-0"
-      >
-        +
-      </button>
-    </div>
+    <NumberStepper
+      value={count}
+      onChange={handleChange}
+      step={step}
+      size={size}
+      onBlur={flush}
+    />
   );
 }
 
 export function AddToShoppingButton({ itemId, label = "＋ to list" }: { itemId: string; label?: string }) {
   const [done, setDone] = useState(false);
   const { trigger, isMutating } = useMutation("post", "/api/shopping", {
-    onSuccess: () => globalMutate(["pantry", "/api/sidebar"]),
+    onSuccess: () => invalidateApi("/api/sidebar"),
   });
 
   async function add() {

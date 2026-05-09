@@ -3,7 +3,7 @@ import { db, items } from "@/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { canEditRoom, getItemRoomId } from "@/lib/access";
-import { updateItemCount } from "@/lib/queries";
+import { getItem, maybeNotifyThresholdCross, updateItemCount } from "@/lib/queries";
 import { PatchItemRequest } from "@/lib/api/schemas";
 
 export const dynamic = "force-dynamic";
@@ -38,10 +38,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     });
     return NextResponse.json({ ok: true });
   }
+  const before = await getItem(id);
   await db
     .update(items)
     .set({ ...data, updatedAt: new Date() })
     .where(eq(items.id, id));
+  if (before && (typeof data.count === "number" || data.threshold !== undefined)) {
+    const newCount = typeof data.count === "number" ? data.count : before.count;
+    const newThreshold =
+      data.threshold === undefined ? before.threshold : data.threshold;
+    await maybeNotifyThresholdCross({
+      itemId: id,
+      itemName: data.name ?? before.name,
+      roomId: before.roomId,
+      threshold: newThreshold,
+      oldCount: before.count,
+      newCount,
+      actorId: session.user.id,
+      actorName: session.user.name ?? null,
+    });
+  }
   return NextResponse.json({ ok: true });
 }
 

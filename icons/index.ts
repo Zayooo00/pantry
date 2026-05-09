@@ -4,6 +4,7 @@ export { GridIcon } from "./grid";
 export { SearchIcon } from "./search";
 export { ListIcon } from "./list";
 export { ActivityIcon } from "./activity";
+export { BellIcon } from "./bell";
 export { SettingsIcon } from "./settings";
 export { UserIcon } from "./user";
 export { BrandMark } from "./brand-mark";

@@ -1,5 +1,15 @@
-import { db, items, rooms, shoppingItems, shoppingTrips, itemEvents, users } from "@/db";
-import { and, asc, desc, eq, inArray, isNotNull, isNull, like, or, sql } from "drizzle-orm";
+import {
+  db,
+  items,
+  rooms,
+  roomMembers,
+  shoppingItems,
+  shoppingTrips,
+  itemEvents,
+  notifications,
+  users,
+} from "@/db";
+import { and, asc, desc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { itemStatus } from "./format";
 import { randomUUID } from "node:crypto";
 import { canEditRoom, getAccessibleRoomIds, getItemRoomId } from "./access";
@@ -65,7 +75,15 @@ export async function getAllItems(userId: string) {
   if (accessibleIds.length === 0) {
     return [];
   }
-  return db.select().from(items).where(inArray(items.roomId, accessibleIds));
+  const liveRooms = await db
+    .select({ id: rooms.id })
+    .from(rooms)
+    .where(and(inArray(rooms.id, accessibleIds), isNull(rooms.archivedAt)));
+  const liveIds = liveRooms.map((r) => r.id);
+  if (liveIds.length === 0) {
+    return [];
+  }
+  return db.select().from(items).where(inArray(items.roomId, liveIds));
 }
 
 export async function getDashboardData(userId: string) {
@@ -162,10 +180,35 @@ export async function getItemEvents(itemId: string) {
     .orderBy(desc(itemEvents.createdAt));
 }
 
-export async function getRecentEvents(userId: string, limit = 200) {
+export async function getRecentEvents(
+  userId: string,
+  opts: { limit?: number; before?: Date; roomId?: string; kind?: string } = {},
+) {
+  const limit = opts.limit ?? 100;
   const accessibleIds = await getAccessibleRoomIds(userId);
   if (accessibleIds.length === 0) {
     return [];
+  }
+  const liveRooms = await db
+    .select({ id: rooms.id })
+    .from(rooms)
+    .where(and(inArray(rooms.id, accessibleIds), isNull(rooms.archivedAt)));
+  let liveIds = liveRooms.map((r) => r.id);
+  if (opts.roomId) {
+    if (!liveIds.includes(opts.roomId)) {
+      return [];
+    }
+    liveIds = [opts.roomId];
+  }
+  if (liveIds.length === 0) {
+    return [];
+  }
+  const conditions = [inArray(items.roomId, liveIds)];
+  if (opts.before) {
+    conditions.push(sql`${itemEvents.createdAt} < ${Math.floor(opts.before.getTime() / 1000)}`);
+  }
+  if (opts.kind) {
+    conditions.push(eq(itemEvents.kind, opts.kind));
   }
   const rows = await db
     .select({
@@ -186,7 +229,7 @@ export async function getRecentEvents(userId: string, limit = 200) {
     .from(itemEvents)
     .leftJoin(items, eq(itemEvents.itemId, items.id))
     .leftJoin(rooms, eq(items.roomId, rooms.id))
-    .where(inArray(items.roomId, accessibleIds))
+    .where(and(...conditions))
     .orderBy(desc(itemEvents.createdAt))
     .limit(limit);
   return rows;
@@ -200,18 +243,27 @@ export async function searchItems(userId: string, q: string) {
   if (accessibleIds.length === 0) {
     return [];
   }
-  const pattern = `%${q.toLowerCase()}%`;
+  const liveRooms = await db
+    .select({ id: rooms.id })
+    .from(rooms)
+    .where(and(inArray(rooms.id, accessibleIds), isNull(rooms.archivedAt)));
+  const liveIds = liveRooms.map((r) => r.id);
+  if (liveIds.length === 0) {
+    return [];
+  }
+  const escaped = q.toLowerCase().replace(/[\\%_]/g, (c) => `\\${c}`);
+  const pattern = `%${escaped}%`;
   return db
     .select()
     .from(items)
     .where(
       and(
-        inArray(items.roomId, accessibleIds),
+        inArray(items.roomId, liveIds),
         or(
-          like(sql`lower(${items.name})`, pattern),
-          like(sql`lower(${items.brand})`, pattern),
-          like(sql`lower(${items.category})`, pattern),
-          like(sql`lower(${items.barcode})`, pattern),
+          sql`lower(${items.name}) LIKE ${pattern} ESCAPE '\\'`,
+          sql`lower(${items.brand}) LIKE ${pattern} ESCAPE '\\'`,
+          sql`lower(${items.category}) LIKE ${pattern} ESCAPE '\\'`,
+          sql`lower(${items.barcode}) LIKE ${pattern} ESCAPE '\\'`,
         ),
       ),
     )
@@ -241,6 +293,70 @@ export async function updateItemCount(
     countAfter: newCount,
     actor: user.name,
   });
+  await maybeNotifyThresholdCross({
+    itemId: id,
+    itemName: existing.name,
+    roomId: existing.roomId,
+    threshold: existing.threshold,
+    oldCount: existing.count,
+    newCount,
+    actorId: user.id,
+    actorName: user.name,
+  });
+}
+
+export async function maybeNotifyThresholdCross(args: {
+  itemId: string;
+  itemName: string;
+  roomId: string;
+  threshold: number | null;
+  oldCount: number;
+  newCount: number;
+  actorId: string | null;
+  actorName: string | null;
+}): Promise<void> {
+  if (args.threshold == null) {
+    return;
+  }
+  const wasBelow = args.oldCount < args.threshold;
+  const isBelow = args.newCount < args.threshold;
+  if (!isBelow || wasBelow) {
+    return;
+  }
+  const room = await db
+    .select({ ownerId: rooms.ownerId, name: rooms.name })
+    .from(rooms)
+    .where(eq(rooms.id, args.roomId))
+    .limit(1);
+  if (room.length === 0) {
+    return;
+  }
+  const members = await db
+    .select({ userId: roomMembers.userId })
+    .from(roomMembers)
+    .where(eq(roomMembers.roomId, args.roomId));
+  const recipients = new Set<string>([room[0].ownerId, ...members.map((m) => m.userId)]);
+  if (args.actorId) {
+    recipients.delete(args.actorId);
+  }
+  if (recipients.size === 0) {
+    return;
+  }
+  const now = new Date();
+  const inserts = Array.from(recipients).map((userId) => ({
+    id: randomUUID(),
+    userId,
+    kind: "low_threshold_crossed",
+    title: `${args.itemName} dropped below the floor`,
+    body: args.actorName
+      ? `${args.actorName} brought it to ${args.newCount} (floor: ${args.threshold}) in ${room[0].name}.`
+      : `Now at ${args.newCount} (floor: ${args.threshold}) in ${room[0].name}.`,
+    link: `/items/${args.itemId}`,
+    itemId: args.itemId,
+    roomId: args.roomId,
+    createdAt: now,
+  }));
+  await db.insert(notifications).values(inserts);
 }
 
 export async function addToShoppingList(itemId: string, userId: string) {

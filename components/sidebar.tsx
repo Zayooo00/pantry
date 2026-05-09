@@ -6,8 +6,10 @@ import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { cva } from "class-variance-authority";
+import useSWR from "swr";
 import {
   ActivityIcon,
+  BellIcon,
   BrandMark,
   GridIcon,
   HomeIcon,
@@ -20,6 +22,14 @@ import { Modal } from "./modal";
 import { NewRoomForm } from "./new-room-form";
 import { cn } from "@/lib/cn";
 import { useQuery } from "@/lib/api/client";
+
+async function unreadFetcher() {
+  const res = await fetch("/api/notifications/unread-count");
+  if (!res.ok) {
+    return { count: 0 };
+  }
+  return res.json() as Promise<{ count: number }>;
+}
 
 const navItem = cva(
   "flex items-center gap-3 px-3 py-2 rounded-md text-sm cursor-pointer no-underline transition-colors",
@@ -44,11 +54,17 @@ export function Sidebar({
   const pathname = usePathname();
   const { data: session } = useSession();
   const { data } = useQuery("/api/sidebar");
+  const { data: unread } = useSWR(
+    ["pantry", "/api/notifications/unread-count"],
+    unreadFetcher,
+    { refreshInterval: 60_000, revalidateOnFocus: true },
+  );
   const [newRoomOpen, setNewRoomOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const isLoading = data === undefined;
   const rooms = data?.rooms ?? [];
   const shoppingCount = data?.shoppingCount ?? 0;
+  const unreadCount = unread?.count ?? 0;
 
   const isActive = (href: string) => pathname === href;
   const isActiveRoom = (id: string) => pathname === `/rooms/${id}`;
@@ -170,6 +186,24 @@ export function Sidebar({
             <span>Activity</span>
           </Link>
           <Link
+            href="/notifications"
+            onClick={handleNavClick}
+            className={navItem({ active: isActive("/notifications") })}
+          >
+            <BellIcon />
+            <span>Notifications</span>
+            {unreadCount > 0 && (
+              <span
+                className={cn(
+                  "ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-tomato-2 px-1.5 font-mono text-2xs leading-none text-paper-0",
+                  isActive("/notifications") && "bg-paper-0 text-ink-1",
+                )}
+              >
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </Link>
+          <Link
             href="/shopping"
             onClick={handleNavClick}
             className={navItem({ active: isActive("/shopping") })}
@@ -277,7 +311,15 @@ export function Sidebar({
                     {session?.user?.email ?? ""}
                   </div>
                 </div>
-                <span className="text-ink-4">{menuOpen ? "▾" : "▸"}</span>
+                <span
+                  aria-hidden
+                  className={cn(
+                    "inline-block text-ink-4 transition-transform duration-150 ease-pantry",
+                    menuOpen ? "rotate-90" : "rotate-0",
+                  )}
+                >
+                  ▸
+                </span>
               </button>
             </Popover.Trigger>
             <Popover.Portal>

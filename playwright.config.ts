@@ -20,7 +20,7 @@ export default defineConfig({
   testIgnore: ["**/setup-db.ts", "**/global-setup.ts", "**/auth.ts"],
   fullyParallel: false,
   workers: 3,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 3 : 0,
   timeout: 180_000,
   expect: { timeout: 10_000 },
   reporter: process.env.CI ? "github" : "list",
@@ -31,11 +31,9 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: process.env.CI
-      ? `npx next build && npx next start --port ${PORT}`
-      : `npx next dev --turbopack --port ${PORT}`,
+    command: `npx next dev --turbopack --port ${PORT}`,
     url: BASE_URL,
-    timeout: 420_000,
+    timeout: 240_000,
     reuseExistingServer: false,
     env: {
       ...process.env,

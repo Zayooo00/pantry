@@ -268,4 +268,8 @@ export const SignUpRequest = z
 
 export const UploadResponse = z.object({ url: z.string() }).openapi("UploadResponse");
 
+export const NotificationsUnreadCountResponse = z
+  .object({ count: z.number() })
+  .openapi("NotificationsUnreadCountResponse");
+
 export const ErrorResponse = z.object({ error: z.unknown() }).openapi("ErrorResponse");

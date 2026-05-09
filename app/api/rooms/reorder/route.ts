@@ -26,13 +26,11 @@ export async function POST(req: NextRequest) {
     .from(rooms)
     .where(and(eq(rooms.ownerId, userId), inArray(rooms.id, parsed.data.order)));
   const ownedIds = new Set(owned.map((r) => r.id));
-  let pos = 0;
-  for (const id of parsed.data.order) {
-    if (!ownedIds.has(id)) {
-      continue;
-    }
-    await db.update(rooms).set({ position: pos }).where(eq(rooms.id, id));
-    pos++;
+  const updates = parsed.data.order
+    .filter((id) => ownedIds.has(id))
+    .map((id, pos) => db.update(rooms).set({ position: pos }).where(eq(rooms.id, id)));
+  if (updates.length > 0) {
+    await db.batch(updates as [(typeof updates)[number], ...(typeof updates)[number][]]);
   }
   return NextResponse.json({ ok: true });
 }

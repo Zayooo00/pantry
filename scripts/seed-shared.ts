@@ -18,10 +18,10 @@ import { generateToken, hashToken } from "../lib/tokens";
 
 export const DEMO_EMAILS = ["alex@pantry.local", "maya@pantry.local", "nora@pantry.local"] as const;
 
-const DEMO_USERS = [
-  { email: "alex@pantry.local", name: "Alex Hsu", password: "password123" },
-  { email: "maya@pantry.local", name: "Maya Hsu", password: "password123" },
-  { email: "nora@pantry.local", name: "Nora Park", password: "password123" },
+const DEMO_PROFILES = [
+  { email: "alex@pantry.local", name: "Alex Hsu" },
+  { email: "maya@pantry.local", name: "Maya Hsu" },
+  { email: "nora@pantry.local", name: "Nora Park" },
 ];
 
 type SeedResult = {
@@ -31,7 +31,8 @@ type SeedResult = {
   pendingInviteToken: string;
 };
 
-export async function seedDemoData(): Promise<SeedResult> {
+export async function seedDemoData(opts: { password: string }): Promise<SeedResult> {
+  const DEMO_USERS = DEMO_PROFILES.map((p) => ({ ...p, password: opts.password }));
   const userIdByEmail = new Map<string, string>();
   for (const u of DEMO_USERS) {
     const existing = await db.select().from(users).where(eq(users.email, u.email)).limit(1);

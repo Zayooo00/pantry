@@ -6,7 +6,6 @@ import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { cva } from "class-variance-authority";
-import useSWR from "swr";
 import {
   ActivityIcon,
   BellIcon,
@@ -23,14 +22,6 @@ import { Modal } from "./modal";
 import { NewRoomForm } from "./new-room-form";
 import { cn } from "@/lib/cn";
 import { useQuery } from "@/lib/api/client";
-
-async function unreadFetcher() {
-  const res = await fetch("/api/notifications/unread-count");
-  if (!res.ok) {
-    return { count: 0 };
-  }
-  return res.json() as Promise<{ count: number }>;
-}
 
 const navItem = cva(
   "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm no-underline transition-colors",
@@ -55,7 +46,7 @@ export function Sidebar({
   const pathname = usePathname();
   const { data: session } = useSession();
   const { data } = useQuery("/api/sidebar");
-  const { data: unread } = useSWR(["pantry", "/api/notifications/unread-count"], unreadFetcher, {
+  const { data: unread } = useQuery("/api/notifications/unread-count", undefined, {
     refreshInterval: 60_000,
     revalidateOnFocus: true,
   });

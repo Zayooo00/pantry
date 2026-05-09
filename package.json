@@ -12,6 +12,7 @@
     "db:studio": "drizzle-kit studio",
     "db:reset": "tsx --env-file=.env scripts/reset-db.ts && npm run db:push && npm run db:seed",
     "openapi:generate": "tsx scripts/generate-openapi.ts",
+    "postinstall": "npm run openapi:generate",
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "tsx e2e/setup-db.ts && playwright test",

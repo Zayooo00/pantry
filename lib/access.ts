@@ -1,4 +1,4 @@
-import { and, eq, inArray, or } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db, items, roomMembers, rooms, type Room, type RoomRole } from "@/db";
 import { auth } from "@/auth";
 
@@ -128,13 +128,4 @@ export async function getItemRoomId(itemId: string): Promise<string | null> {
     .where(eq(items.id, itemId))
     .limit(1);
   return row.length === 0 ? null : row[0].roomId;
-}
-
-export async function getAccessibleRoomsCondition(userId: string) {
-  const owned = db.select({ id: rooms.id }).from(rooms).where(eq(rooms.ownerId, userId));
-  const member = db
-    .select({ id: roomMembers.roomId })
-    .from(roomMembers)
-    .where(eq(roomMembers.userId, userId));
-  return or(inArray(rooms.id, owned), inArray(rooms.id, member));
 }

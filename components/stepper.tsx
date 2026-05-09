@@ -6,7 +6,7 @@ import { button } from "@/components/button";
 import { ChevronIcon } from "@/icons";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/cn";
-import { invalidateApi, useMutation } from "@/lib/api/client";
+import { apiClient, invalidateApi, useMutation } from "@/lib/api/client";
 
 type Size = "sm" | "md" | "xl";
 
@@ -229,16 +229,32 @@ export function Stepper({
     });
   }
 
-  useEffect(() => {
-    function onUnload() {
-      flush();
+  function flushOnPageHide() {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
-    window.addEventListener("beforeunload", onUnload);
+    const next = pendingRef.current;
+    if (next === null || next === lastSavedRef.current) {
+      pendingRef.current = null;
+      return;
+    }
+    pendingRef.current = null;
+    lastSavedRef.current = next;
+    void apiClient.PATCH("/api/items/{id}", {
+      params: { path: { id: itemId } },
+      body: { count: next },
+      keepalive: true,
+    });
+  }
+
+  useEffect(() => {
+    window.addEventListener("pagehide", flushOnPageHide);
     return () => {
-      window.removeEventListener("beforeunload", onUnload);
+      window.removeEventListener("pagehide", flushOnPageHide);
       flush();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/unmount-only flush; the closures read live refs, not stale deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/unmount-only flush; closures read live refs, not stale deps
   }, []);
 
   function handleChange(next: number) {

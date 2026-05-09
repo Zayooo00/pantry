@@ -23,9 +23,9 @@ test("rejects invalid credentials with a visible error", async ({ page }) => {
   await expect(page).toHaveURL(/\/sign-in/);
 });
 
-test("redirects unauthenticated requests to /welcome", async ({ page }) => {
+test("redirects unauthenticated requests to /sign-in", async ({ page }) => {
   await page.goto("/dashboard");
-  await expect(page).toHaveURL(/\/welcome/);
+  await expect(page).toHaveURL(/\/sign-in/);
 });
 
 test("signs up a new user, lands on dashboard, and shows them in the sidebar", async ({ page }) => {
@@ -60,5 +60,5 @@ test("signs out from the sidebar profile popover and returns to /sign-in", async
   await page.waitForURL("**/sign-in");
 
   await page.goto("/dashboard");
-  await expect(page).toHaveURL(/\/welcome/);
+  await expect(page).toHaveURL(/\/sign-in/);
 });

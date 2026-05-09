@@ -11,6 +11,7 @@ import {
   InviteMemberResponse,
   MembersResponse,
   MeSharedResponse,
+  NotificationsUnreadCountResponse,
   OkResponse,
   PatchItemRequest,
   PatchMeRequest,
@@ -38,6 +39,15 @@ export function buildRegistry() {
     path: "/api/sidebar",
     responses: {
       200: { description: "Sidebar data", ...json(SidebarResponse) },
+      401: { description: "Unauthorized", ...json(ErrorResponse) },
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/notifications/unread-count",
+    responses: {
+      200: { description: "Unread notification count", ...json(NotificationsUnreadCountResponse) },
       401: { description: "Unauthorized", ...json(ErrorResponse) },
     },
   });

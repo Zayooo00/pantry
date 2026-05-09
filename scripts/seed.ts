@@ -2,7 +2,8 @@ import { seedDemoData } from "./seed-shared";
 
 async function main() {
   console.log("Seeding pantry…");
-  const result = await seedDemoData();
+  const password = process.env.DEMO_PASSWORD ?? "password123";
+  const result = await seedDemoData({ password });
   console.log(
     `Seeded ${result.rooms} rooms (1 archived, 1 shared in), ${result.items} items, ` +
       `${result.users} users, 1 pending invite (/invite/${result.pendingInviteToken}).`,

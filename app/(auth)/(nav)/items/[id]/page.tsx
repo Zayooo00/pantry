@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { auth } from "@/auth";
-import { canEditRoom, canViewRoom, requireUserId } from "@/lib/access";
+import { getRoomWithRole } from "@/lib/access";
 import { Stepper, AddToShoppingButton } from "@/components/stepper";
 import { ItemActions, MarkOpenedButton } from "./item-actions";
-import { getItem, getItemEvents, getRoom, getRoomsWithCounts } from "@/lib/queries";
+import { getItem, getItemEvents, getRoomsWithCounts } from "@/lib/queries";
 import { formatCount, formatDate, formatEventKind, itemStatus, shortLabel } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { badge } from "@/components/badge";
@@ -16,20 +16,24 @@ import { SectionTitle } from "@/components/section-title";
 export const dynamic = "force-dynamic";
 
 export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
-  const userId = await requireUserId();
   const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/sign-in");
+  }
+  const userId = session.user.id;
   const { id } = await params;
 
   const item = await getItem(id);
   if (!item) {
     notFound();
   }
-  if (!(await canViewRoom(userId, item.roomId))) {
+  const access = await getRoomWithRole(userId, item.roomId);
+  if (!access) {
     notFound();
   }
-  const [canEdit, room, events, allRooms] = await Promise.all([
-    canEditRoom(userId, item.roomId),
-    getRoom(item.roomId),
+  const { room, role } = access;
+  const canEdit = role === "owner" || role === "editor";
+  const [events, allRooms] = await Promise.all([
     getItemEvents(item.id),
     getRoomsWithCounts(userId),
   ]);

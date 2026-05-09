@@ -1,10 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { RoomGlyph } from "@/icons";
 import { AddToShoppingButton } from "@/components/stepper";
 import { getDashboardData } from "@/lib/queries";
 import { auth } from "@/auth";
-import { requireUserId } from "@/lib/access";
 import { daysUntil, formatCount, formatDate, formatEventKind } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { badge } from "@/components/badge";
@@ -16,8 +16,11 @@ import { ItemThumbnail } from "@/components/item-thumbnail";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const userId = await requireUserId();
   const session = await auth();
+  if (!session?.user?.id) {
+    redirect("/sign-in");
+  }
+  const userId = session.user.id;
   const data = await getDashboardData(userId);
 
   const today = new Date();

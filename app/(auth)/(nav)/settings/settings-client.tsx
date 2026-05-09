@@ -59,9 +59,7 @@ export function SettingsClient({ user }: { user: User }) {
     defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
   });
 
-  const profileValues = profileForm.watch();
-  const profileUnchanged =
-    profileValues.name === user.name && profileValues.email.toLowerCase() === user.email;
+  const profileUnchanged = !profileForm.formState.isDirty;
 
   const { trigger: triggerProfile } = useMutation("patch", "/api/me");
   const { trigger: triggerPassword } = useMutation("patch", "/api/me");
@@ -95,7 +93,7 @@ export function SettingsClient({ user }: { user: User }) {
 
   async function onSaveProfile(values: ProfileValues) {
     setProfileError(null);
-    if (values.name === user.name && values.email === user.email) {
+    if (!profileForm.formState.isDirty) {
       return;
     }
     try {

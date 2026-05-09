@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { db, users } from "@/db";
 import { hashPassword } from "@/lib/password";
 import { SignupRequest } from "@/lib/api/schemas";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: "Invalid input. Email must be valid; password ≥ 8 chars." },
       { status: 400 },
+    );
+  }
+  const limited = rateLimit({
+    bucket: "signup",
+    key: clientKey(req),
+    max: 10,
+    windowMs: 60 * 60 * 1000,
+  });
+  if (!limited.allowed) {
+    return NextResponse.json(
+      { error: "Too many signup attempts. Try again later." },
+      { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
     );
   }
   const email = parsed.data.email;

@@ -12,14 +12,22 @@ export const authConfig = {
         path.startsWith("/welcome") ||
         path.startsWith("/signin") ||
         path.startsWith("/signup") ||
+        path.startsWith("/forgot-password") ||
+        path.startsWith("/reset-password") ||
+        path.startsWith("/invite") ||
         path.startsWith("/api/auth") ||
-        path.startsWith("/api/signup");
+        path.startsWith("/api/signup") ||
+        path.startsWith("/api/password-reset") ||
+        path.startsWith("/api/invites") ||
+        path.startsWith("/api/cron");
       if (isPublic) {
         const isAuthGate =
           path === "/" ||
           path === "/welcome" ||
           path === "/signin" ||
-          path === "/signup";
+          path === "/signup" ||
+          path.startsWith("/forgot-password") ||
+          path.startsWith("/reset-password");
         if (isLoggedIn && isAuthGate) {
           return Response.redirect(new URL("/dashboard", nextUrl));
         }

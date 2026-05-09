@@ -41,7 +41,9 @@ describe("PATCH /api/me", () => {
   });
 
   it("changes the email and lowercases it", async () => {
-    const res = await PATCH(jsonReq({ email: "ALEX2@example.COM" }));
+    const res = await PATCH(
+      jsonReq({ email: "ALEX2@example.COM", currentPassword: "hunter2hunter" }),
+    );
     expect(res.status).toBe(200);
     const found = await db.select().from(users).where(eq(users.id, "u1"));
     expect(found[0].email).toBe("alex2@example.com");
@@ -54,7 +56,9 @@ describe("PATCH /api/me", () => {
       name: "Other",
       passwordHash: await hashPassword("anypass12"),
     });
-    const res = await PATCH(jsonReq({ email: "taken@example.com" }));
+    const res = await PATCH(
+      jsonReq({ email: "taken@example.com", currentPassword: "hunter2hunter" }),
+    );
     expect(res.status).toBe(409);
   });
 

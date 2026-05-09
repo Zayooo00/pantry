@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
 import { useMutation } from "@/lib/api/client";
+import { safeNext } from "@/lib/safe-next";
 
 const SignupSchema = z.object({
   name: z.string().trim().min(1, "Tell us your name."),
@@ -21,6 +22,9 @@ type SignupValues = z.infer<typeof SignupSchema>;
 
 export function SignupForm() {
   const router = useRouter();
+  const params = useSearchParams();
+  const next = safeNext(params.get("next"));
+  const presetEmail = params.get("email") ?? "";
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
@@ -28,7 +32,7 @@ export function SignupForm() {
     formState: { errors, isSubmitting },
   } = useForm<SignupValues>({
     resolver: zodResolver(SignupSchema),
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { name: "", email: presetEmail, password: "" },
   });
 
   const { trigger } = useMutation("post", "/api/signup");
@@ -50,7 +54,7 @@ export function SignupForm() {
       setServerError("Account created, but sign-in failed. Try logging in.");
       return;
     }
-    router.push("/dashboard");
+    router.push(next);
     router.refresh();
   }
 

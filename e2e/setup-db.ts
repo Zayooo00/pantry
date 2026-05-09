@@ -51,15 +51,11 @@ if (seed.status !== 0) {
 writeFileSync(STATE_FILE, DB_URL);
 console.log(`[e2e] DATABASE_URL=${DB_URL}`);
 
-const verify = spawnSync(
-  "npx",
-  [
-    "tsx",
-    "-e",
-    `import { createClient } from "@libsql/client"; const c = createClient({ url: "${DB_URL}" }); const r = await c.execute("SELECT email FROM users"); console.log("[e2e] users:", r.rows.map(x => x.email).join(", "));`,
-  ],
-  { env, stdio: "inherit", shell: true },
-);
+const verify = spawnSync("npx", ["tsx", "e2e/verify-db.ts"], {
+  env,
+  stdio: "inherit",
+  shell: true,
+});
 if (verify.status !== 0) {
   console.error("[e2e] WARNING: could not read users back from seeded DB");
 }

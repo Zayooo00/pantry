@@ -28,8 +28,12 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(creds, request) {
+        const debug = process.env.E2E_BYPASS_RATE_LIMIT === "1";
         const parsed = Creds.safeParse(creds);
         if (!parsed.success) {
+          if (debug) {
+            console.log("[auth-debug] parse failed", parsed.error.flatten());
+          }
           return null;
         }
         const ip = request ? clientKey({ headers: request.headers }) : "unknown";
@@ -40,6 +44,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           windowMs: 15 * 60 * 1000,
         });
         if (!limited.allowed) {
+          if (debug) {
+            console.log("[auth-debug] rate-limited", parsed.data.email);
+          }
           throw new TooManyAttempts();
         }
         const found = await db
@@ -47,10 +54,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           .from(users)
           .where(eq(users.email, parsed.data.email.toLowerCase()))
           .limit(1);
+        if (debug) {
+          console.log("[auth-debug] db lookup", parsed.data.email, "found:", found.length);
+        }
         if (found.length === 0) {
           return null;
         }
         const ok = await verifyPassword(parsed.data.password, found[0].passwordHash);
+        if (debug) {
+          console.log("[auth-debug] password ok:", ok);
+        }
         if (!ok) {
           return null;
         }

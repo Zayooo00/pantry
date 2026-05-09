@@ -1344,6 +1344,7 @@ export interface components {
             glyph?: string;
             subtitle?: string | null;
             tinted?: boolean;
+            archived?: boolean;
         };
         ReorderRoomsRequest: {
             order: string[];
@@ -1479,6 +1480,8 @@ export interface components {
             email?: string;
             currentPassword?: string;
             newPassword?: string;
+            /** @enum {string} */
+            notifyDigest?: "off" | "daily" | "weekly";
         };
         SharedWithMeRoom: {
             roomId: string;

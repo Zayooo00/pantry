@@ -111,12 +111,12 @@ export function buildRegistry() {
       body: json(InviteMemberRequest),
     },
     responses: {
-      200: { description: "Invited", ...json(InviteMemberResponse) },
+      200: { description: "Invited or pending", ...json(InviteMemberResponse) },
       400: { description: "Invalid", ...json(ErrorResponse) },
       401: { description: "Unauthorized", ...json(ErrorResponse) },
       403: { description: "Forbidden", ...json(ErrorResponse) },
-      404: { description: "User not registered", ...json(ErrorResponse) },
       409: { description: "Already a member", ...json(ErrorResponse) },
+      503: { description: "Email not configured", ...json(ErrorResponse) },
     },
   });
 

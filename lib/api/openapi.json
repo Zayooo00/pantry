@@ -135,6 +135,9 @@
           },
           "tinted": {
             "type": "boolean"
+          },
+          "archived": {
+            "type": "boolean"
           }
         }
       },
@@ -673,6 +676,14 @@
             "type": "string",
             "minLength": 8,
             "maxLength": 200
+          },
+          "notifyDigest": {
+            "type": "string",
+            "enum": [
+              "off",
+              "daily",
+              "weekly"
+            ]
           }
         }
       },

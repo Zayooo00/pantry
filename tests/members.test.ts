@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
-import { db, rooms, roomMembers, users } from "@/db";
+import { db, pendingInvites, rooms, roomMembers, users } from "@/db";
 
 const sessionMock = vi.hoisted(() => ({
   value: { user: { id: "u1", name: "Owner", email: "owner@example.com" } } as
@@ -12,6 +12,23 @@ const sessionMock = vi.hoisted(() => ({
 vi.mock("@/auth", () => ({
   auth: vi.fn(async () => sessionMock.value),
 }));
+
+const fetchMock = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(
+  async () => new Response(JSON.stringify({ id: "msg_1" }), { status: 200 }),
+);
+
+beforeEach(() => {
+  fetchMock.mockClear();
+  vi.stubGlobal("fetch", fetchMock);
+  vi.stubEnv("RESEND_API_KEY", "re_test");
+  vi.stubEnv("EMAIL_FROM", "Pantry <pantry@example.com>");
+  vi.stubEnv("APP_URL", "http://localhost:3000");
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+});
 
 import { GET as listMembers, POST as inviteMember } from "@/app/api/rooms/[id]/members/route";
 import {
@@ -63,7 +80,7 @@ describe("POST /api/rooms/[id]/members", () => {
     expect(all[0].invitedBy).toBe("u1");
   });
 
-  it("404s when the email isn't registered", async () => {
+  it("creates a pending invite and emails the address when not registered", async () => {
     const res = await inviteMember(
       jsonReq("http://l/api/rooms/r1/members", "POST", {
         email: "stranger@example.com",
@@ -71,7 +88,61 @@ describe("POST /api/rooms/[id]/members", () => {
       }),
       roomParams("r1"),
     );
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.pending).toEqual({ email: "stranger@example.com", role: "editor" });
+    const invites = await db
+      .select()
+      .from(pendingInvites)
+      .where(eq(pendingInvites.email, "stranger@example.com"));
+    expect(invites).toHaveLength(1);
+    expect(invites[0].roomId).toBe("r1");
+    expect(invites[0].role).toBe("editor");
+    expect(invites[0].invitedBy).toBe("u1");
+    expect(invites[0].acceptedAt).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("https://api.resend.com/emails");
+    expect(JSON.parse(init.body as string).to).toBe("stranger@example.com");
+  });
+
+  it("503s on pending invite when email isn't configured", async () => {
+    vi.stubEnv("RESEND_API_KEY", "");
+    vi.stubEnv("EMAIL_FROM", "");
+    const res = await inviteMember(
+      jsonReq("http://l/api/rooms/r1/members", "POST", {
+        email: "stranger@example.com",
+        role: "viewer",
+      }),
+      roomParams("r1"),
+    );
+    expect(res.status).toBe(503);
+    expect(await db.select().from(pendingInvites)).toHaveLength(0);
+  });
+
+  it("upserts an existing pending invite with a fresh token", async () => {
+    await db.insert(pendingInvites).values({
+      id: "p1",
+      roomId: "r1",
+      email: "stranger@example.com",
+      role: "viewer",
+      tokenHash: "old",
+      invitedBy: "u1",
+      expiresAt: new Date(Date.now() + 1000),
+    });
+    const res = await inviteMember(
+      jsonReq("http://l/api/rooms/r1/members", "POST", {
+        email: "stranger@example.com",
+        role: "editor",
+      }),
+      roomParams("r1"),
+    );
+    expect(res.status).toBe(200);
+    const all = await db.select().from(pendingInvites);
+    expect(all).toHaveLength(1);
+    expect(all[0].id).toBe("p1");
+    expect(all[0].role).toBe("editor");
+    expect(all[0].tokenHash).not.toBe("old");
   });
 
   it("409s when the user is already a member", async () => {

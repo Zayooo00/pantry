@@ -54,16 +54,29 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
 
   async function invite(values: InviteValues) {
     setInviteError(null);
+    let result: { member?: unknown; pending?: unknown } | undefined;
     try {
-      await triggerInvite({
+      result = (await triggerInvite({
         params: { path: { id: roomId } },
         body: values,
-      });
+      })) as { member?: unknown; pending?: unknown };
     } catch (err) {
       setInviteError(err instanceof Error ? err.message : "Could not send invite.");
       return;
     }
-    toast(<>Invited <em>{values.email}</em>.</>);
+    if (result?.pending) {
+      toast(
+        <>
+          Sent invite to <em>{values.email}</em>. They'll get an email with a link.
+        </>,
+      );
+    } else {
+      toast(
+        <>
+          Added <em>{values.email}</em>.
+        </>,
+      );
+    }
     form.reset({ email: "", role: values.role });
   }
 
@@ -163,7 +176,7 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
           </div>
         )}
         <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 mt-2">
-          THE PERSON MUST ALREADY HAVE A PANTRY ACCOUNT.
+          IF THEY DON'T HAVE AN ACCOUNT, WE'LL EMAIL THEM A SIGN-UP LINK.
         </div>
       </div>
 

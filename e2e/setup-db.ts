@@ -5,7 +5,8 @@ import { join, resolve } from "node:path";
 
 const DB_DIR = join(tmpdir(), "pantry-e2e");
 const DB_FILE = join(DB_DIR, "test.db");
-const DB_URL = `file:${DB_FILE.replace(/\\/g, "/")}`;
+const NORMALIZED = DB_FILE.replace(/\\/g, "/");
+const DB_URL = `file://${NORMALIZED.startsWith("/") ? NORMALIZED : `/${NORMALIZED}`}`;
 const STATE_FILE = resolve("e2e/.test-db-path");
 
 if (!existsSync(DB_DIR)) {
@@ -49,3 +50,16 @@ if (seed.status !== 0) {
 
 writeFileSync(STATE_FILE, DB_URL);
 console.log(`[e2e] DATABASE_URL=${DB_URL}`);
+
+const verify = spawnSync(
+  "npx",
+  [
+    "tsx",
+    "-e",
+    `import { createClient } from "@libsql/client"; const c = createClient({ url: "${DB_URL}" }); const r = await c.execute("SELECT email FROM users"); console.log("[e2e] users:", r.rows.map(x => x.email).join(", "));`,
+  ],
+  { env, stdio: "inherit", shell: true },
+);
+if (verify.status !== 0) {
+  console.error("[e2e] WARNING: could not read users back from seeded DB");
+}

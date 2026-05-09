@@ -20,6 +20,7 @@ class TooManyAttempts extends CredentialsSignin {
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   ...authConfig,
+  debug: process.env.E2E_BYPASS_RATE_LIMIT === "1",
   providers: [
     Credentials({
       credentials: {

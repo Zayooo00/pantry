@@ -4,6 +4,7 @@ import {
   rooms,
   roomMembers,
   shoppingItems,
+  shoppingTrips,
   itemEvents,
   notifications,
   pendingInvites,
@@ -21,13 +22,13 @@ async function seed() {
   await db.delete(notifications);
   await db.delete(itemEvents);
   await db.delete(shoppingItems);
+  await db.delete(shoppingTrips);
   await db.delete(items);
   await db.delete(pendingInvites);
   await db.delete(passwordResets);
   await db.delete(roomMembers);
   await db.delete(rooms);
 
-  // --- Users -----------------------------------------------------------------
   const demoUsers = [
     {
       email: "alex@pantry.local",
@@ -58,7 +59,6 @@ async function seed() {
       email: u.email,
       name: u.name,
       passwordHash: await hashPassword(u.password),
-      // Alex gets weekly digest opt-in to demonstrate the setting.
       notifyDigest: u.email === "alex@pantry.local" ? "weekly" : "off",
     });
     userIdByEmail.set(u.email, id);
@@ -68,7 +68,6 @@ async function seed() {
   const mayaId = userIdByEmail.get("maya@pantry.local")!;
   const noraId = userIdByEmail.get("nora@pantry.local")!;
 
-  // --- Rooms -----------------------------------------------------------------
   const today = new Date();
   const day = (offsetDays: number) => {
     const d = new Date(today);
@@ -84,27 +83,18 @@ async function seed() {
     { id: "freezer", ownerId: alexId, name: "Freezer", glyph: "freezer", subtitle: "Frozen — proteins, ice, doughs.", tinted: false, position: 4, archivedAt: null },
     { id: "spice", ownerId: alexId, name: "Spice rack", glyph: "spice", subtitle: "Spices, dried herbs, infusions.", tinted: false, position: 5, archivedAt: null },
     { id: "garage", ownerId: alexId, name: "Garage", glyph: "garage", subtitle: "Backstock — bulk paper, water, oils.", tinted: false, position: 6, archivedAt: null },
-    // Archived room — demonstrates the Archived tab.
     { id: "old-cellar", ownerId: alexId, name: "Wine cellar (old)", glyph: "basement", subtitle: "Replaced by the new basement racks.", tinted: false, position: 7, archivedAt: day(-30) },
-    // A room owned by Maya, shared with Alex as editor — demonstrates "shared with me".
     { id: "maya-pantry", ownerId: mayaId, name: "Maya's pantry", glyph: "pantry", subtitle: "Home-made jams and bakes.", tinted: false, position: 0, archivedAt: null },
   ];
   await db.insert(rooms).values(roomData);
 
-  // --- Room sharing ----------------------------------------------------------
   await db.insert(roomMembers).values([
-    // Alex → invites Maya as editor on Pantry, Fridge.
     { id: randomUUID(), roomId: "pantry", userId: mayaId, role: "editor", invitedBy: alexId },
     { id: randomUUID(), roomId: "fridge", userId: mayaId, role: "editor", invitedBy: alexId },
-    // Alex → invites Nora as viewer on Kitchen.
     { id: randomUUID(), roomId: "kitchen", userId: noraId, role: "viewer", invitedBy: alexId },
-    // Maya shares her pantry with Alex (editor).
     { id: randomUUID(), roomId: "maya-pantry", userId: alexId, role: "editor", invitedBy: mayaId },
   ]);
 
-  // --- Pending invite (non-existent user) -----------------------------------
-  // Demonstrates the email-token invite flow. Token is logged so you can
-  // visit /invite/<token> in dev to step through the acceptance UI.
   const inviteToken = generateToken();
   await db.insert(pendingInvites).values({
     id: randomUUID(),
@@ -117,9 +107,7 @@ async function seed() {
   });
   console.log(`Pending invite (friend@example.com → Basement): /invite/${inviteToken}`);
 
-  // --- Items -----------------------------------------------------------------
   const itemData = [
-    // Pantry — mix of in-stock, low, expiring, with brand/notes/tags/barcode/photo
     { roomId: "pantry", name: "San Marzano tomatoes", brand: "Cento", category: "Canned", unit: "tins", count: 12, threshold: 6, shelf: "B-04", lastPrice: 3.50, barcode: "0070303081012" },
     { roomId: "pantry", name: "Arborio rice", category: "Grains", unit: "kg", count: 1.4, threshold: 1, shelf: "A-08", lastPrice: 8.00 },
     { roomId: "pantry", name: "00 pizza flour", brand: "Caputo", category: "Grains", unit: "kg", count: 0.5, threshold: 2, reorderAmount: 2, shelf: "A-04", lastPrice: 4.00, tags: "Imported,Italy" },
@@ -263,7 +251,7 @@ async function seed() {
       });
     }
   }
-  // Manual entries — both outstanding and completed.
+  // Manual entries — all outstanding so the user can demo checking them off.
   await db.insert(shoppingItems).values([
     {
       id: randomUUID(),
@@ -275,7 +263,7 @@ async function seed() {
       reason: "MANUAL · MAYA",
       groupName: "Produce",
       estPrice: 2.40,
-      done: true,
+      done: false,
       source: "manual",
     },
     {
@@ -306,9 +294,6 @@ async function seed() {
     },
   ]);
 
-  // --- Notifications --------------------------------------------------------
-  // A couple of unread low-stock ones for Alex (matching the hero items),
-  // plus one already-read older one to show both states.
   if (oliveOil) {
     await db.insert(notifications).values({
       id: randomUUID(),

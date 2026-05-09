@@ -126,7 +126,7 @@ test("moves an item to another room — appears in target, gone from source", as
   const option = page.getByRole("option", { name: /^Kitchen$/i });
   await expect(option).toBeVisible();
   await option.click({ force: true });
-  await dialog.getByRole("button", { name: /^Move$/ }).click();
+  await dialog.getByRole("button", { name: /^Move item$/ }).click();
   await expect(dialog).not.toBeVisible();
 
   await page.goto("/rooms/kitchen");

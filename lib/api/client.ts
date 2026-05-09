@@ -1,5 +1,6 @@
 import createClient, { type FetchOptions } from "openapi-fetch";
 import { createImmutableHook, createQueryHook } from "swr-openapi";
+import { mutate as swrGlobalMutate } from "swr";
 import useSWRMutation, { type SWRMutationConfiguration } from "swr/mutation";
 import type {
   HasRequiredKeys,
@@ -8,14 +9,30 @@ import type {
 } from "openapi-typescript-helpers";
 import type { paths } from "./openapi";
 
+const SWR_PREFIX = "pantry";
+
 export const apiClient = createClient<paths>({
   baseUrl: typeof window === "undefined" ? "" : window.location.origin,
 });
 
 export type ApiClient = typeof apiClient;
 
-export const useQuery = createQueryHook(apiClient, "pantry");
-export const useImmutable = createImmutableHook(apiClient, "pantry");
+export const useQuery = createQueryHook(apiClient, SWR_PREFIX);
+export const useImmutable = createImmutableHook(apiClient, SWR_PREFIX);
+
+// `swr-openapi` keys queries as `[prefix, path, init]` — globalMutate's array
+// match requires exact equality, so a 2-tuple never matches. Use a predicate.
+export function invalidateApi(...paths: string[]): Promise<unknown> {
+  const wanted = new Set(paths);
+  return swrGlobalMutate(
+    (key) =>
+      Array.isArray(key) &&
+      key.length >= 2 &&
+      key[0] === SWR_PREFIX &&
+      typeof key[1] === "string" &&
+      wanted.has(key[1]),
+  );
+}
 
 type Method = Lowercase<HttpMethod>;
 

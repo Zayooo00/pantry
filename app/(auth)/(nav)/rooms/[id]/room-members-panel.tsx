@@ -223,6 +223,7 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
               <Select
                 value={m.role}
                 onChange={(v) => changeRole(m, v as "viewer" | "editor")}
+                size="sm"
                 options={[
                   { value: "viewer", label: "Viewer" },
                   { value: "editor", label: "Editor" },

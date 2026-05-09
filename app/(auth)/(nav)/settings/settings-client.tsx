@@ -251,9 +251,9 @@ export function SettingsClient({ user }: { user: User }) {
             title="Notifications"
             lede="Email digest of low-stock items. Off by default — you can opt in to daily or weekly reminders."
           >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-[280px_1fr] md:items-end">
-              <div>
-                <label className="field-label">Low-stock email digest</label>
+            <div>
+              <label className="field-label">Low-stock email digest</label>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-[280px_1fr] md:items-center">
                 <Select
                   value={digest}
                   onChange={(v) => onChangeDigest(v as DigestFreq)}
@@ -264,13 +264,13 @@ export function SettingsClient({ user }: { user: User }) {
                   ]}
                   disabled={savingDigest}
                 />
-              </div>
-              <div className="font-display text-sm text-ink-3 italic">
-                {digest === "off"
-                  ? "You won't receive email digests."
-                  : digest === "daily"
-                    ? "We'll email you every morning if anything's below its floor."
-                    : "We'll email you weekly with anything below its floor."}
+                <div className="font-display text-sm text-ink-3 italic">
+                  {digest === "off"
+                    ? "You won't receive email digests."
+                    : digest === "daily"
+                      ? "We'll email you every morning if anything's below its floor."
+                      : "We'll email you weekly with anything below its floor."}
+                </div>
               </div>
             </div>
           </SettingsSection>

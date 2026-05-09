@@ -83,7 +83,10 @@ export async function POST(
       role: invite.role,
       invitedBy: invite.invitedBy,
     })
-    .onConflictDoNothing({ target: [roomMembers.roomId, roomMembers.userId] });
+    .onConflictDoUpdate({
+      target: [roomMembers.roomId, roomMembers.userId],
+      set: { role: invite.role, invitedBy: invite.invitedBy },
+    });
   await db
     .update(pendingInvites)
     .set({ acceptedAt: new Date() })

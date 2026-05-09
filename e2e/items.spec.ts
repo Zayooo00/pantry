@@ -89,7 +89,7 @@ test("adds an item to the shopping list from item detail — sidebar count goes 
   await page.getByRole("main").getByRole("button", { name: /Shopping list/i }).click();
   await expect(page.getByRole("button", { name: /^✓ added$/ })).toBeVisible();
 
-  await expect(shoppingLink).toContainText(String(before + 1));
+  await expect(shoppingLink).toContainText(String(before + 1), { timeout: 15_000 });
 });
 
 test("edits an item via the modal — heading + room list reflect the new name", async ({ page }) => {

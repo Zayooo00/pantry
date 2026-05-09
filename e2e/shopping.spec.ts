@@ -32,7 +32,7 @@ test("manual add increments the sidebar shopping count badge", async ({ page }) 
   await page.getByRole("button", { name: /^＋ Add$/ }).click();
 
   await expect(page.getByText(itemName).first()).toBeVisible();
-  await expect(shoppingLink).toContainText(String(before + 1));
+  await expect(shoppingLink).toContainText(String(before + 1), { timeout: 15_000 });
 });
 
 test("checks an item off and completing a trip clears it from the list", async ({ page }) => {

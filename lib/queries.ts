@@ -12,7 +12,7 @@ import {
 import { and, asc, desc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { itemStatus } from "./format";
 import { randomUUID } from "node:crypto";
-import { canEditRoom, getAccessibleRoomIds, getItemRoomId } from "./access";
+import { canEditRoom, ForbiddenError, getAccessibleRoomIds, getItemRoomId } from "./access";
 
 export async function getRoomsWithCounts(
   userId: string,
@@ -270,6 +270,27 @@ export async function searchItems(userId: string, q: string) {
     .limit(50);
 }
 
+export async function recordCountChange(args: {
+  itemId: string;
+  oldCount: number;
+  newCount: number;
+  user: { id: string; name: string };
+}): Promise<void> {
+  if (args.newCount === args.oldCount) {
+    return;
+  }
+  const delta = args.newCount - args.oldCount;
+  await db.insert(itemEvents).values({
+    id: randomUUID(),
+    itemId: args.itemId,
+    userId: args.user.id,
+    kind: delta > 0 ? "restock" : "consume",
+    delta,
+    countAfter: args.newCount,
+    actor: args.user.name,
+  });
+}
+
 export async function updateItemCount(
   id: string,
   newCount: number,
@@ -279,25 +300,17 @@ export async function updateItemCount(
   if (!existing) {
     throw new Error("Item not found");
   }
-  const delta = newCount - existing.count;
   await db
     .update(items)
     .set({ count: newCount, updatedAt: new Date() })
     .where(eq(items.id, id));
-  await db.insert(itemEvents).values({
-    id: randomUUID(),
-    itemId: id,
-    userId: user.id,
-    kind: delta > 0 ? "restock" : "consume",
-    delta,
-    countAfter: newCount,
-    actor: user.name,
-  });
+  await recordCountChange({ itemId: id, oldCount: existing.count, newCount, user });
   await maybeNotifyThresholdCross({
     itemId: id,
     itemName: existing.name,
     roomId: existing.roomId,
-    threshold: existing.threshold,
+    oldThreshold: existing.threshold,
+    newThreshold: existing.threshold,
     oldCount: existing.count,
     newCount,
     actorId: user.id,
@@ -309,17 +322,15 @@ export async function maybeNotifyThresholdCross(args: {
   itemId: string;
   itemName: string;
   roomId: string;
-  threshold: number | null;
+  oldThreshold: number | null;
+  newThreshold: number | null;
   oldCount: number;
   newCount: number;
   actorId: string | null;
   actorName: string | null;
 }): Promise<void> {
-  if (args.threshold == null) {
-    return;
-  }
-  const wasBelow = args.oldCount < args.threshold;
-  const isBelow = args.newCount < args.threshold;
+  const wasBelow = args.oldThreshold != null && args.oldCount < args.oldThreshold;
+  const isBelow = args.newThreshold != null && args.newCount < args.newThreshold;
   if (!isBelow || wasBelow) {
     return;
   }
@@ -349,8 +360,8 @@ export async function maybeNotifyThresholdCross(args: {
     kind: "low_threshold_crossed",
     title: `${args.itemName} dropped below the floor`,
     body: args.actorName
-      ? `${args.actorName} brought it to ${args.newCount} (floor: ${args.threshold}) in ${room[0].name}.`
-      : `Now at ${args.newCount} (floor: ${args.threshold}) in ${room[0].name}.`,
+      ? `${args.actorName} brought it to ${args.newCount} (floor: ${args.newThreshold}) in ${room[0].name}.`
+      : `Now at ${args.newCount} (floor: ${args.newThreshold}) in ${room[0].name}.`,
     link: `/items/${args.itemId}`,
     itemId: args.itemId,
     roomId: args.roomId,
@@ -370,7 +381,7 @@ export async function addToShoppingList(itemId: string, userId: string) {
   }
   const allowed = await canEditRoom(userId, roomId);
   if (!allowed) {
-    throw new Error("Forbidden");
+    throw new ForbiddenError();
   }
   const existing = await db
     .select()

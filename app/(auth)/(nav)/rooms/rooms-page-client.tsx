@@ -31,6 +31,7 @@ import { badge } from "@/components/badge";
 import { button } from "@/components/button";
 import { roleBadge } from "@/components/role-badge";
 import { invalidateApi, useMutation } from "@/lib/api/client";
+import { chip } from "@/components/chip";
 import type { Room as RoomRow } from "@/db/schema";
 
 type Room = Pick<RoomRow, "id" | "name" | "glyph" | "subtitle" | "tinted"> & {
@@ -190,36 +191,59 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
       </div>
 
       {!reordering && (
-        <div
-          role="tablist"
-          aria-label="Filter rooms"
-          className="-mx-4 mb-6 flex items-center gap-1 overflow-x-auto overflow-y-hidden border-b border-paper-3 px-4 md:mx-0 md:mb-8 md:px-0"
-        >
-          {tabs.map((t) => {
-            const isActive = activeTab === t.key;
-            return (
-              <button
-                key={t.key}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => setActiveTab(t.key)}
-                className={cn(
-                  "-mb-px shrink-0 border-b-2 px-3 py-2 font-display text-md whitespace-nowrap transition-colors md:px-4 md:text-lg",
-                  isActive
-                    ? "border-ink-1 text-ink-0"
-                    : "border-transparent text-ink-3 hover:text-ink-1",
-                )}
-              >
-                {isActive ? (
-                  <em className="font-normal italic">{t.label}</em>
-                ) : (
-                  <span className="font-light">{t.label}</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        <>
+          <div
+            role="tablist"
+            aria-label="Filter rooms"
+            className="mb-6 flex flex-wrap items-center gap-2 sm:hidden"
+          >
+            {tabs.map((t) => {
+              const isActive = activeTab === t.key;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(t.key)}
+                  className={chip({ active: isActive })}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+          <div
+            role="tablist"
+            aria-label="Filter rooms"
+            className="mb-6 hidden items-center gap-1 border-b border-paper-3 sm:flex md:mb-8"
+          >
+            {tabs.map((t) => {
+              const isActive = activeTab === t.key;
+              return (
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(t.key)}
+                  className={cn(
+                    "-mb-px shrink-0 border-b-2 px-3 py-2 font-display text-md whitespace-nowrap transition-colors md:px-4 md:text-lg",
+                    isActive
+                      ? "border-ink-1 text-ink-0"
+                      : "border-transparent text-ink-3 hover:text-ink-1",
+                  )}
+                >
+                  {isActive ? (
+                    <em className="font-normal italic">{t.label}</em>
+                  ) : (
+                    <span className="font-light">{t.label}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {reordering && (

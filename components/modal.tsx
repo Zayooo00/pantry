@@ -46,25 +46,25 @@ export function Modal({
       className="pantry-modal w-[95vw]"
       style={{ maxWidth: width }}
     >
-      <div className="bg-paper-0 border border-ink-1 rounded-lg shadow-[0_24px_80px_rgba(0,0,0,0.18),0_4px_0_rgba(0,0,0,0.04)] overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="flex max-h-[92vh] flex-col overflow-hidden rounded-lg border border-ink-1 bg-paper-0 shadow-[0_24px_80px_rgba(0,0,0,0.18),0_4px_0_rgba(0,0,0,0.04)]">
         {title && (
-          <div className="flex justify-between items-baseline px-6 py-5 border-b border-paper-3 gap-4">
-            <h3 className="m-0 font-display font-normal text-xl tracking-display-sm [&_em]:italic [&_em]:font-light">
+          <div className="flex items-baseline justify-between gap-4 border-b border-paper-3 px-6 py-5">
+            <h3 className="m-0 font-display text-xl font-normal tracking-display-sm [&_em]:font-light [&_em]:italic">
               {title}
             </h3>
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 rounded-full border border-paper-4 bg-paper-0 text-ink-2 grid place-items-center cursor-pointer transition-all duration-150 ease-pantry hover:bg-ink-1 hover:text-paper-0 hover:border-ink-1"
+              className="grid h-8 w-8 cursor-pointer place-items-center rounded-full border border-paper-4 bg-paper-0 text-ink-2 transition-all duration-150 ease-pantry hover:border-ink-1 hover:bg-ink-1 hover:text-paper-0"
               aria-label="Close"
             >
               ✕
             </button>
           </div>
         )}
-        <div className="p-6 overflow-y-auto">{children}</div>
+        <div className="overflow-y-auto p-6">{children}</div>
         {footer && (
-          <div className="px-6 py-4 border-t border-paper-3 bg-paper-1 flex justify-end gap-3">
+          <div className="flex justify-end gap-3 border-t border-paper-3 bg-paper-1 px-6 py-4">
             {footer}
           </div>
         )}

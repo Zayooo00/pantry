@@ -32,7 +32,11 @@ export function RoomRowActions({ room }: { room: Room }) {
       return;
     }
     await invalidateApi("/api/sidebar");
-    toast(<>Removed <em>{room.name}</em>.</>);
+    toast(
+      <>
+        Removed <em>{room.name}</em>.
+      </>,
+    );
     router.refresh();
   }
 
@@ -51,9 +55,13 @@ export function RoomRowActions({ room }: { room: Room }) {
     await invalidateApi("/api/sidebar");
     toast(
       archive ? (
-        <>Archived <em>{room.name}</em>.</>
+        <>
+          Archived <em>{room.name}</em>.
+        </>
       ) : (
-        <>Restored <em>{room.name}</em>.</>
+        <>
+          Restored <em>{room.name}</em>.
+        </>
       ),
     );
     router.refresh();
@@ -65,7 +73,7 @@ export function RoomRowActions({ room }: { room: Room }) {
         <button
           type="button"
           onClick={() => setEditOpen(true)}
-          className="w-8 h-8 rounded-full border border-transparent bg-transparent text-ink-2 grid place-items-center cursor-pointer transition-all duration-150 ease-pantry hover:bg-paper-2 hover:text-ink-0 hover:border-paper-3 active:scale-95"
+          className="grid h-8 w-8 cursor-pointer place-items-center rounded-full border border-transparent bg-transparent text-ink-2 transition-all duration-150 ease-pantry hover:border-paper-3 hover:bg-paper-2 hover:text-ink-0 active:scale-95"
           title="Edit room"
           aria-label="Edit room"
         >
@@ -74,7 +82,7 @@ export function RoomRowActions({ room }: { room: Room }) {
         <button
           type="button"
           onClick={toggleArchive}
-          className="w-8 h-8 rounded-full border border-transparent bg-transparent text-ink-2 grid place-items-center cursor-pointer transition-all duration-150 ease-pantry hover:bg-paper-2 hover:text-ink-0 hover:border-paper-3 active:scale-95"
+          className="grid h-8 w-8 cursor-pointer place-items-center rounded-full border border-transparent bg-transparent text-ink-2 transition-all duration-150 ease-pantry hover:border-paper-3 hover:bg-paper-2 hover:text-ink-0 active:scale-95"
           title={room.archived ? "Restore room" : "Archive room"}
           aria-label={room.archived ? "Restore room" : "Archive room"}
         >
@@ -84,7 +92,7 @@ export function RoomRowActions({ room }: { room: Room }) {
           type="button"
           onClick={() => setDeleteOpen(true)}
           className={cn(
-            "w-8 h-8 rounded-full border border-transparent bg-transparent text-ink-2 grid place-items-center cursor-pointer transition-all duration-150 ease-pantry hover:bg-paper-2 hover:text-ink-0 hover:border-paper-3 active:scale-95",
+            "grid h-8 w-8 cursor-pointer place-items-center rounded-full border border-transparent bg-transparent text-ink-2 transition-all duration-150 ease-pantry hover:border-paper-3 hover:bg-paper-2 hover:text-ink-0 active:scale-95",
             "text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!",
           )}
           title="Delete room"

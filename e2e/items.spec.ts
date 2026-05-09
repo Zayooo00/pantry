@@ -89,9 +89,7 @@ test("adds an item to the shopping list from item detail — sidebar count goes 
   await expect(shoppingLink).toContainText(String(before + 1));
 });
 
-test("edits an item via the modal — heading + room list reflect the new name", async ({
-  page,
-}) => {
+test("edits an item via the modal — heading + room list reflect the new name", async ({ page }) => {
   await loginAs(page);
   const original = `Editable item ${Date.now()}`;
   await addItem(page, "pantry", original);

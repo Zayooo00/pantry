@@ -55,23 +55,11 @@ export function PhotoUpload({
 
   return (
     <div className="flex flex-col gap-3">
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        onChange={onFile}
-        className="hidden"
-      />
+      <input ref={inputRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
       {value ? (
-        <div className="flex gap-4 items-start">
-          <div className="relative w-28 h-28 rounded-lg overflow-hidden border border-paper-3 bg-paper-1 shrink-0">
-            <Image
-              src={value}
-              alt="Item photo"
-              fill
-              sizes="112px"
-              className="object-cover"
-            />
+        <div className="flex items-start gap-4">
+          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-lg border border-paper-3 bg-paper-1">
+            <Image src={value} alt="Item photo" fill sizes="112px" className="object-cover" />
           </div>
           <div className="flex flex-col gap-2">
             <button
@@ -102,12 +90,12 @@ export function PhotoUpload({
           >
             {uploading ? "Uploading…" : "Choose photo"}
           </button>
-          <span className="font-mono text-xs tracking-mono uppercase text-ink-4">JPG / PNG / WEBP · UP TO 5MB</span>
+          <span className="font-mono text-xs tracking-mono text-ink-4 uppercase">
+            JPG / PNG / WEBP · UP TO 5MB
+          </span>
         </div>
       )}
-      {error && (
-        <div className="text-tomato-2 font-display text-sm">{error}</div>
-      )}
+      {error && <div className="font-display text-sm text-tomato-2">{error}</div>}
     </div>
   );
 }

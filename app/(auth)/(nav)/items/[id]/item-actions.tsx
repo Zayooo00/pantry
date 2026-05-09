@@ -27,7 +27,11 @@ export function ItemActions({ item, rooms }: { item: Item; rooms: RoomLite[] }) 
   async function deleteItem() {
     await triggerDelete({ params: { path: { id: item.id } } });
     await invalidateApi("/api/sidebar");
-    toast(<>Removed <em>{item.name}</em>.</>);
+    toast(
+      <>
+        Removed <em>{item.name}</em>.
+      </>,
+    );
     router.push(`/rooms/${item.roomId}`);
     router.refresh();
   }
@@ -35,10 +39,18 @@ export function ItemActions({ item, rooms }: { item: Item; rooms: RoomLite[] }) 
   return (
     <>
       <div className="flex gap-2">
-        <button type="button" onClick={() => setEditOpen(true)} className={button({ variant: "ghost", size: "sm" })}>
+        <button
+          type="button"
+          onClick={() => setEditOpen(true)}
+          className={button({ variant: "ghost", size: "sm" })}
+        >
           Edit
         </button>
-        <button type="button" onClick={() => setMoveOpen(true)} className={button({ variant: "ghost", size: "sm" })}>
+        <button
+          type="button"
+          onClick={() => setMoveOpen(true)}
+          className={button({ variant: "ghost", size: "sm" })}
+        >
           Move
         </button>
         <button
@@ -117,12 +129,21 @@ export function MarkOpenedButton({
 
   async function mark() {
     await trigger({ params: { path: { id: itemId } } });
-    toast(<>Marked <em>{itemName}</em> opened.</>);
+    toast(
+      <>
+        Marked <em>{itemName}</em> opened.
+      </>,
+    );
     router.refresh();
   }
 
   return (
-    <button type="button" onClick={mark} disabled={isMutating} className={button({ variant: "ghost", size: "sm" })}>
+    <button
+      type="button"
+      onClick={mark}
+      disabled={isMutating}
+      className={button({ variant: "ghost", size: "sm" })}
+    >
       {alreadyOpened ? "Re-mark opened" : "Mark opened"}
     </button>
   );

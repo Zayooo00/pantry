@@ -81,9 +81,13 @@ export function SettingsClient({ user }: { user: User }) {
     setSavingDigest(false);
     toast(
       next === "off" ? (
-        <>Email digest <em>off</em>.</>
+        <>
+          Email digest <em>off</em>.
+        </>
       ) : (
-        <>Email digest set to <em>{next}</em>.</>
+        <>
+          Email digest set to <em>{next}</em>.
+        </>
       ),
     );
   }
@@ -99,7 +103,11 @@ export function SettingsClient({ user }: { user: User }) {
       setProfileError(err instanceof Error ? err.message : "Could not update profile.");
       return;
     }
-    toast(<>Profile <em>saved</em>.</>);
+    toast(
+      <>
+        Profile <em>saved</em>.
+      </>,
+    );
     profileForm.reset(values);
     router.refresh();
   }
@@ -118,13 +126,17 @@ export function SettingsClient({ user }: { user: User }) {
       return;
     }
     passwordForm.reset();
-    toast(<>Password <em>changed</em>.</>);
+    toast(
+      <>
+        Password <em>changed</em>.
+      </>,
+    );
   }
 
   return (
     <>
       <div className="mb-8 md:mb-12">
-        <div className={cn("caption","mb-3")}>PROFILE · NO. 0001</div>
+        <div className={cn("caption", "mb-3")}>PROFILE · NO. 0001</div>
         <h1 className="m-0 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-5xl">
           Your <em className="font-normal italic">desk</em>.
         </h1>
@@ -280,7 +292,11 @@ export function SettingsClient({ user }: { user: User }) {
             title="Session"
             lede="Sign out of this browser. Your pantry will still be here."
           >
-            <button type="button" onClick={() => setSignOutOpen(true)} className={button({ variant: "secondary" })}>
+            <button
+              type="button"
+              onClick={() => setSignOutOpen(true)}
+              className={button({ variant: "secondary" })}
+            >
               Sign out
             </button>
           </SettingsSection>
@@ -289,11 +305,11 @@ export function SettingsClient({ user }: { user: User }) {
         </div>
 
         <aside className="h-fit rounded-xl border border-paper-3 bg-paper-1 p-6 lg:sticky lg:top-24">
-          <div className={cn("caption","mb-3")}>A NOTE</div>
+          <div className={cn("caption", "mb-3")}>A NOTE</div>
           <p className="m-0 font-display text-lg leading-snug text-ink-2">
             "The pantry is a ledger first, a magazine second."
           </p>
-          <hr className="my-4 border-0 h-px bg-[linear-gradient(to_right,var(--color-paper-4)_50%,transparent_0)] bg-size-[6px_1px] bg-repeat-x" />
+          <hr className="my-4 h-px border-0 bg-[linear-gradient(to_right,var(--color-paper-4)_50%,transparent_0)] bg-size-[6px_1px] bg-repeat-x" />
           <div className="caption">EST. KITCHEN · NO. 0001</div>
           <div className="mt-2 font-display text-sm text-ink-3 italic">
             Your changes save the moment you press the button. Nothing leaves the household.

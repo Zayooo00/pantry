@@ -2,11 +2,7 @@ import createClient, { type FetchOptions } from "openapi-fetch";
 import { createImmutableHook, createQueryHook } from "swr-openapi";
 import { mutate as swrGlobalMutate } from "swr";
 import useSWRMutation, { type SWRMutationConfiguration } from "swr/mutation";
-import type {
-  HasRequiredKeys,
-  HttpMethod,
-  PathsWithMethod,
-} from "openapi-typescript-helpers";
+import type { HasRequiredKeys, HttpMethod, PathsWithMethod } from "openapi-typescript-helpers";
 import type { paths } from "./openapi";
 
 const SWR_PREFIX = "pantry";
@@ -36,18 +32,17 @@ export function invalidateApi(...paths: string[]): Promise<unknown> {
 
 type Method = Lowercase<HttpMethod>;
 
-type MutationOptions<M extends Method, P extends PathsWithMethod<paths, M>> =
-  FetchOptions<paths[P][M]>;
+type MutationOptions<M extends Method, P extends PathsWithMethod<paths, M>> = FetchOptions<
+  paths[P][M]
+>;
 
-type MutationData<M extends Method, P extends PathsWithMethod<paths, M>> =
-  Awaited<ReturnType<ApiClient[Uppercase<M>]>> extends { data?: infer D }
-    ? D
-    : unknown;
+type MutationData<M extends Method, P extends PathsWithMethod<paths, M>> = paths[P][M] extends {
+  responses: { 200: { content: { "application/json": infer D } } };
+}
+  ? D
+  : unknown;
 
-export function useMutation<
-  M extends Method,
-  P extends PathsWithMethod<paths, M>,
->(
+export function useMutation<M extends Method, P extends PathsWithMethod<paths, M>>(
   method: M,
   path: P,
   config?: SWRMutationConfiguration<MutationData<M, P>, Error, [M, P], MutationOptions<M, P>>,
@@ -63,7 +58,7 @@ export function useMutation<
       const res = await fn(p, args);
       if (res.error) {
         const err = res.error as { error?: string } | string | undefined;
-        const message = typeof err === "string" ? err : err?.error ?? "Request failed.";
+        const message = typeof err === "string" ? err : (err?.error ?? "Request failed.");
         throw new Error(message);
       }
       return res.data as MutationData<M, P>;
@@ -72,9 +67,7 @@ export function useMutation<
   );
 }
 
-export type TriggerArgs<
-  M extends Method,
-  P extends PathsWithMethod<paths, M>,
-> = HasRequiredKeys<MutationOptions<M, P>> extends never
-  ? MutationOptions<M, P> | undefined
-  : MutationOptions<M, P>;
+export type TriggerArgs<M extends Method, P extends PathsWithMethod<paths, M>> =
+  HasRequiredKeys<MutationOptions<M, P>> extends never
+    ? MutationOptions<M, P> | undefined
+    : MutationOptions<M, P>;

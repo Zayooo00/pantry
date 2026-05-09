@@ -46,8 +46,6 @@ export async function POST(req: NextRequest) {
   await db
     .update(passwordResets)
     .set({ usedAt: new Date() })
-    .where(
-      and(eq(passwordResets.userId, reset.userId), isNull(passwordResets.usedAt)),
-    );
+    .where(and(eq(passwordResets.userId, reset.userId), isNull(passwordResets.usedAt)));
   return NextResponse.json({ ok: true });
 }

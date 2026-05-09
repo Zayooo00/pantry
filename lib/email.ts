@@ -12,9 +12,7 @@ export type EmailSendResult =
   | { ok: false; reason: "not_configured" | "send_failed"; message: string };
 
 export function isEmailConfigured(): boolean {
-  return Boolean(
-    process.env.SMTP_USER && process.env.SMTP_PASS && process.env.EMAIL_FROM,
-  );
+  return Boolean(process.env.SMTP_USER && process.env.SMTP_PASS && process.env.EMAIL_FROM);
 }
 
 export function appUrl(): string {
@@ -23,9 +21,7 @@ export function appUrl(): string {
     return url;
   }
   if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "APP_URL is not set. Email links would point at localhost — refusing to send.",
-    );
+    throw new Error("APP_URL is not set. Email links would point at localhost — refusing to send.");
   }
   return "http://localhost:3000";
 }
@@ -84,13 +80,7 @@ export function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
-export function emailLayout({
-  preheader,
-  body,
-}: {
-  preheader: string;
-  body: string;
-}): string {
+export function emailLayout({ preheader, body }: { preheader: string; body: string }): string {
   return `<!doctype html>
 <html>
   <head>

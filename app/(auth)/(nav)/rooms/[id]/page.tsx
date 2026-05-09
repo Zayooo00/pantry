@@ -80,7 +80,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
 
       <div className="mb-8 grid grid-cols-1 gap-8 rounded-xl border border-paper-3 bg-paper-1 p-5 md:p-8 lg:grid-cols-[1.6fr_1fr]">
         <div>
-          <div className={cn("caption","mb-3")}>AT A GLANCE</div>
+          <div className={cn("caption", "mb-3")}>AT A GLANCE</div>
           <div className="mb-6 flex flex-wrap items-center gap-6 md:gap-12">
             <Stat n={String(items.length).padStart(2, "0")} label="ITEMS" />
             <Divider />
@@ -94,7 +94,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
           </div>
         </div>
         <div>
-          <div className={cn("caption","mb-3")}>BY CATEGORY</div>
+          <div className={cn("caption", "mb-3")}>BY CATEGORY</div>
           <div className="grid gap-3">
             {catCounts.length === 0 && (
               <div className="font-display text-md text-ink-3 italic">Nothing categorized yet.</div>
@@ -114,9 +114,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
                   <div className={level()}>
                     <i style={{ width: `${pct}%` }} className={colors[i % colors.length]} />
                   </div>
-                  <span className="num text-right font-mono text-xs text-ink-2">
-                    {c.count}
-                  </span>
+                  <span className="num text-right font-mono text-xs text-ink-2">{c.count}</span>
                 </div>
               );
             })}
@@ -144,7 +142,7 @@ function Stat({ n, label, color }: { n: string; label: string; color?: string })
       <div className={cn("num font-display text-3xl leading-none font-light sm:text-5xl", color)}>
         {n}
       </div>
-      <div className={cn("caption","mt-1")}>{label}</div>
+      <div className={cn("caption", "mt-1")}>{label}</div>
     </div>
   );
 }

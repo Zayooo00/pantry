@@ -66,7 +66,11 @@ export function EditRoomForm({ room, onClose }: { room: Room; onClose: () => voi
       return;
     }
     await invalidateApi("/api/sidebar");
-    toast(<>Updated <em>{values.name}</em>.</>);
+    toast(
+      <>
+        Updated <em>{values.name}</em>.
+      </>,
+    );
     onClose();
     router.refresh();
   }
@@ -77,20 +81,22 @@ export function EditRoomForm({ room, onClose }: { room: Room; onClose: () => voi
         <label className="field-label">Room name</label>
         <TextInput {...register("name")} />
         {errors.name && (
-          <div className="text-tomato-2 text-sm font-display mt-1">{errors.name.message}</div>
+          <div className="mt-1 font-display text-sm text-tomato-2">{errors.name.message}</div>
         )}
       </div>
       <div>
         <label className="field-label">Glyph</label>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {ROOM_GLYPHS.map((g) => (
             <button
               key={g}
               type="button"
               onClick={() => setValue("glyph", g, { shouldDirty: true })}
               className={cn(
-                "w-12 h-12 rounded-md border grid place-items-center transition-all hover:border-ink-2",
-                glyph === g ? "border-ink-1 bg-ink-1 text-paper-0" : "border-paper-3 bg-paper-0 text-ink-2",
+                "grid h-12 w-12 place-items-center rounded-md border transition-all hover:border-ink-2",
+                glyph === g
+                  ? "border-ink-1 bg-ink-1 text-paper-0"
+                  : "border-paper-3 bg-paper-0 text-ink-2",
               )}
               title={g}
             >
@@ -107,19 +113,21 @@ export function EditRoomForm({ room, onClose }: { room: Room; onClose: () => voi
         control={control}
         name="tinted"
         render={({ field }) => (
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-3">
             <Checkbox checked={field.value} onChange={field.onChange} />
             <span className="text-sm">Tint this room</span>
           </label>
         )}
       />
       {serverError && (
-        <div className="bg-tomato-3 border border-tomato-2 text-tomato-2 rounded-md px-3 py-2 text-sm font-display">
+        <div className="rounded-md border border-tomato-2 bg-tomato-3 px-3 py-2 font-display text-sm text-tomato-2">
           {serverError}
         </div>
       )}
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={onClose} className={button({ variant: "ghost" })}>Cancel</button>
+        <button type="button" onClick={onClose} className={button({ variant: "ghost" })}>
+          Cancel
+        </button>
         <button type="submit" disabled={isSubmitting} className={button({ variant: "primary" })}>
           {isSubmitting ? "Saving…" : "Save changes"}
         </button>

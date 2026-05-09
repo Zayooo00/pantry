@@ -7,7 +7,14 @@ import { FreezerRoomIcon } from "./rooms/freezer";
 import { SpiceRoomIcon } from "./rooms/spice";
 import { GarageRoomIcon } from "./rooms/garage";
 
-export type RoomGlyphName = "pantry" | "basement" | "kitchen" | "fridge" | "freezer" | "spice" | "garage";
+export type RoomGlyphName =
+  | "pantry"
+  | "basement"
+  | "kitchen"
+  | "fridge"
+  | "freezer"
+  | "spice"
+  | "garage";
 
 export const ROOM_GLYPHS: RoomGlyphName[] = [
   "pantry",

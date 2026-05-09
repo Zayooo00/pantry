@@ -108,7 +108,11 @@ export function ShoppingList({
       },
     ]);
     manualForm.reset({ name: "", quantity: 1, unit: values.unit, groupName: values.groupName });
-    toast(<>Added <em>{values.name}</em>.</>);
+    toast(
+      <>
+        Added <em>{values.name}</em>.
+      </>,
+    );
     router.refresh();
   }
 
@@ -168,7 +172,10 @@ export function ShoppingList({
   const visible = view === "outstanding" ? items.filter((i) => !i.done) : items;
   const groups = groupBy(visible, "groupName");
 
-  const total = sumBy(items.filter((i) => !i.done), (i) => i.estPrice ?? 0);
+  const total = sumBy(
+    items.filter((i) => !i.done),
+    (i) => i.estPrice ?? 0,
+  );
   const auto = items.filter((i) => i.source === "auto").length;
   const manual = items.filter((i) => i.source === "manual").length;
   const outstanding = items.filter((i) => !i.done).length;
@@ -180,15 +187,16 @@ export function ShoppingList({
       return;
     }
     const nextDone = !item.done;
-    setItems((current) =>
-      current.map((i) => (i.id === id ? { ...i, done: nextDone } : i)),
-    );
+    setItems((current) => current.map((i) => (i.id === id ? { ...i, done: nextDone } : i)));
     pendingDoneRef.current.set(id, nextDone);
     const existing = timersRef.current.get(id);
     if (existing) {
       clearTimeout(existing);
     }
-    timersRef.current.set(id, setTimeout(() => flushToggle(id), TOGGLE_DEBOUNCE_MS));
+    timersRef.current.set(
+      id,
+      setTimeout(() => flushToggle(id), TOGGLE_DEBOUNCE_MS),
+    );
   }
 
   async function clearDone() {
@@ -247,7 +255,10 @@ export function ShoppingList({
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <button onClick={() => window.print()} className={cn(button({ variant: "ghost" }), "no-print")}>
+          <button
+            onClick={() => window.print()}
+            className={cn(button({ variant: "ghost" }), "no-print")}
+          >
             Print
           </button>
           <button onClick={exportList} className={cn(button({ variant: "secondary" }), "no-print")}>
@@ -265,10 +276,7 @@ export function ShoppingList({
 
       <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-2">
-          <button
-            onClick={() => setView("all")}
-            className={chip({ active: view === "all" })}
-          >
+          <button onClick={() => setView("all")} className={chip({ active: view === "all" })}>
             All ({items.length})
           </button>
           <button
@@ -350,7 +358,7 @@ export function ShoppingList({
           <span className={stamp()}>No. {tripLabel}</span>
         </div>
         <div className="mb-6 border-b-[1.5px] border-ink-1 pb-4 text-center">
-          <div className={cn("caption","mb-2")}>PANTRY · SHOPPING LIST</div>
+          <div className={cn("caption", "mb-2")}>PANTRY · SHOPPING LIST</div>
           <h2 className="m-0 font-display text-2xl font-light tracking-display-md md:text-4xl">
             Today's <em className="italic">errands</em>.
           </h2>
@@ -427,7 +435,7 @@ export function ShoppingList({
           <span className="num font-display text-3xl">${total.toFixed(2)}</span>
         </div>
 
-        <div className={cn("caption","mt-6 text-center")}>★ THANK YOU FOR FEEDING THE HOUSE ★</div>
+        <div className={cn("caption", "mt-6 text-center")}>★ THANK YOU FOR FEEDING THE HOUSE ★</div>
       </div>
 
       <footer className="no-print mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-paper-3 pt-6 md:mt-24">

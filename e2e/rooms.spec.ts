@@ -54,7 +54,9 @@ test("renames a room — modal closes and the new name shows in sidebar and page
 
   await expect(page.locator("aside").getByRole("link", { name: renamed })).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toContainText(renamed.toLowerCase());
-  await expect(page.locator("aside").getByRole("link", { name: original, exact: true })).toHaveCount(0);
+  await expect(
+    page.locator("aside").getByRole("link", { name: original, exact: true }),
+  ).toHaveCount(0);
 });
 
 test("archives a room — disappears from sidebar and All tab, appears under Archived", async ({
@@ -68,7 +70,10 @@ test("archives a room — disappears from sidebar and All tab, appears under Arc
 
   await page.getByRole("link", { name: name, exact: true }).click();
   await page.waitForURL(/\/rooms\/[^/]+$/);
-  await page.getByRole("main").getByRole("button", { name: /^Archive room$/ }).click();
+  await page
+    .getByRole("main")
+    .getByRole("button", { name: /^Archive room$/ })
+    .click();
 
   await expect(page.getByText("This room is archived")).toBeVisible();
   await expect(page.locator("aside").getByRole("link", { name: name })).toHaveCount(0);
@@ -89,7 +94,10 @@ test("deletes an empty room via confirm dialog — gone from list and sidebar", 
 
   await page.getByRole("link", { name: name, exact: true }).click();
   await page.waitForURL(/\/rooms\/[^/]+$/);
-  await page.getByRole("main").getByRole("button", { name: /^Delete room$/ }).click();
+  await page
+    .getByRole("main")
+    .getByRole("button", { name: /^Delete room$/ })
+    .click();
 
   const confirm = page.locator("dialog[open]");
   await expect(confirm.getByText("Remove this room?")).toBeVisible();
@@ -109,10 +117,16 @@ test("restores an archived room — reappears in sidebar and on the All tab", as
 
   await page.getByRole("link", { name: name, exact: true }).click();
   await page.waitForURL(/\/rooms\/[^/]+$/);
-  await page.getByRole("main").getByRole("button", { name: /^Archive room$/ }).click();
+  await page
+    .getByRole("main")
+    .getByRole("button", { name: /^Archive room$/ })
+    .click();
   await expect(page.getByText("This room is archived")).toBeVisible();
 
-  await page.getByRole("main").getByRole("button", { name: /^Restore room$/ }).click();
+  await page
+    .getByRole("main")
+    .getByRole("button", { name: /^Restore room$/ })
+    .click();
   await expect(page.getByText("This room is archived")).toHaveCount(0);
 
   await expect(page.locator("aside").getByRole("link", { name: name })).toBeVisible();
@@ -125,7 +139,10 @@ test("blocks deleting a non-empty seeded room with a clear message", async ({ pa
   await loginAs(page);
   await page.goto("/rooms/pantry");
 
-  await page.getByRole("main").getByRole("button", { name: /^Delete room$/ }).click();
+  await page
+    .getByRole("main")
+    .getByRole("button", { name: /^Delete room$/ })
+    .click();
   const confirm = page.locator("dialog[open]");
   await expect(confirm.getByText(/still holds/)).toBeVisible();
   await expect(confirm.getByText(/Move them first/)).toBeVisible();

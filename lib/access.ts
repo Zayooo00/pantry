@@ -42,10 +42,7 @@ export async function getAccessibleRoomIds(userId: string): Promise<string[]> {
   return Array.from(set);
 }
 
-export async function getRoleInRoom(
-  userId: string,
-  roomId: string,
-): Promise<AccessRole | null> {
+export async function getRoleInRoom(userId: string, roomId: string): Promise<AccessRole | null> {
   const room = await db
     .select({ ownerId: rooms.ownerId })
     .from(rooms)
@@ -83,9 +80,7 @@ export async function isRoomOwner(userId: string, roomId: string): Promise<boole
   return role === "owner";
 }
 
-export async function getRoomRolesForUser(
-  userId: string,
-): Promise<Map<string, AccessRole>> {
+export async function getRoomRolesForUser(userId: string): Promise<Map<string, AccessRole>> {
   const map = new Map<string, AccessRole>();
   const owned = await db.select({ id: rooms.id }).from(rooms).where(eq(rooms.ownerId, userId));
   for (const r of owned) {

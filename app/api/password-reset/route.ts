@@ -37,11 +37,7 @@ export async function POST(req: NextRequest) {
       { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
     );
   }
-  const found = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, parsed.data.email))
-    .limit(1);
+  const found = await db.select().from(users).where(eq(users.email, parsed.data.email)).limit(1);
   if (found.length === 0) {
     return NextResponse.json({ ok: true });
   }

@@ -40,13 +40,20 @@ export function ConfirmDialog({
       title={title}
       footer={
         <>
-          <button type="button" onClick={onClose} className={button({ variant: "ghost" })} disabled={pending}>
+          <button
+            type="button"
+            onClick={onClose}
+            className={button({ variant: "ghost" })}
+            disabled={pending}
+          >
             Cancel
           </button>
           <button
             type="button"
             onClick={handle}
-            className={variant === "danger" ? button({ variant: "tomato" }) : button({ variant: "primary" })}
+            className={
+              variant === "danger" ? button({ variant: "tomato" }) : button({ variant: "primary" })
+            }
             disabled={pending}
           >
             {pending ? "Working…" : confirmLabel}
@@ -54,9 +61,7 @@ export function ConfirmDialog({
         </>
       }
     >
-      <div className="font-display text-lg text-ink-2 leading-relaxed [&_em]:italic">
-        {message}
-      </div>
+      <div className="font-display text-lg leading-relaxed text-ink-2 [&_em]:italic">{message}</div>
     </Modal>
   );
 }

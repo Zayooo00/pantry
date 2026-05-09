@@ -96,9 +96,7 @@ export function RoomViews({ items }: { items: EnrichedItem[] }) {
                 className={chip({ active: filter === c && !lowOnly })}
               >
                 {c}
-                {c === "All" && (
-                  <span className="caption num ml-1.5 text-current">{count}</span>
-                )}
+                {c === "All" && <span className="caption num ml-1.5 text-current">{count}</span>}
               </button>
             );
           })}
@@ -112,7 +110,7 @@ export function RoomViews({ items }: { items: EnrichedItem[] }) {
           </button>
         </div>
         <div className="flex items-center gap-3 self-end lg:self-auto">
-          <span className={cn("caption","hidden sm:inline")}>SORT</span>
+          <span className={cn("caption", "hidden sm:inline")}>SORT</span>
           <div className="hidden w-50 sm:block">
             <Select
               value={sort}
@@ -192,7 +190,7 @@ function StatusBadge({ status }: { status: ItemStatus }) {
   if (status === "low") {
     return (
       <span className={badge({ tone: "low" })}>
-        <i className={"w-1.5 h-1.5 rounded-full inline-block bg-tomato"} />
+        <i className={"inline-block h-1.5 w-1.5 rounded-full bg-tomato"} />
         LOW
       </span>
     );
@@ -200,14 +198,14 @@ function StatusBadge({ status }: { status: ItemStatus }) {
   if (status === "soon") {
     return (
       <span className={badge({ tone: "soon" })}>
-        <i className={"w-1.5 h-1.5 rounded-full inline-block bg-amber-pantry"} />
+        <i className={"inline-block h-1.5 w-1.5 rounded-full bg-amber-pantry"} />
         SOON
       </span>
     );
   }
   return (
     <span className={badge({ tone: "ok" })}>
-      <i className={"w-1.5 h-1.5 rounded-full inline-block bg-olive"} />
+      <i className={"inline-block h-1.5 w-1.5 rounded-full bg-olive"} />
       OK
     </span>
   );
@@ -230,7 +228,13 @@ function GridView({ items }: { items: EnrichedItem[] }) {
               <span className={stamp({ tone: "tomato" })}>RESTOCK</span>
             </span>
           )}
-          <ItemThumbnail name={it.name} photoUrl={it.photoUrl} className="h-35 w-full" abbrevLength={6} sizes="(max-width: 768px) 200px, 320px" />
+          <ItemThumbnail
+            name={it.name}
+            photoUrl={it.photoUrl}
+            className="h-35 w-full"
+            abbrevLength={6}
+            sizes="(max-width: 768px) 200px, 320px"
+          />
           <div className="caption">
             {(it.category ?? "").toUpperCase()}
             {it.shelf ? ` · ${it.shelf}` : ""}
@@ -271,10 +275,15 @@ function ListView({ items }: { items: EnrichedItem[] }) {
             href={`/items/${it.id}`}
             className="grid grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-dashed border-paper-3 px-4 py-3 text-inherit transition-[background,transform,box-shadow] duration-150 ease-pantry last:border-0 hover:bg-paper-1 lg:grid-cols-[56px_2fr_100px_140px_120px_80px] lg:gap-4"
           >
-            <ItemThumbnail name={it.name} photoUrl={it.photoUrl} className="h-14 w-14" sizes="56px" />
+            <ItemThumbnail
+              name={it.name}
+              photoUrl={it.photoUrl}
+              className="h-14 w-14"
+              sizes="56px"
+            />
             <div className="min-w-0">
               <div className="truncate font-display text-lg">{it.name}</div>
-              <div className={cn("caption","mt-0.5 truncate")}>
+              <div className={cn("caption", "mt-0.5 truncate")}>
                 {(it.category ?? "").toUpperCase()}
                 {it.shelf ? ` · ${it.shelf}` : ""}
               </div>
@@ -296,7 +305,9 @@ function ListView({ items }: { items: EnrichedItem[] }) {
               </div>
               <div
                 className={cn(
-                  level({ tone: it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok" }),
+                  level({
+                    tone: it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok",
+                  }),
                   "mt-1",
                 )}
               >
@@ -395,7 +406,7 @@ function ShelfView({ items }: { items: EnrichedItem[] }) {
                       {it.unit === "kg" || it.unit === "L" ? it.unit : ""}
                     </div>
                   </div>
-                  <div className={cn("caption","text-3xs")}>{it.shelf ?? ""}</div>
+                  <div className={cn("caption", "text-3xs")}>{it.shelf ?? ""}</div>
                 </Link>
               );
             })}

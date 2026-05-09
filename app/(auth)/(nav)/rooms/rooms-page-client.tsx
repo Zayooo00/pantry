@@ -135,7 +135,11 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
     }
     setReorderDraft(null);
     await invalidateApi("/api/sidebar");
-    toast(<>Order <em>saved</em>.</>);
+    toast(
+      <>
+        Order <em>saved</em>.
+      </>,
+    );
     router.refresh();
   }
 
@@ -182,7 +186,11 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
               >
                 Reorder
               </button>
-              <button type="button" onClick={() => setNewRoomOpen(true)} className={button({ variant: "primary" })}>
+              <button
+                type="button"
+                onClick={() => setNewRoomOpen(true)}
+                className={button({ variant: "primary" })}
+              >
                 ＋ New room
               </button>
             </>
@@ -257,7 +265,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
           <div className="font-display text-2xl font-light text-ink-3 italic">
             Nothing <em>here</em> yet.
           </div>
-          <div className={cn("caption","mt-2")}>NO ROOMS IN THIS CATEGORY</div>
+          <div className={cn("caption", "mt-2")}>NO ROOMS IN THIS CATEGORY</div>
         </div>
       ) : reordering ? (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -282,7 +290,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
             <div className="text-center">
               <div className="text-4xl leading-none font-extralight">＋</div>
               <div className="mt-2 font-display text-2xl font-light italic">a new room</div>
-              <div className={cn("caption","mt-2")}>CUPBOARD · CELLAR · SHELF</div>
+              <div className={cn("caption", "mt-2")}>CUPBOARD · CELLAR · SHELF</div>
             </div>
           </button>
         </div>
@@ -348,13 +356,11 @@ function RoomTileInner({
         </div>
         <div className="flex items-center gap-2">
           {showActions && room.role === "owner" && (
-            <RoomRowActions
-              room={{ ...room, itemCount: room.count, archived: room.archived }}
-            />
+            <RoomRowActions room={{ ...room, itemCount: room.count, archived: room.archived }} />
           )}
           {room.archived && (
             <span
-              className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose uppercase text-ink-3"
+              className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose text-ink-3 uppercase"
               title="Archived"
             >
               ARCHIVED
@@ -370,7 +376,7 @@ function RoomTileInner({
           </span>
         </div>
       </div>
-      <div className={cn("caption","mt-3", tinted && "text-olive-2")}>{room.subtitle ?? ""}</div>
+      <div className={cn("caption", "mt-3", tinted && "text-olive-2")}>{room.subtitle ?? ""}</div>
       <div
         className={cn(
           "mt-auto font-display text-5xl leading-none font-light tracking-display-md",
@@ -395,7 +401,7 @@ function RoomTileInner({
         {room.low > 0 ? (
           <span className={badge({ tone: "low" })}>{room.low} LOW</span>
         ) : (
-          <span className={cn("caption","text-olive-2")}>ALL OK</span>
+          <span className={cn("caption", "text-olive-2")}>ALL OK</span>
         )}
       </div>
     </>

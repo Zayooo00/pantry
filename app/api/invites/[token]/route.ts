@@ -7,10 +7,7 @@ import { hashToken } from "@/lib/tokens";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(
-  _req: NextRequest,
-  { params }: { params: Promise<{ token: string }> },
-) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const tokenHash = hashToken(decodeURIComponent(token));
   const found = await db
@@ -40,17 +37,11 @@ export async function GET(
   });
 }
 
-export async function POST(
-  _req: NextRequest,
-  { params }: { params: Promise<{ token: string }> },
-) {
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const session = await auth();
   if (!session?.user?.id || !session.user.email) {
-    return NextResponse.json(
-      { error: "Sign in or create an account first." },
-      { status: 401 },
-    );
+    return NextResponse.json({ error: "Sign in or create an account first." }, { status: 401 });
   }
   const tokenHash = hashToken(decodeURIComponent(token));
   const found = await db

@@ -15,9 +15,33 @@ beforeEach(async () => {
   ]);
   await db.insert(rooms).values({ id: "r1", ownerId: "u1", name: "Pantry", glyph: "🥫" });
   await db.insert(items).values([
-    { id: "i1", roomId: "r1", name: "Olive oil", brand: "Filippo", category: "oil", unit: "bottles", count: 1 },
-    { id: "i2", roomId: "r1", name: "Sea salt", brand: "Maldon", category: "spice", unit: "g", count: 100 },
-    { id: "i3", roomId: "r1", name: "Black pepper", brand: null, category: "spice", unit: "g", count: 50 },
+    {
+      id: "i1",
+      roomId: "r1",
+      name: "Olive oil",
+      brand: "Filippo",
+      category: "oil",
+      unit: "bottles",
+      count: 1,
+    },
+    {
+      id: "i2",
+      roomId: "r1",
+      name: "Sea salt",
+      brand: "Maldon",
+      category: "spice",
+      unit: "g",
+      count: 100,
+    },
+    {
+      id: "i3",
+      roomId: "r1",
+      name: "Black pepper",
+      brand: null,
+      category: "spice",
+      unit: "g",
+      count: 50,
+    },
   ]);
 });
 

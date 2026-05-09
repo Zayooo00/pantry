@@ -24,17 +24,21 @@ function idParams(id: string) {
 }
 
 beforeEach(async () => {
-  await db.insert(users).values({ id: "u1", email: "alex@example.com", name: "Alex", passwordHash: "x" });
+  await db
+    .insert(users)
+    .values({ id: "u1", email: "alex@example.com", name: "Alex", passwordHash: "x" });
   await db.insert(rooms).values({ id: "r1", ownerId: "u1", name: "Pantry", glyph: "🥫" });
 });
 
 describe("POST /api/shopping (manual)", () => {
   it("adds a manual entry with default group/reason scoped to the current user", async () => {
-    const res = await createShopping(jsonReq("http://l/api/shopping", "POST", {
-      name: "Bread",
-      quantity: 1,
-      unit: "loaf",
-    }));
+    const res = await createShopping(
+      jsonReq("http://l/api/shopping", "POST", {
+        name: "Bread",
+        quantity: 1,
+        unit: "loaf",
+      }),
+    );
     expect(res.status).toBe(200);
 
     const all = await db.select().from(shoppingItems);
@@ -47,7 +51,9 @@ describe("POST /api/shopping (manual)", () => {
   });
 
   it("rejects missing name", async () => {
-    const res = await createShopping(jsonReq("http://l/api/shopping", "POST", { quantity: 1, unit: "g" }));
+    const res = await createShopping(
+      jsonReq("http://l/api/shopping", "POST", { quantity: 1, unit: "g" }),
+    );
     expect(res.status).toBe(400);
   });
 });
@@ -77,7 +83,14 @@ describe("POST /api/shopping (from item)", () => {
   });
 
   it("does not create a duplicate if an open row already exists for that item", async () => {
-    await db.insert(items).values({ id: "i1", roomId: "r1", name: "Olive oil", unit: "bottles", count: 0, threshold: 1 });
+    await db.insert(items).values({
+      id: "i1",
+      roomId: "r1",
+      name: "Olive oil",
+      unit: "bottles",
+      count: 0,
+      threshold: 1,
+    });
     await createShopping(jsonReq("http://l/api/shopping", "POST", { itemId: "i1" }));
     await createShopping(jsonReq("http://l/api/shopping", "POST", { itemId: "i1" }));
     const all = await db.select().from(shoppingItems);
@@ -85,9 +98,13 @@ describe("POST /api/shopping (from item)", () => {
   });
 
   it("returns 403 when adding from an item in a room the user can't edit", async () => {
-    await db.insert(users).values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
     await db.insert(rooms).values({ id: "r2", ownerId: "u2", name: "Theirs", glyph: "🥫" });
-    await db.insert(items).values({ id: "i1", roomId: "r2", name: "Salt", unit: "g", count: 0, threshold: 1 });
+    await db
+      .insert(items)
+      .values({ id: "i1", roomId: "r2", name: "Salt", unit: "g", count: 0, threshold: 1 });
     const res = await createShopping(jsonReq("http://l/api/shopping", "POST", { itemId: "i1" }));
     expect(res.status).toBe(403);
   });
@@ -95,15 +112,22 @@ describe("POST /api/shopping (from item)", () => {
 
 describe("PATCH /api/shopping/[id]", () => {
   it("toggles done", async () => {
-    await db.insert(shoppingItems).values({ id: "s1", userId: "u1", name: "Bread", quantity: 1, unit: "loaf" });
-    const res = await patchShopping(jsonReq("http://l/api/shopping/s1", "PATCH", { done: true }), idParams("s1"));
+    await db
+      .insert(shoppingItems)
+      .values({ id: "s1", userId: "u1", name: "Bread", quantity: 1, unit: "loaf" });
+    const res = await patchShopping(
+      jsonReq("http://l/api/shopping/s1", "PATCH", { done: true }),
+      idParams("s1"),
+    );
     expect(res.status).toBe(200);
     const found = await db.select().from(shoppingItems).where(eq(shoppingItems.id, "s1"));
     expect(found[0].done).toBe(true);
   });
 
   it("returns 404 when patching another user's item", async () => {
-    await db.insert(users).values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
     await db.insert(shoppingItems).values({
       id: "s1",
       userId: "u2",
@@ -111,15 +135,23 @@ describe("PATCH /api/shopping/[id]", () => {
       quantity: 1,
       unit: "loaf",
     });
-    const res = await patchShopping(jsonReq("http://l/api/shopping/s1", "PATCH", { done: true }), idParams("s1"));
+    const res = await patchShopping(
+      jsonReq("http://l/api/shopping/s1", "PATCH", { done: true }),
+      idParams("s1"),
+    );
     expect(res.status).toBe(404);
   });
 });
 
 describe("DELETE /api/shopping/[id]", () => {
   it("removes the row owned by the user", async () => {
-    await db.insert(shoppingItems).values({ id: "s1", userId: "u1", name: "Bread", quantity: 1, unit: "loaf" });
-    const res = await deleteShopping(new NextRequest("http://l/api/shopping/s1", { method: "DELETE" }), idParams("s1"));
+    await db
+      .insert(shoppingItems)
+      .values({ id: "s1", userId: "u1", name: "Bread", quantity: 1, unit: "loaf" });
+    const res = await deleteShopping(
+      new NextRequest("http://l/api/shopping/s1", { method: "DELETE" }),
+      idParams("s1"),
+    );
     expect(res.status).toBe(200);
     expect(await db.select().from(shoppingItems)).toHaveLength(0);
   });
@@ -127,7 +159,9 @@ describe("DELETE /api/shopping/[id]", () => {
 
 describe("POST /api/shopping/clear-done", () => {
   it("removes only done rows for the current user", async () => {
-    await db.insert(users).values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
     await db.insert(shoppingItems).values([
       { id: "s1", userId: "u1", name: "Bread", quantity: 1, unit: "loaf", done: true },
       { id: "s2", userId: "u1", name: "Milk", quantity: 1, unit: "L", done: false },

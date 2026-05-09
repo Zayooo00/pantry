@@ -42,7 +42,14 @@ export default async function DashboardPage() {
   const yyyy = today.getFullYear();
   const firstName = session?.user?.name?.split(" ")[0] ?? "friend";
   const hour = today.getHours();
-  const greeting = hour < 5 ? "Good night" : hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const greeting =
+    hour < 5
+      ? "Good night"
+      : hour < 12
+        ? "Good morning"
+        : hour < 18
+          ? "Good afternoon"
+          : "Good evening";
 
   return (
     <AppShell>
@@ -154,7 +161,13 @@ export default async function DashboardPage() {
                     aria-label={it.name}
                     className="absolute inset-0 z-0"
                   />
-                  <ItemThumbnail name={it.name} photoUrl={it.photoUrl} className="h-14 w-14" abbrevLength={4} sizes="56px" />
+                  <ItemThumbnail
+                    name={it.name}
+                    photoUrl={it.photoUrl}
+                    className="h-14 w-14"
+                    abbrevLength={4}
+                    sizes="56px"
+                  />
                   <div className="min-w-0">
                     <div className="block truncate font-display text-lg transition-colors group-hover:text-olive-2">
                       {it.name}
@@ -217,7 +230,7 @@ export default async function DashboardPage() {
                     className="flex min-h-35 flex-col gap-3 rounded-md border border-paper-3 bg-paper-0 p-4 text-inherit transition-[transform,box-shadow,border-color] duration-200 ease-pantry hover:-translate-y-0.5 hover:border-ink-3 hover:shadow-card-hover"
                   >
                     <span className={badge({ tone: "soon" })}>
-                      <i className="w-1.5 h-1.5 rounded-full inline-block bg-amber-pantry" />
+                      <i className="inline-block h-1.5 w-1.5 rounded-full bg-amber-pantry" />
                       {days} DAYS
                     </span>
                     <div className="font-display text-xl font-normal">
@@ -247,9 +260,7 @@ export default async function DashboardPage() {
           </SectionTitle>
           <div className="rounded-xl border border-paper-3 bg-paper-1 p-4 md:p-6">
             {data.recentEvents.length === 0 && (
-              <div className="caption py-3 text-center">
-                Nothing yet — start adding items.
-              </div>
+              <div className="caption py-3 text-center">Nothing yet — start adding items.</div>
             )}
             {data.recentEvents.map((ev) => {
               const row = (

@@ -13,7 +13,6 @@ import { badge } from "@/components/badge";
 import { stamp } from "@/components/stamp";
 import { SectionTitle } from "@/components/section-title";
 
-
 export const dynamic = "force-dynamic";
 
 export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
@@ -107,16 +106,17 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             )}
             {item.barcode && (
               <div className="absolute right-4 bottom-4 flex items-center gap-2 rounded-sm border border-ink-1 bg-paper-0 px-2.5 py-1.5">
-                <span aria-hidden className="font-mono text-base leading-none tracking-[0.35em] text-ink-1">
+                <span
+                  aria-hidden
+                  className="font-mono text-base leading-none tracking-[0.35em] text-ink-1"
+                >
                   ║║║▌║║
                 </span>
-                <span className="font-mono text-2xs tracking-label text-ink-2">
-                  {item.barcode}
-                </span>
+                <span className="font-mono text-2xs tracking-label text-ink-2">{item.barcode}</span>
               </div>
             )}
           </div>
-          <div className={cn("caption","mt-6")}>
+          <div className={cn("caption", "mt-6")}>
             CREATED {formatDate(item.createdAt, { dotted: true })}
             {item.openedAt && ` · OPENED ${formatDate(item.openedAt, { dotted: true })}`}
           </div>
@@ -125,7 +125,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
         <div>
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-paper-3 pb-6 md:gap-6">
             <div>
-              <div className={cn("caption","mb-3")}>
+              <div className={cn("caption", "mb-3")}>
                 {(item.category ?? "").toUpperCase()}
                 {room ? ` · ${room.name.toUpperCase()}` : ""}
                 {item.shelf ? ` / ${item.shelf.toUpperCase()}` : ""}
@@ -232,8 +232,8 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
           </div>
 
           {item.notes && (
-            <div className="mb-6 bg-paper-1 border border-paper-3 rounded-lg p-6">
-              <div className={cn("caption","mb-2")}>NOTES</div>
+            <div className="mb-6 rounded-lg border border-paper-3 bg-paper-1 p-6">
+              <div className={cn("caption", "mb-2")}>NOTES</div>
               <p className="m-0 font-display text-lg leading-relaxed text-ink-2">{item.notes}</p>
             </div>
           )}
@@ -304,7 +304,7 @@ function Fact({
 }) {
   return (
     <div className="bg-paper-0 px-6 py-4">
-      <div className={cn("caption","mb-1")}>{label}</div>
+      <div className={cn("caption", "mb-1")}>{label}</div>
       <div className={mono ? "font-mono text-sm" : "font-display text-lg"}>
         {value}
         {sub && <em className="text-ink-3 italic"> {sub}</em>}
@@ -312,4 +312,3 @@ function Fact({
     </div>
   );
 }
-

@@ -159,7 +159,9 @@ export function AddItemForm({
         },
       })) as { id: string };
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Could not save item. Check the form and try again.");
+      setServerError(
+        err instanceof Error ? err.message : "Could not save item. Check the form and try again.",
+      );
       return;
     }
     if (!json) {
@@ -205,7 +207,11 @@ export function AddItemForm({
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <button type="button" onClick={() => router.back()} className={button({ variant: "ghost" })}>
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className={button({ variant: "ghost" })}
+          >
             Cancel
           </button>
           <button
@@ -348,7 +354,7 @@ export function AddItemForm({
                   placeholder="Optional"
                   {...register("threshold")}
                 />
-                <div className={cn("caption","mt-1.5")}>
+                <div className={cn("caption", "mt-1.5")}>
                   YOU'LL BE NOTIFIED WHEN COUNT FALLS BELOW.
                 </div>
               </div>
@@ -361,7 +367,7 @@ export function AddItemForm({
                   placeholder="Optional"
                   {...register("reorderAmount")}
                 />
-                <div className={cn("caption","mt-1.5")}>QUANTITY ADDED TO SHOPPING LIST.</div>
+                <div className={cn("caption", "mt-1.5")}>QUANTITY ADDED TO SHOPPING LIST.</div>
               </div>
             </div>
           </Section>
@@ -450,7 +456,7 @@ export function AddItemForm({
 
         <aside>
           <div className="rounded-xl border border-paper-3 bg-paper-1 p-6 lg:sticky lg:top-24">
-            <div className={cn("caption","mb-3")}>PREVIEW</div>
+            <div className={cn("caption", "mb-3")}>PREVIEW</div>
             {values.photoUrl ? (
               <div className="relative mb-4 aspect-square w-full overflow-hidden rounded-lg border border-paper-3 bg-paper-0">
                 <Image
@@ -480,17 +486,17 @@ export function AddItemForm({
               </div>
               {isLow ? (
                 <span className={badge({ tone: "low" })}>
-                  <i className={"w-1.5 h-1.5 rounded-full inline-block bg-tomato"} />
+                  <i className={"inline-block h-1.5 w-1.5 rounded-full bg-tomato"} />
                   LOW
                 </span>
               ) : (
                 <span className={badge({ tone: "ok" })}>
-                  <i className={"w-1.5 h-1.5 rounded-full inline-block bg-olive"} />
+                  <i className={"inline-block h-1.5 w-1.5 rounded-full bg-olive"} />
                   OK
                 </span>
               )}
             </div>
-            <div className={cn("caption","mt-4")}>SAVED ITEMS APPEAR IMMEDIATELY IN THE ROOM.</div>
+            <div className={cn("caption", "mt-4")}>SAVED ITEMS APPEAR IMMEDIATELY IN THE ROOM.</div>
           </div>
         </aside>
       </div>

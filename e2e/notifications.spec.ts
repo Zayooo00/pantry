@@ -32,7 +32,10 @@ test("marks a single notification as read by clicking its row", async ({ page })
   await loginAs(page);
   await page.goto("/notifications");
 
-  const firstUnread = page.locator("a, div").filter({ hasText: /below the floor/i }).first();
+  const firstUnread = page
+    .locator("a, div")
+    .filter({ hasText: /below the floor/i })
+    .first();
   await firstUnread.click();
 
   await page.goto("/notifications");

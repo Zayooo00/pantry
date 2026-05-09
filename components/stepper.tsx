@@ -86,7 +86,7 @@ export function NumberStepper({
           onBlur={onBlur}
           onKeyDown={onTypedKey}
           aria-label={ariaLabel}
-          className="w-full min-w-0 bg-transparent px-3 py-3 text-center font-sans text-base text-ink-1 outline-none tabular-nums"
+          className="w-full min-w-0 bg-transparent px-3 py-3 text-center font-sans text-base text-ink-1 tabular-nums outline-none"
         />
         <div className="flex flex-col border-l border-paper-4">
           <button
@@ -131,11 +131,16 @@ export function NumberStepper({
 
   if (size === "xl") {
     return (
-      <div className={cn("inline-flex items-stretch overflow-hidden border-2 border-ink-1 rounded-full bg-paper-0", className)}>
+      <div
+        className={cn(
+          "inline-flex items-stretch overflow-hidden rounded-full border-2 border-ink-1 bg-paper-0",
+          className,
+        )}
+      >
         <button
           type="button"
           onClick={() => bump(-step)}
-          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center cursor-pointer transition-colors hover:bg-paper-2 active:bg-paper-3"
+          className="grid h-14 w-14 cursor-pointer place-items-center border-0 bg-transparent text-xl text-ink-1 transition-colors hover:bg-paper-2 active:bg-paper-3"
           aria-label="Decrease"
         >
           −
@@ -144,7 +149,7 @@ export function NumberStepper({
         <button
           type="button"
           onClick={() => bump(step)}
-          className="w-14 h-14 bg-transparent border-0 text-xl text-ink-1 grid place-items-center cursor-pointer transition-colors hover:bg-paper-2 active:bg-paper-3"
+          className="grid h-14 w-14 cursor-pointer place-items-center border-0 bg-transparent text-xl text-ink-1 transition-colors hover:bg-paper-2 active:bg-paper-3"
           aria-label="Increase"
         >
           +
@@ -154,12 +159,17 @@ export function NumberStepper({
   }
 
   return (
-    <div className={cn("inline-flex items-stretch border border-paper-4 rounded-full overflow-hidden bg-paper-0", className)}>
+    <div
+      className={cn(
+        "inline-flex items-stretch overflow-hidden rounded-full border border-paper-4 bg-paper-0",
+        className,
+      )}
+    >
       <button
         type="button"
         onClick={() => bump(-step)}
         aria-label="Decrease"
-        className="w-8 h-8 bg-transparent border-0 text-ink-2 text-base grid place-items-center hover:bg-paper-2 hover:text-ink-0"
+        className="grid h-8 w-8 place-items-center border-0 bg-transparent text-base text-ink-2 hover:bg-paper-2 hover:text-ink-0"
       >
         −
       </button>
@@ -168,7 +178,7 @@ export function NumberStepper({
         type="button"
         onClick={() => bump(step)}
         aria-label="Increase"
-        className="w-8 h-8 bg-transparent border-0 text-ink-2 text-base grid place-items-center hover:bg-paper-2 hover:text-ink-0"
+        className="grid h-8 w-8 place-items-center border-0 bg-transparent text-base text-ink-2 hover:bg-paper-2 hover:text-ink-0"
       >
         +
       </button>
@@ -241,17 +251,17 @@ export function Stepper({
   }
 
   return (
-    <NumberStepper
-      value={count}
-      onChange={handleChange}
-      step={step}
-      size={size}
-      onBlur={flush}
-    />
+    <NumberStepper value={count} onChange={handleChange} step={step} size={size} onBlur={flush} />
   );
 }
 
-export function AddToShoppingButton({ itemId, label = "＋ to list" }: { itemId: string; label?: string }) {
+export function AddToShoppingButton({
+  itemId,
+  label = "＋ to list",
+}: {
+  itemId: string;
+  label?: string;
+}) {
   const [done, setDone] = useState(false);
   const { trigger, isMutating } = useMutation("post", "/api/shopping", {
     onSuccess: () => invalidateApi("/api/sidebar"),
@@ -263,7 +273,11 @@ export function AddToShoppingButton({ itemId, label = "＋ to list" }: { itemId:
   }
 
   return (
-    <button onClick={add} disabled={isMutating || done} className={button({ variant: "ghost", size: "sm" })}>
+    <button
+      onClick={add}
+      disabled={isMutating || done}
+      className={button({ variant: "ghost", size: "sm" })}
+    >
       {done ? "✓ added" : label}
     </button>
   );

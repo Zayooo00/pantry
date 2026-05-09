@@ -1,20 +1,9 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { MoonIcon, SunIcon } from "@/icons";
 import { cn } from "@/lib/cn";
-import {
-  THEME_COOKIE_MAX_AGE,
-  THEME_COOKIE_NAME,
-  type Theme,
-} from "./theme-shared";
+import { THEME_COOKIE_MAX_AGE, THEME_COOKIE_NAME, type Theme } from "./theme-shared";
 
 export type { Theme };
 export { THEME_COOKIE_NAME };

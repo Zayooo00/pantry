@@ -34,9 +34,13 @@ beforeEach(async () => {
 
 describe("POST /api/rooms", () => {
   it("creates a room owned by the session user with sequential position", async () => {
-    const r1 = await createRoom(jsonReq("http://l/api/rooms", "POST", { name: "Pantry", glyph: "🥫" }));
+    const r1 = await createRoom(
+      jsonReq("http://l/api/rooms", "POST", { name: "Pantry", glyph: "🥫" }),
+    );
     expect(r1.status).toBe(200);
-    const r2 = await createRoom(jsonReq("http://l/api/rooms", "POST", { name: "Fridge", glyph: "❄️" }));
+    const r2 = await createRoom(
+      jsonReq("http://l/api/rooms", "POST", { name: "Fridge", glyph: "❄️" }),
+    );
     expect(r2.status).toBe(200);
 
     const all = await db.select().from(rooms);
@@ -55,7 +59,10 @@ describe("POST /api/rooms", () => {
 describe("PATCH /api/rooms/[id]", () => {
   it("updates the provided fields when the user owns the room", async () => {
     await db.insert(rooms).values({ id: "r1", ownerId: "u1", name: "Pantry", glyph: "🥫" });
-    const res = await patchRoom(jsonReq("http://l/api/rooms/r1", "PATCH", { name: "Larder", tinted: true }), idParams("r1"));
+    const res = await patchRoom(
+      jsonReq("http://l/api/rooms/r1", "PATCH", { name: "Larder", tinted: true }),
+      idParams("r1"),
+    );
     expect(res.status).toBe(200);
     const found = await db.select().from(rooms).where(eq(rooms.id, "r1"));
     expect(found[0].name).toBe("Larder");
@@ -63,14 +70,21 @@ describe("PATCH /api/rooms/[id]", () => {
   });
 
   it("returns 403 when the user is neither owner nor editor", async () => {
-    await db.insert(users).values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
     await db.insert(rooms).values({ id: "r1", ownerId: "u2", name: "Pantry", glyph: "🥫" });
-    const res = await patchRoom(jsonReq("http://l/api/rooms/r1", "PATCH", { name: "X" }), idParams("r1"));
+    const res = await patchRoom(
+      jsonReq("http://l/api/rooms/r1", "PATCH", { name: "X" }),
+      idParams("r1"),
+    );
     expect(res.status).toBe(403);
   });
 
   it("allows editor members to patch the room", async () => {
-    await db.insert(users).values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
     await db.insert(rooms).values({ id: "r1", ownerId: "u2", name: "Pantry", glyph: "🥫" });
     await db.insert(roomMembers).values({
       id: "m1",
@@ -79,7 +93,10 @@ describe("PATCH /api/rooms/[id]", () => {
       role: "editor",
       invitedBy: "u2",
     });
-    const res = await patchRoom(jsonReq("http://l/api/rooms/r1", "PATCH", { name: "Larder" }), idParams("r1"));
+    const res = await patchRoom(
+      jsonReq("http://l/api/rooms/r1", "PATCH", { name: "Larder" }),
+      idParams("r1"),
+    );
     expect(res.status).toBe(200);
   });
 });
@@ -87,7 +104,10 @@ describe("PATCH /api/rooms/[id]", () => {
 describe("DELETE /api/rooms/[id]", () => {
   it("deletes an empty room owned by the session user", async () => {
     await db.insert(rooms).values({ id: "r1", ownerId: "u1", name: "Pantry", glyph: "🥫" });
-    const res = await deleteRoom(new NextRequest("http://l/api/rooms/r1", { method: "DELETE" }), idParams("r1"));
+    const res = await deleteRoom(
+      new NextRequest("http://l/api/rooms/r1", { method: "DELETE" }),
+      idParams("r1"),
+    );
     expect(res.status).toBe(200);
     expect(await db.select().from(rooms)).toHaveLength(0);
   });
@@ -95,13 +115,18 @@ describe("DELETE /api/rooms/[id]", () => {
   it("refuses to delete a room that still has items", async () => {
     await db.insert(rooms).values({ id: "r1", ownerId: "u1", name: "Pantry", glyph: "🥫" });
     await db.insert(items).values({ id: "i1", roomId: "r1", name: "Salt", unit: "g", count: 1 });
-    const res = await deleteRoom(new NextRequest("http://l/api/rooms/r1", { method: "DELETE" }), idParams("r1"));
+    const res = await deleteRoom(
+      new NextRequest("http://l/api/rooms/r1", { method: "DELETE" }),
+      idParams("r1"),
+    );
     expect(res.status).toBe(409);
     expect(await db.select().from(rooms)).toHaveLength(1);
   });
 
   it("refuses to delete when the user is only an editor (not owner)", async () => {
-    await db.insert(users).values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
     await db.insert(rooms).values({ id: "r1", ownerId: "u2", name: "Pantry", glyph: "🥫" });
     await db.insert(roomMembers).values({
       id: "m1",
@@ -110,7 +135,10 @@ describe("DELETE /api/rooms/[id]", () => {
       role: "editor",
       invitedBy: "u2",
     });
-    const res = await deleteRoom(new NextRequest("http://l/api/rooms/r1", { method: "DELETE" }), idParams("r1"));
+    const res = await deleteRoom(
+      new NextRequest("http://l/api/rooms/r1", { method: "DELETE" }),
+      idParams("r1"),
+    );
     expect(res.status).toBe(403);
     expect(await db.select().from(rooms)).toHaveLength(1);
   });
@@ -124,7 +152,9 @@ describe("POST /api/rooms/reorder", () => {
       { id: "r3", ownerId: "u1", name: "C", glyph: "C", position: 2 },
     ]);
 
-    const res = await reorderRooms(jsonReq("http://l/api/rooms/reorder", "POST", { order: ["r3", "r1", "r2"] }));
+    const res = await reorderRooms(
+      jsonReq("http://l/api/rooms/reorder", "POST", { order: ["r3", "r1", "r2"] }),
+    );
     expect(res.status).toBe(200);
 
     const all = await db.select().from(rooms);

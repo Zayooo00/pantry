@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 export const level = cva(
-  "relative h-1.5 bg-paper-3 rounded-full overflow-hidden [&>i]:absolute [&>i]:top-0 [&>i]:left-0 [&>i]:bottom-0 [&>i]:rounded-full",
+  "relative h-1.5 overflow-hidden rounded-full bg-paper-3 [&>i]:absolute [&>i]:top-0 [&>i]:bottom-0 [&>i]:left-0 [&>i]:rounded-full",
   {
     variants: {
       tone: {

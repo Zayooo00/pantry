@@ -14,8 +14,37 @@ import { TextArea, TextInput } from "@/components/text-input";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Item as ItemRow } from "@/db/schema";
 
-const CATEGORIES = ["Grains", "Canned", "Oils & vinegars", "Spices", "Baking", "Preserves", "Drinks", "Dairy", "Produce", "Frozen"];
-const UNITS = ["Tin", "Jar", "Bottle", "btl", "L", "ml", "kg", "g", "ea", "pkts", "box", "bags", "tins", "jars", "sticks", "balls", "bunch"];
+const CATEGORIES = [
+  "Grains",
+  "Canned",
+  "Oils & vinegars",
+  "Spices",
+  "Baking",
+  "Preserves",
+  "Drinks",
+  "Dairy",
+  "Produce",
+  "Frozen",
+];
+const UNITS = [
+  "Tin",
+  "Jar",
+  "Bottle",
+  "btl",
+  "L",
+  "ml",
+  "kg",
+  "g",
+  "ea",
+  "pkts",
+  "box",
+  "bags",
+  "tins",
+  "jars",
+  "sticks",
+  "balls",
+  "bunch",
+];
 
 const numericString = z.string().refine((s) => s === "" || !Number.isNaN(Number(s)), {
   message: "Enter a number.",
@@ -87,7 +116,10 @@ export function EditItemForm({ item, onClose }: { item: ItemEditable; onClose: (
       lastPrice: item.lastPrice?.toString() ?? "",
       barcode: item.barcode ?? "",
       notes: item.notes ?? "",
-      tags: (item.tags ?? "").split(",").map((s) => s.trim()).filter(Boolean),
+      tags: (item.tags ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
       photoUrl: item.photoUrl,
     },
   });
@@ -140,7 +172,11 @@ export function EditItemForm({ item, onClose }: { item: ItemEditable; onClose: (
       return;
     }
     await invalidateApi("/api/sidebar");
-    toast(<>Saved <em>{values.name}</em>.</>);
+    toast(
+      <>
+        Saved <em>{values.name}</em>.
+      </>,
+    );
     onClose();
     router.refresh();
   }
@@ -262,7 +298,7 @@ export function EditItemForm({ item, onClose }: { item: ItemEditable; onClose: (
         </div>
         <div className="col-span-2">
           <label className="field-label">Notes</label>
-          <TextArea  rows={3} {...register("notes")} />
+          <TextArea rows={3} {...register("notes")} />
         </div>
       </div>
       {serverError && (

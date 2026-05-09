@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 export const stamp = cva(
-  "inline-flex items-center gap-1.5 px-2.5 py-1 border-[1.5px] border-ink-1 rounded-xs font-mono text-2xs tracking-[0.18em] uppercase text-ink-1 -rotate-[1.5deg] bg-paper-0",
+  "inline-flex items-center gap-1.5 px-2.5 py-1 border-[1.5px] border-ink-1 rounded-xs font-mono text-2xs tracking-eyebrow-loose uppercase text-ink-1 -rotate-[1.5deg] bg-paper-0",
   {
     variants: {
       tone: {

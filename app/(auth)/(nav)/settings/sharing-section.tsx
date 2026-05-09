@@ -80,8 +80,8 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
       <section>
         <div className="mb-2 flex items-baseline justify-between border-t border-ink-1 pt-3">
           <div className="flex items-baseline gap-3">
-            <span className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4">05</span>
-            <h2 className="m-0 font-display text-2xl tracking-[-0.01em]">Sharing</h2>
+            <span className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4">05</span>
+            <h2 className="m-0 font-display text-2xl tracking-display-sm">Sharing</h2>
           </div>
         </div>
         <p className="mb-6 max-w-prose text-sm text-ink-3">
@@ -90,7 +90,7 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
 
         <div className="grid gap-8 md:grid-cols-2">
           <div>
-            <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 mb-3">SHARED WITH YOU</div>
+            <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 mb-3">SHARED WITH YOU</div>
             {isLoading && <SharingListSkeleton rows={2} />}
             {data && data.sharedWithMe.length === 0 && (
               <div className="rounded-md border border-paper-3 bg-paper-1 p-4 text-sm text-ink-3 italic">
@@ -114,7 +114,7 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
                       >
                         {r.name}
                       </Link>
-                      <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 truncate">
+                      <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 truncate">
                         {r.role.toUpperCase()} · FROM {r.ownerEmail.toUpperCase()}
                       </div>
                     </div>
@@ -135,7 +135,7 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
           </div>
 
           <div>
-            <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 mb-3">YOU'RE SHARING</div>
+            <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 mb-3">YOU'RE SHARING</div>
             {isLoading && <SharingListSkeleton rows={2} />}
             {data && data.iShare.length === 0 && (
               <div className="rounded-md border border-paper-3 bg-paper-1 p-4 text-sm text-ink-3 italic">
@@ -159,7 +159,7 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
                       >
                         {room.name}
                       </Link>
-                      <span className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 ml-auto">
+                      <span className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 ml-auto">
                         {room.members.length} MEMBER{room.members.length === 1 ? "" : "S"}
                       </span>
                     </div>
@@ -170,10 +170,10 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
                       >
                         <div className="min-w-0">
                           <div className="truncate text-sm">{m.name}</div>
-                          <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 truncate">{m.email.toUpperCase()}</div>
+                          <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 truncate">{m.email.toUpperCase()}</div>
                         </div>
                         <span
-                          className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 rounded-full bg-paper-2 px-2 py-0.5"
+                          className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 rounded-full bg-paper-2 px-2 py-0.5"
                         >
                           {m.role.toUpperCase()}
                         </span>

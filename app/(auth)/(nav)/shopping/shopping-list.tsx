@@ -239,7 +239,7 @@ export function ShoppingList({
       <div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-12">
         <div>
           <div className="caption">{items.length} ITEMS · BUILT FROM LOW STOCK + MANUAL</div>
-          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-[-0.03em] sm:text-4xl lg:text-6xl">
+          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-6xl">
             Shopping <em className="font-normal italic">list</em>.
           </h1>
           <div className="mt-3 font-display text-md font-light text-ink-3 italic sm:text-xl">
@@ -351,10 +351,10 @@ export function ShoppingList({
         </div>
         <div className="mb-6 border-b-[1.5px] border-ink-1 pb-4 text-center">
           <div className={cn("caption","mb-2")}>PANTRY · SHOPPING LIST</div>
-          <h2 className="m-0 font-display text-2xl font-light tracking-[-0.02em] md:text-4xl">
+          <h2 className="m-0 font-display text-2xl font-light tracking-display-md md:text-4xl">
             Today's <em className="italic">errands</em>.
           </h2>
-          <div className="mt-3 font-mono text-2xs tracking-[0.18em] text-ink-3 uppercase">
+          <div className="mt-3 font-mono text-2xs tracking-eyebrow-loose text-ink-3 uppercase">
             {todayLabel} · {items.length} ITEMS
           </div>
         </div>
@@ -369,7 +369,7 @@ export function ShoppingList({
           <div key={group} className="mb-6">
             <div className="mb-2 flex justify-between border-b border-dashed border-paper-4 pb-1.5">
               <span className="font-display text-lg text-ink-2 italic">{group}</span>
-              <span className="font-mono text-2xs tracking-[0.16em] text-ink-4">
+              <span className="font-mono text-2xs tracking-eyebrow text-ink-4">
                 {rows.length} ITEM{rows.length === 1 ? "" : "S"}
               </span>
             </div>
@@ -421,7 +421,7 @@ export function ShoppingList({
         ))}
 
         <div className="mt-6 flex items-baseline justify-between border-t-[1.5px] border-ink-1 pt-4">
-          <span className="font-mono text-2xs tracking-[0.18em] text-ink-3">
+          <span className="font-mono text-2xs tracking-eyebrow-loose text-ink-3">
             EST. TOTAL · {outstanding} OUTSTANDING
           </span>
           <span className="num font-display text-3xl">${total.toFixed(2)}</span>

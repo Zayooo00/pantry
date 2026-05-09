@@ -119,7 +119,7 @@ export function SearchClient({
           <div className="caption">
             SEARCH · {items.length} ITEMS · {rooms.length} ROOMS
           </div>
-          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-[-0.03em] sm:text-4xl lg:text-6xl">
+          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-6xl">
             Find the <em className="font-normal italic">jar</em>.
           </h1>
         </div>
@@ -139,7 +139,7 @@ export function SearchClient({
           placeholder="Search by name, brand, barcode, room…"
           autoFocus
           aria-label="Search"
-          className="w-full border-0 bg-transparent font-display text-xl leading-tight font-light tracking-[-0.02em] text-ink-1 outline-none placeholder:text-ink-4 placeholder:italic sm:text-2xl lg:text-4xl"
+          className="w-full border-0 bg-transparent font-display text-xl leading-tight font-light tracking-display-md text-ink-1 outline-none placeholder:text-ink-4 placeholder:italic sm:text-2xl lg:text-4xl"
         />
         <div className="flex items-center gap-3">
           <span className="caption">
@@ -401,7 +401,7 @@ export function SearchClient({
 function Facet({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-4 rounded-xl border border-paper-3 bg-paper-1 p-4">
-      <h4 className="m-0 mb-3 font-display text-md tracking-[-0.01em]">{title}</h4>
+      <h4 className="m-0 mb-3 font-display text-md tracking-display-sm">{title}</h4>
       {children}
     </div>
   );

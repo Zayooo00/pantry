@@ -89,12 +89,12 @@ export function RoomDetailHeader({
             </span>
             <span className={roleBadge({ role })}>{ROLE_LABEL[role]}</span>
             {archived && (
-              <span className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-[0.18em] uppercase text-ink-3">
+              <span className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose uppercase text-ink-3">
                 ARCHIVED
               </span>
             )}
           </div>
-          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-[-0.03em] sm:text-4xl lg:text-6xl">
+          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-6xl">
             The <em className="font-normal italic">{room.name.toLowerCase()}</em>.
           </h1>
           <div className="mt-3 font-display text-md font-light text-ink-3 italic sm:text-xl">

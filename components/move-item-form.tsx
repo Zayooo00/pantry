@@ -80,7 +80,7 @@ export function MoveItemForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
       <div>
-        <label className="block font-mono text-xs tracking-[0.12em] uppercase text-ink-3 mb-2">New room</label>
+        <label className="block font-mono text-xs tracking-label uppercase text-ink-3 mb-2">New room</label>
         <Controller
           control={control}
           name="roomId"
@@ -94,7 +94,7 @@ export function MoveItemForm({
         />
       </div>
       <div>
-        <label className="block font-mono text-xs tracking-[0.12em] uppercase text-ink-3 mb-2">New shelf / bin (optional)</label>
+        <label className="block font-mono text-xs tracking-label uppercase text-ink-3 mb-2">New shelf / bin (optional)</label>
         <input
           className="w-full px-3.5 py-3 bg-paper-0 border border-paper-4 rounded-md font-sans text-base text-ink-1 transition-[border-color] duration-150 ease-pantry focus:outline-none focus:border-ink-1 placeholder:text-ink-4"
           placeholder="Leave blank to keep current"

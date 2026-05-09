@@ -197,7 +197,7 @@ export function AddItemForm({
       <div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-12">
         <div>
           <div className="caption">NEW ITEM</div>
-          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-[-0.03em] sm:text-4xl lg:text-6xl">
+          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-6xl">
             Add to <em className="font-normal italic">the ledger</em>.
           </h1>
           <div className="mt-3 font-display text-md font-light text-ink-3 italic sm:text-xl">
@@ -517,10 +517,10 @@ function Section({
   return (
     <div className="border-t border-dashed border-paper-3 pt-6 first:border-t-0 first:pt-0">
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="m-0 font-display text-2xl tracking-[-0.01em]">
+        <h3 className="m-0 font-display text-2xl tracking-display-sm">
           {num} — {title}
         </h3>
-        <span className="font-mono text-2xs tracking-[0.16em] text-ink-4">
+        <span className="font-mono text-2xs tracking-eyebrow text-ink-4">
           {required ? "REQUIRED" : "OPTIONAL"}
         </span>
       </div>

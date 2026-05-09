@@ -60,7 +60,7 @@ export function Topbar({
         <span className="hidden sm:inline-flex"><Kbd keys={["Mod", "K"]} /></span>
       </button>
       <div className="flex items-center gap-3 shrink-0">
-        <span className="hidden lg:inline font-mono text-xs tracking-[0.06em] uppercase text-ink-4">{today.dd}.{today.mm}.{today.yy} · {today.dow}</span>
+        <span className="hidden lg:inline font-mono text-xs tracking-mono uppercase text-ink-4">{today.dd}.{today.mm}.{today.yy} · {today.dow}</span>
         <span className="w-px h-5 bg-paper-3 hidden lg:inline" />
         <ThemeToggle />
         <Link href="/items/new" className={button({ variant: "primary", size: "sm" })}>

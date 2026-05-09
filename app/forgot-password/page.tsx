@@ -13,17 +13,17 @@ export default function ForgotPasswordPage() {
             <JarMark size={22} />
           </div>
           <div>
-            <div className="font-display text-xl font-normal tracking-[-0.01em]">Pantry</div>
-            <div className="font-mono text-xs tracking-[0.06em] text-ink-4 uppercase">
+            <div className="font-display text-xl font-normal tracking-display-sm">Pantry</div>
+            <div className="font-mono text-xs tracking-mono text-ink-4 uppercase">
               EST. KITCHEN · NO. 0001
             </div>
           </div>
         </Link>
 
-        <div className="mb-4 font-mono text-xs tracking-[0.06em] text-ink-4 uppercase">
+        <div className="mb-4 font-mono text-xs tracking-mono text-ink-4 uppercase">
           RESET PASSWORD
         </div>
-        <h1 className="m-0 mb-3 font-display text-[clamp(56px,7vw,88px)] leading-[0.95] font-light tracking-[-0.03em] [&_em]:font-normal [&_em]:italic">
+        <h1 className="m-0 mb-3 font-display text-[clamp(56px,7vw,88px)] leading-[0.95] font-light tracking-display [&_em]:font-normal [&_em]:italic">
           Forgot the <em>key</em>?
         </h1>
         <p className="m-0 mb-10 font-display text-xl font-light text-ink-3 italic">

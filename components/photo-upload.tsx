@@ -102,7 +102,7 @@ export function PhotoUpload({
           >
             {uploading ? "Uploading…" : "Choose photo"}
           </button>
-          <span className="font-mono text-xs tracking-[0.06em] uppercase text-ink-4">JPG / PNG / WEBP · UP TO 5MB</span>
+          <span className="font-mono text-xs tracking-mono uppercase text-ink-4">JPG / PNG / WEBP · UP TO 5MB</span>
         </div>
       )}
       {error && (

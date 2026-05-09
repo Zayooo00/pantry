@@ -131,7 +131,7 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-12">
         <div>
           <div className={cn("caption", "mb-3")}>PANTRY · INBOX</div>
-          <h1 className="m-0 mb-2 font-display text-3xl leading-none font-light tracking-[-0.03em] sm:text-4xl lg:text-6xl">
+          <h1 className="m-0 mb-2 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-6xl">
             <em className="font-normal italic">Notifications</em>.
           </h1>
           <div className="mt-3 font-display text-md font-light text-ink-3 italic sm:text-xl">
@@ -198,7 +198,7 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
                   <span className="caption">
                     {KIND_LABEL[n.kind] ?? n.kind.replace(/_/g, " ").toUpperCase()}
                   </span>
-                  <span className="font-mono text-2xs tracking-[0.16em] text-ink-4">
+                  <span className="font-mono text-2xs tracking-eyebrow text-ink-4">
                     {formatDate(new Date(n.createdAt), { dotted: true })}
                   </span>
                 </div>

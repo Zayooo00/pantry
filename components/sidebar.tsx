@@ -132,7 +132,7 @@ export function Sidebar({
           >
             <BrandMark size={32} />
             <div>
-              <div className="font-display text-xl font-normal tracking-[-0.01em] group-hover:text-olive-2 transition-colors">
+              <div className="font-display text-xl font-normal tracking-display-sm group-hover:text-olive-2 transition-colors">
                 Pantry
               </div>
               <span className="block font-mono text-3xs tracking-[0.2em] text-ink-4 mt-0.5">
@@ -151,7 +151,7 @@ export function Sidebar({
         </div>
 
         <div className="flex flex-col gap-0.5">
-          <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 px-3 pb-2">
+          <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 px-3 pb-2">
             General
           </div>
           <Link
@@ -225,7 +225,7 @@ export function Sidebar({
         </div>
 
         <div className="flex flex-col gap-0.5">
-          <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 px-3 pb-2">
+          <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 px-3 pb-2">
             Rooms
           </div>
           {isLoading ? (
@@ -244,7 +244,7 @@ export function Sidebar({
                   {r.role !== "owner" && (
                     <span
                       className={cn(
-                        "shrink-0 font-mono text-4xs tracking-[0.18em] uppercase opacity-70",
+                        "shrink-0 font-mono text-4xs tracking-eyebrow-loose uppercase opacity-70",
                         isActiveRoom(r.id) && "opacity-90",
                       )}
                       title={`Shared · ${r.role}`}
@@ -308,7 +308,7 @@ export function Sidebar({
                 </div>
                 <div className="leading-tight flex-1 min-w-0">
                   <div className="text-sm text-ink-1 truncate">{session?.user?.name ?? "—"}</div>
-                  <div className="font-mono text-xs tracking-[0.06em] uppercase text-ink-4 truncate">
+                  <div className="font-mono text-xs tracking-mono uppercase text-ink-4 truncate">
                     {session?.user?.email ?? ""}
                   </div>
                 </div>

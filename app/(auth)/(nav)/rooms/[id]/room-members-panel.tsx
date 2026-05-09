@@ -109,16 +109,16 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
   return (
     <section className="mt-12 md:mt-16">
       <div className="flex items-baseline justify-between border-t border-ink-1 pt-3 mb-6">
-        <h2 className="font-display text-2xl m-0 tracking-[-0.01em]">
+        <h2 className="font-display text-2xl m-0 tracking-display-sm">
           <em className="italic">Members</em>.
         </h2>
-        <span className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4">
+        <span className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4">
           OWNER ONLY
         </span>
       </div>
 
       <div className="bg-paper-1 border border-paper-3 rounded-xl p-5 md:p-8">
-        <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 mb-3">
+        <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 mb-3">
           INVITE BY EMAIL
         </div>
         <form
@@ -127,7 +127,7 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
           noValidate
         >
           <div>
-            <label className="block font-mono text-2xs tracking-[0.16em] uppercase text-ink-3 mb-2">
+            <label className="block font-mono text-2xs tracking-eyebrow uppercase text-ink-3 mb-2">
               Email
             </label>
             <input
@@ -144,7 +144,7 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
             )}
           </div>
           <div>
-            <label className="block font-mono text-2xs tracking-[0.16em] uppercase text-ink-3 mb-2">
+            <label className="block font-mono text-2xs tracking-eyebrow uppercase text-ink-3 mb-2">
               Role
             </label>
             <Controller
@@ -175,7 +175,7 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
             {inviteError}
           </div>
         )}
-        <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 mt-2">
+        <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 mt-2">
           IF THEY DON'T HAVE AN ACCOUNT, WE'LL EMAIL THEM A SIGN-UP LINK.
         </div>
       </div>
@@ -191,14 +191,14 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
           <div className="grid items-center grid-cols-[1fr_auto_auto] gap-4 px-4 md:px-6 py-3 border-b border-dashed border-paper-3">
             <div className="min-w-0">
               <div className="text-base font-medium truncate">{data.owner.name}</div>
-              <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 truncate">
+              <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 truncate">
                 {data.owner.email.toUpperCase()}
               </div>
             </div>
-            <span className="font-mono text-2xs tracking-[0.16em] uppercase px-2 py-1 rounded-full bg-ink-1 text-paper-0">
+            <span className="font-mono text-2xs tracking-eyebrow uppercase px-2 py-1 rounded-full bg-ink-1 text-paper-0">
               OWNER
             </span>
-            <span className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4">
+            <span className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4">
               YOU
             </span>
           </div>
@@ -216,7 +216,7 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
             >
               <div className="min-w-0">
                 <div className="text-base font-medium truncate">{m.name}</div>
-                <div className="font-mono text-2xs tracking-[0.16em] uppercase text-ink-4 truncate">
+                <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 truncate">
                   {m.email.toUpperCase()}
                 </div>
               </div>

@@ -49,7 +49,7 @@ export function Modal({
       <div className="bg-paper-0 border border-ink-1 rounded-lg shadow-[0_24px_80px_rgba(0,0,0,0.18),0_4px_0_rgba(0,0,0,0.04)] overflow-hidden flex flex-col max-h-[92vh]">
         {title && (
           <div className="flex justify-between items-baseline px-6 py-5 border-b border-paper-3 gap-4">
-            <h3 className="m-0 font-display font-normal text-xl tracking-[-0.01em] [&_em]:italic [&_em]:font-light">
+            <h3 className="m-0 font-display font-normal text-xl tracking-display-sm [&_em]:italic [&_em]:font-light">
               {title}
             </h3>
             <button

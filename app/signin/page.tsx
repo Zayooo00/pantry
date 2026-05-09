@@ -13,17 +13,17 @@ export default function SigninPage() {
             <JarMark size={22} />
           </div>
           <div>
-            <div className="font-display text-xl font-normal tracking-[-0.01em]">Pantry</div>
-            <div className="font-mono text-xs tracking-[0.06em] text-ink-4 uppercase">
+            <div className="font-display text-xl font-normal tracking-display-sm">Pantry</div>
+            <div className="font-mono text-xs tracking-mono text-ink-4 uppercase">
               EST. KITCHEN · NO. 0001
             </div>
           </div>
         </Link>
 
-        <div className="mb-4 font-mono text-xs tracking-[0.06em] text-ink-4 uppercase">
+        <div className="mb-4 font-mono text-xs tracking-mono text-ink-4 uppercase">
           SIGN IN · NO. 0042
         </div>
-        <h1 className="m-0 mb-3 font-display text-[clamp(56px,7vw,88px)] leading-[0.95] font-light tracking-[-0.03em] [&_em]:font-normal [&_em]:italic">
+        <h1 className="m-0 mb-3 font-display text-[clamp(56px,7vw,88px)] leading-[0.95] font-light tracking-display [&_em]:font-normal [&_em]:italic">
           Welcome <em>back</em>.
         </h1>
         <p className="m-0 mb-10 font-display text-xl font-light text-ink-3 italic">
@@ -54,13 +54,13 @@ export default function SigninPage() {
 
       <aside className="hidden items-center justify-center bg-ink-1 bg-[radial-gradient(rgba(247,243,234,0.04)_1px,transparent_1px),radial-gradient(circle_at_80%_20%,rgba(90,107,58,0.15),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(184,65,43,0.10),transparent_50%)] bg-size-[4px_4px,auto,auto] p-16 text-paper-0 md:flex">
         <div className="flex max-w-120 flex-col gap-8">
-          <div className="font-mono text-xs tracking-[0.06em] text-paper-3 uppercase">
+          <div className="font-mono text-xs tracking-mono text-paper-3 uppercase">
             A QUIET INVENTORY, KEPT HONEST.
           </div>
-          <div className="font-display text-[clamp(36px,5vw,56px)] leading-[1.1] font-light tracking-[-0.02em] text-paper-0 text-balance [&_em]:font-normal [&_em]:text-amber-pantry-3 [&_em]:italic">
+          <div className="font-display text-[clamp(36px,5vw,56px)] leading-[1.1] font-light tracking-display-md text-paper-0 text-balance [&_em]:font-normal [&_em]:text-amber-pantry-3 [&_em]:italic">
             "Olive oil is at <em>0.4 L</em>. You set the floor at <em>1 L</em>."
           </div>
-          <div className="font-mono text-xs tracking-[0.06em] text-paper-3 uppercase">
+          <div className="font-mono text-xs tracking-mono text-paper-3 uppercase">
             EST. ONE KITCHEN
           </div>
         </div>

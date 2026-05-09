@@ -123,7 +123,7 @@ export function CommandPalette() {
           onChange={(e) => onQueryChange(e.target.value)}
           onKeyDown={onInputKey}
           placeholder="Search items, rooms, actions…"
-          className="w-full border-0 outline-none bg-transparent font-display text-2xl font-light tracking-[-0.01em] pt-2 px-1 pb-4 border-b border-paper-3 mb-4 text-ink-1"
+          className="w-full border-0 outline-none bg-transparent font-display text-2xl font-light tracking-display-sm pt-2 px-1 pb-4 border-b border-paper-3 mb-4 text-ink-1"
         />
         <div ref={listRef} className="max-h-105 overflow-y-auto">
           {filtered.length === 0 && (
@@ -145,7 +145,7 @@ export function CommandPalette() {
                 >
                   <span className="flex-1 font-display text-base">{action.label}</span>
                   {action.sub && (
-                    <span className="font-mono text-xs tracking-[0.06em] uppercase opacity-70">
+                    <span className="font-mono text-xs tracking-mono uppercase opacity-70">
                       {action.sub}
                     </span>
                   )}

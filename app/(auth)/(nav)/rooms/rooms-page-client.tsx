@@ -146,7 +146,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
           <div className="caption">
             {visibleRooms.length} ROOMS · {total} ITEMS
           </div>
-          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-[-0.03em] sm:text-4xl lg:text-6xl">
+          <h1 className="m-0 mt-2 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-6xl">
             Where things <em className="font-normal italic">live</em>.
           </h1>
           <div className="mt-3 font-display text-md font-light text-ink-3 italic sm:text-xl">
@@ -312,7 +312,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
 
 function tileClasses(tinted: boolean) {
   return cn(
-    "group relative flex min-h-70 flex-col gap-3 rounded-xl border p-6 transition-[transform,box-shadow,border-color] duration-200 ease-pantry hover:-translate-y-0.5 hover:border-ink-3 hover:shadow-[0_12px_28px_rgba(26,24,20,0.08),0_1px_0_rgba(26,24,20,0.04)]",
+    "group relative flex min-h-70 flex-col gap-3 rounded-xl border p-6 transition-[transform,box-shadow,border-color] duration-200 ease-pantry hover:-translate-y-0.5 hover:border-ink-3 hover:shadow-card-hover",
     tinted ? "border-paper-3 bg-olive-3" : "border-paper-3 bg-paper-0",
   );
 }
@@ -354,7 +354,7 @@ function RoomTileInner({
           )}
           {room.archived && (
             <span
-              className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-[0.18em] uppercase text-ink-3"
+              className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose uppercase text-ink-3"
               title="Archived"
             >
               ARCHIVED
@@ -362,7 +362,7 @@ function RoomTileInner({
           )}
           <span
             className={cn(
-              "font-mono text-2xs tracking-[0.18em]",
+              "font-mono text-2xs tracking-eyebrow-loose",
               tinted ? "text-olive-2" : "text-ink-4",
             )}
           >
@@ -373,7 +373,7 @@ function RoomTileInner({
       <div className={cn("caption","mt-3", tinted && "text-olive-2")}>{room.subtitle ?? ""}</div>
       <div
         className={cn(
-          "mt-auto font-display text-5xl leading-none font-light tracking-[-0.02em]",
+          "mt-auto font-display text-5xl leading-none font-light tracking-display-md",
           tinted && "text-olive-2",
         )}
       >
@@ -441,7 +441,7 @@ function SortableRoomTile({ room, index, total }: { room: Room; index: number; t
       <div
         aria-hidden
         className={cn(
-          "absolute top-3 right-3 rounded px-1.5 py-1 font-mono text-2xs leading-none tracking-[0.18em]",
+          "absolute top-3 right-3 rounded px-1.5 py-1 font-mono text-2xs leading-none tracking-eyebrow-loose",
           room.tinted ? "text-olive-2" : "text-ink-4",
         )}
         title="Drag to reorder"

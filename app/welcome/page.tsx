@@ -14,13 +14,13 @@ export default function WelcomePage() {
             <JarMark size={22} />
           </div>
           <div>
-            <div className="font-display text-xl font-normal tracking-[-0.01em]">Pantry</div>
-            <div className="font-mono text-xs tracking-[0.06em] uppercase text-ink-4">EST. KITCHEN · NO. 0001</div>
+            <div className="font-display text-xl font-normal tracking-display-sm">Pantry</div>
+            <div className="font-mono text-xs tracking-mono uppercase text-ink-4">EST. KITCHEN · NO. 0001</div>
           </div>
         </Link>
 
-        <div className="font-mono text-xs tracking-[0.06em] uppercase text-ink-4 mb-4">WELCOME · NO. 0000</div>
-        <h1 className="font-display font-light text-[clamp(56px,7vw,88px)] tracking-[-0.03em] leading-[0.95] m-0 mb-3 [&_em]:italic [&_em]:font-normal">
+        <div className="font-mono text-xs tracking-mono uppercase text-ink-4 mb-4">WELCOME · NO. 0000</div>
+        <h1 className="font-display font-light text-[clamp(56px,7vw,88px)] tracking-display leading-[0.95] m-0 mb-3 [&_em]:italic [&_em]:font-normal">
           A quiet inventory,<br />
           <em>kept honest</em>.
         </h1>
@@ -38,19 +38,19 @@ export default function WelcomePage() {
         </div>
 
         <div className="mt-8 pt-6 border-t border-dashed border-paper-3 text-sm text-ink-3 font-display italic">
-          <span className="font-mono text-xs tracking-[0.06em] uppercase text-ink-4">No setup required · works on mobile and desktop</span>
+          <span className="font-mono text-xs tracking-mono uppercase text-ink-4">No setup required · works on mobile and desktop</span>
         </div>
       </div>
 
       <aside className="hidden md:flex bg-ink-1 text-paper-0 items-center justify-center p-16 bg-[radial-gradient(rgba(247,243,234,0.04)_1px,transparent_1px),radial-gradient(circle_at_80%_20%,rgba(90,107,58,0.15),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(184,65,43,0.10),transparent_50%)] bg-size-[4px_4px,auto,auto]">
         <div className="max-w-120 flex flex-col gap-8">
-          <div className="font-mono text-xs tracking-[0.06em] uppercase text-paper-3">A QUIET INVENTORY, KEPT HONEST.</div>
-          <div className="font-display font-light text-[clamp(36px,5vw,56px)] leading-[1.1] tracking-[-0.02em] text-paper-0 [&_em]:italic [&_em]:font-normal [&_em]:text-amber-pantry-3">
+          <div className="font-mono text-xs tracking-mono uppercase text-paper-3">A QUIET INVENTORY, KEPT HONEST.</div>
+          <div className="font-display font-light text-[clamp(36px,5vw,56px)] leading-[1.1] tracking-display-md text-paper-0 [&_em]:italic [&_em]:font-normal [&_em]:text-amber-pantry-3">
             Every <em>jar</em>,<br />
             every <em>bottle</em>,<br />
             every <em>bag</em>.
           </div>
-          <div className="font-mono text-xs tracking-[0.06em] uppercase text-paper-3">EST. ONE KITCHEN</div>
+          <div className="font-mono text-xs tracking-mono uppercase text-paper-3">EST. ONE KITCHEN</div>
         </div>
       </aside>
     </div>

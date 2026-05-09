@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 export const roleBadge = cva(
-  "inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-3xs tracking-[0.18em] uppercase",
+  "inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose uppercase",
   {
     variants: {
       role: {

@@ -108,7 +108,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
                   key={c.name}
                   className="grid grid-cols-[80px_1fr_40px] items-center gap-3 sm:grid-cols-[100px_1fr_60px]"
                 >
-                  <span className="truncate font-mono text-2xs tracking-[0.12em] text-ink-3 uppercase">
+                  <span className="truncate font-mono text-2xs tracking-label text-ink-3 uppercase">
                     {c.name}
                   </span>
                   <div className={level()}>

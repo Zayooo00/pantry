@@ -110,7 +110,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
                 <span aria-hidden className="font-mono text-base leading-none tracking-[0.35em] text-ink-1">
                   ║║║▌║║
                 </span>
-                <span className="font-mono text-2xs tracking-[0.12em] text-ink-2">
+                <span className="font-mono text-2xs tracking-label text-ink-2">
                   {item.barcode}
                 </span>
               </div>
@@ -130,7 +130,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
                 {room ? ` · ${room.name.toUpperCase()}` : ""}
                 {item.shelf ? ` / ${item.shelf.toUpperCase()}` : ""}
               </div>
-              <h1 className="m-0 font-display text-3xl leading-[0.95] font-light tracking-[-0.03em] sm:text-4xl lg:text-6xl">
+              <h1 className="m-0 font-display text-3xl leading-[0.95] font-light tracking-display sm:text-4xl lg:text-6xl">
                 {item.name.split(" ").slice(0, -1).join(" ") || item.name}
                 {item.name.split(" ").length > 1 && (
                   <>
@@ -161,7 +161,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             )}
           >
             <div>
-              <div className="mb-1 font-mono text-2xs tracking-[0.18em] text-ink-2 uppercase">
+              <div className="mb-1 font-mono text-2xs tracking-eyebrow-loose text-ink-2 uppercase">
                 CURRENTLY ON HAND
               </div>
               <div

@@ -51,7 +51,7 @@ export default async function DashboardPage() {
           <div className="caption mb-3">
             {dow} · {dd} {mon} {yyyy}
           </div>
-          <h1 className="m-0 mb-2 font-display text-3xl leading-none font-light tracking-[-0.03em] sm:text-4xl lg:text-6xl">
+          <h1 className="m-0 mb-2 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-6xl">
             {greeting},
             <br />
             <em className="font-normal italic">{firstName}.</em>
@@ -73,11 +73,11 @@ export default async function DashboardPage() {
       {(data.lowCount > 0 || data.soonCount > 0) && (
         <div className="mb-8 grid grid-cols-1 items-center gap-6 rounded-xl bg-ink-1 px-5 py-5 text-paper-0 md:mb-12 md:px-8 md:py-6 lg:grid-cols-[1fr_auto]">
           <div>
-            <div className="mb-2 font-mono text-2xs tracking-[0.18em] text-paper-3 uppercase">
+            <div className="mb-2 font-mono text-2xs tracking-eyebrow-loose text-paper-3 uppercase">
               {String(today.getHours()).padStart(2, "0")}:
               {String(today.getMinutes()).padStart(2, "0")} · ATTENTION
             </div>
-            <div className="font-display text-2xl leading-tight font-light tracking-[-0.02em] sm:text-3xl">
+            <div className="font-display text-2xl leading-tight font-light tracking-display-md sm:text-3xl">
               {data.lowCount > 0 && (
                 <>
                   {data.lowCount} item{data.lowCount === 1 ? "" : "s"} below their floor.
@@ -214,7 +214,7 @@ export default async function DashboardPage() {
                   <Link
                     key={it.id}
                     href={`/items/${it.id}`}
-                    className="flex min-h-35 flex-col gap-3 rounded-md border border-paper-3 bg-paper-0 p-4 text-inherit transition-[transform,box-shadow,border-color] duration-200 ease-pantry hover:-translate-y-0.5 hover:border-ink-3 hover:shadow-[0_12px_28px_rgba(26,24,20,0.08),0_1px_0_rgba(26,24,20,0.04)]"
+                    className="flex min-h-35 flex-col gap-3 rounded-md border border-paper-3 bg-paper-0 p-4 text-inherit transition-[transform,box-shadow,border-color] duration-200 ease-pantry hover:-translate-y-0.5 hover:border-ink-3 hover:shadow-card-hover"
                   >
                     <span className={badge({ tone: "soon" })}>
                       <i className="w-1.5 h-1.5 rounded-full inline-block bg-amber-pantry" />

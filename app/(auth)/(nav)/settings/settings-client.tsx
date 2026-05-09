@@ -125,7 +125,7 @@ export function SettingsClient({ user }: { user: User }) {
     <>
       <div className="mb-8 md:mb-12">
         <div className={cn("caption","mb-3")}>PROFILE · NO. 0001</div>
-        <h1 className="m-0 font-display text-3xl leading-none font-light tracking-[-0.03em] sm:text-4xl lg:text-5xl">
+        <h1 className="m-0 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-5xl">
           Your <em className="font-normal italic">desk</em>.
         </h1>
         <div className="mt-3 font-display text-md font-light text-ink-3 italic sm:text-xl">
@@ -329,7 +329,7 @@ function SettingsSection({
       <div className="mb-2 flex items-baseline justify-between border-t border-ink-1 pt-3">
         <div className="flex items-baseline gap-3">
           <span className="caption">{num}</span>
-          <h2 className="m-0 font-display text-2xl tracking-[-0.01em]">{title}</h2>
+          <h2 className="m-0 font-display text-2xl tracking-display-sm">{title}</h2>
         </div>
       </div>
       <p className="mb-6 max-w-prose text-sm text-ink-3">{lede}</p>

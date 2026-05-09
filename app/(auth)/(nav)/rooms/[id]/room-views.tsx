@@ -184,7 +184,7 @@ function GridView({ items }: { items: EnrichedItem[] }) {
         <Link
           key={it.id}
           href={`/items/${it.id}`}
-          className="relative flex flex-col gap-3 overflow-hidden rounded-xl border border-paper-3 bg-paper-0 p-4 text-inherit transition-[transform,box-shadow,border-color] duration-200 ease-pantry hover:-translate-y-0.5 hover:border-ink-3 hover:shadow-[0_12px_28px_rgba(26,24,20,0.08),0_1px_0_rgba(26,24,20,0.04)]"
+          className="relative flex flex-col gap-3 overflow-hidden rounded-xl border border-paper-3 bg-paper-0 p-4 text-inherit transition-[transform,box-shadow,border-color] duration-200 ease-pantry hover:-translate-y-0.5 hover:border-ink-3 hover:shadow-card-hover"
         >
           {it.status === "low" && (
             <span className="absolute top-3 right-3 z-10">
@@ -305,7 +305,7 @@ function ShelfView({ items }: { items: EnrichedItem[] }) {
     <div className="flex flex-col gap-12">
       {shelves.map((s, idx) => (
         <div key={idx} className="relative pb-4">
-          <div className="mb-2 flex justify-between border-b border-dashed border-paper-3 pb-1.5 font-mono text-2xs tracking-[0.18em] text-ink-4 uppercase">
+          <div className="mb-2 flex justify-between border-b border-dashed border-paper-3 pb-1.5 font-mono text-2xs tracking-eyebrow-loose text-ink-4 uppercase">
             <span>{s.tag}</span>
             <span>{s.items.length} ITEMS</span>
           </div>

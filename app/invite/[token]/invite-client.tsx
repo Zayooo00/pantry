@@ -108,7 +108,7 @@ export function InviteClient({ token }: { token: string }) {
   return (
     <div className="w-full max-w-md rounded-xl border border-paper-3 bg-paper-1 p-8 shadow-[0_12px_40px_rgba(26,24,20,0.06)]">
       <div className="caption mb-3">YOU'RE INVITED</div>
-      <h1 className="m-0 font-display text-3xl leading-tight font-light tracking-[-0.03em]">
+      <h1 className="m-0 font-display text-3xl leading-tight font-light tracking-display">
         Share <em className="font-normal italic">{room.name.toLowerCase()}</em>?
       </h1>
       <p className="mt-3 font-display text-md text-ink-3 italic">

@@ -52,11 +52,19 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
     setItems((current) =>
       current.map((i) => (i.id === id ? { ...i, readAt: new Date().toISOString() } : i)),
     );
+    refreshBadge();
+    let res: Response;
     try {
-      await fetch(`/api/notifications/${id}`, { method: "PATCH" });
-      refreshBadge();
+      // keepalive lets the PATCH survive the navigation a notification-link click triggers.
+      res = await fetch(`/api/notifications/${id}`, { method: "PATCH", keepalive: true });
     } catch {
-      // best-effort
+      toast(<>Couldn't mark read — try again.</>);
+      refreshBadge();
+      return;
+    }
+    if (!res.ok) {
+      toast(<>Couldn't mark read — server returned {res.status}.</>);
+      refreshBadge();
     }
   }
 
@@ -67,13 +75,21 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
     setItems((current) =>
       current.map((i) => (i.readAt ? i : { ...i, readAt: new Date().toISOString() })),
     );
+    let res: Response;
     try {
-      await fetch("/api/notifications/read-all", { method: "POST" });
-      refreshBadge();
-      toast(<>All caught up.</>);
+      res = await fetch("/api/notifications/read-all", { method: "POST" });
     } catch {
-      toast(<>Couldn't mark all read.</>);
+      toast(<>Couldn't mark all read — try again.</>);
+      refreshBadge();
+      return;
     }
+    if (!res.ok) {
+      toast(<>Couldn't mark all read — server returned {res.status}.</>);
+      refreshBadge();
+      return;
+    }
+    refreshBadge();
+    toast(<>All caught up.</>);
     router.refresh();
   }
 
@@ -85,14 +101,27 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
     }
     setItems((current) => current.filter((i) => !i.readAt));
     setClearOpen(false);
-    try {
-      await Promise.all(
-        readIds.map((id) => fetch(`/api/notifications/${id}`, { method: "DELETE" })),
+    const results = await Promise.all(
+      readIds.map((id) =>
+        fetch(`/api/notifications/${id}`, { method: "DELETE" }).catch(
+          () => new Response(null, { status: 0 }),
+        ),
+      ),
+    );
+    const failed = results.filter((r) => !r.ok).length;
+    refreshBadge();
+    if (failed > 0) {
+      toast(
+        <>
+          Cleared {readIds.length - failed} of {readIds.length} — {failed} couldn't be removed.
+        </>,
       );
-      refreshBadge();
-      toast(<>Cleared {readIds.length} read notification{readIds.length === 1 ? "" : "s"}.</>);
-    } catch {
-      toast(<>Couldn't clear.</>);
+    } else {
+      toast(
+        <>
+          Cleared {readIds.length} read notification{readIds.length === 1 ? "" : "s"}.
+        </>,
+      );
     }
     router.refresh();
   }

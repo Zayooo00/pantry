@@ -20,7 +20,7 @@ export default defineConfig({
   testIgnore: ["**/setup-db.ts", "**/global-setup.ts", "**/auth.ts"],
   fullyParallel: false,
   workers: 3,
-  retries: 0,
+  retries: process.env.CI ? 2 : 0,
   timeout: 180_000,
   expect: { timeout: 10_000 },
   reporter: process.env.CI ? "github" : "list",

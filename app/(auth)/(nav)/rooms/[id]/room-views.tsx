@@ -9,15 +9,52 @@ import { badge } from "@/components/badge";
 import { chip } from "@/components/chip";
 import { level } from "@/components/level";
 import { stamp } from "@/components/stamp";
+import { Select } from "@/components/select";
 
 type EnrichedItem = Item & { status: ItemStatus; upd: string };
 
 type Layout = "grid" | "list" | "shelf";
+type SortKey = "recent" | "name" | "count-asc" | "count-desc" | "expires";
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: "recent", label: "Recently updated" },
+  { value: "name", label: "Name (A→Z)" },
+  { value: "count-asc", label: "Count (low→high)" },
+  { value: "count-desc", label: "Count (high→low)" },
+  { value: "expires", label: "Expires soonest" },
+];
+
+function sortItems(items: EnrichedItem[], sort: SortKey): EnrichedItem[] {
+  const copy = [...items];
+  switch (sort) {
+    case "name": {
+      return copy.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+    }
+    case "count-asc": {
+      return copy.sort((a, b) => a.count - b.count);
+    }
+    case "count-desc": {
+      return copy.sort((a, b) => b.count - a.count);
+    }
+    case "expires": {
+      return copy.sort((a, b) => {
+        const ax = a.expiresAt ? a.expiresAt.getTime() : Number.POSITIVE_INFINITY;
+        const bx = b.expiresAt ? b.expiresAt.getTime() : Number.POSITIVE_INFINITY;
+        return ax - bx;
+      });
+    }
+    case "recent":
+    default: {
+      return copy.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+    }
+  }
+}
 
 export function RoomViews({ items }: { items: EnrichedItem[] }) {
   const [layout, setLayout] = useState<Layout>("grid");
   const [filter, setFilter] = useState<string>("All");
   const [lowOnly, setLowOnly] = useState(false);
+  const [sort, setSort] = useState<SortKey>("recent");
 
   const categories = useMemo(() => {
     return [
@@ -26,15 +63,18 @@ export function RoomViews({ items }: { items: EnrichedItem[] }) {
     ];
   }, [items]);
 
-  const filtered = items.filter((i) => {
-    if (lowOnly && i.status !== "low") {
-      return false;
-    }
-    if (filter === "All") {
-      return true;
-    }
-    return i.category === filter;
-  });
+  const filtered = useMemo(() => {
+    const matching = items.filter((i) => {
+      if (lowOnly && i.status !== "low") {
+        return false;
+      }
+      if (filter === "All") {
+        return true;
+      }
+      return i.category === filter;
+    });
+    return sortItems(matching, sort);
+  }, [items, lowOnly, filter, sort]);
 
   return (
     <>
@@ -69,7 +109,15 @@ export function RoomViews({ items }: { items: EnrichedItem[] }) {
           </button>
         </div>
         <div className="flex items-center gap-3 self-end lg:self-auto">
-          <span className={cn("caption","hidden sm:inline")}>SORT — RECENT</span>
+          <span className={cn("caption","hidden sm:inline")}>SORT</span>
+          <div className="w-50">
+            <Select
+              value={sort}
+              onChange={(v) => setSort(v as SortKey)}
+              options={SORT_OPTIONS}
+              size="sm"
+            />
+          </div>
           <div className="inline-flex rounded-full border border-paper-3 bg-paper-1 p-0.75">
             {(["grid", "list", "shelf"] as Layout[]).map((l) => (
               <button
@@ -233,12 +281,27 @@ function ShelfView({ items }: { items: EnrichedItem[] }) {
   if (items.length === 0) {
     return <Empty />;
   }
-  const perShelf = Math.ceil(items.length / 3);
-  const shelves = [
-    { tag: "SHELF A", items: items.slice(0, perShelf) },
-    { tag: "SHELF B", items: items.slice(perShelf, perShelf * 2) },
-    { tag: "SHELF C", items: items.slice(perShelf * 2) },
-  ].filter((s) => s.items.length > 0);
+  const groups = new Map<string, EnrichedItem[]>();
+  for (const it of items) {
+    const key = (it.shelf ?? "").trim() || "UNFILED";
+    const list = groups.get(key);
+    if (list) {
+      list.push(it);
+    } else {
+      groups.set(key, [it]);
+    }
+  }
+  const shelves = Array.from(groups.entries())
+    .sort(([a], [b]) => {
+      if (a === "UNFILED") {
+        return 1;
+      }
+      if (b === "UNFILED") {
+        return -1;
+      }
+      return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
+    })
+    .map(([tag, items]) => ({ tag: tag.toUpperCase(), items }));
 
   return (
     <div className="flex flex-col gap-12">

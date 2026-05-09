@@ -11,12 +11,14 @@ export function Select({
   options,
   placeholder = "Select…",
   disabled,
+  size = "md",
 }: {
   value: string;
   onChange: (v: string) => void;
   options: SelectOption[];
   placeholder?: string;
   disabled?: boolean;
+  size?: "sm" | "md";
 }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -76,7 +78,10 @@ export function Select({
       <button
         type="button"
         disabled={disabled}
-        className="flex justify-between items-center w-full px-3.5 py-3 bg-paper-0 border border-paper-4 rounded-md font-sans text-base text-ink-1 cursor-pointer transition-[border-color] duration-150 ease-pantry text-left hover:border-ink-3 data-[open=true]:border-ink-1"
+        className={cn(
+          "flex justify-between items-center w-full bg-paper-0 border border-paper-4 rounded-md font-sans text-ink-1 cursor-pointer transition-[border-color] duration-150 ease-pantry text-left hover:border-ink-3 data-[open=true]:border-ink-1",
+          size === "sm" ? "px-2.5 py-1.5 text-sm" : "px-3.5 py-3 text-base",
+        )}
         data-open={open}
         onClick={toggleOpen}
       >

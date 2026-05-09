@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { and, eq, inArray, isNull, or } from "drizzle-orm";
+import { timingSafeEqual } from "node:crypto";
 import { db, items, rooms, roomMembers, users } from "@/db";
 import { itemStatus } from "@/lib/format";
 import { appUrl, emailLayout, escapeHtml, isEmailConfigured, sendEmail } from "@/lib/email";
@@ -16,7 +17,15 @@ function isAuthorized(req: NextRequest): boolean {
     return false;
   }
   const header = req.headers.get("authorization");
-  return header === `Bearer ${secret}`;
+  if (!header) {
+    return false;
+  }
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const got = Buffer.from(header);
+  if (got.length !== expected.length) {
+    return false;
+  }
+  return timingSafeEqual(got, expected);
 }
 
 export async function GET(req: NextRequest) {

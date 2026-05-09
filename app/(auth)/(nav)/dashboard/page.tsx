@@ -5,12 +5,13 @@ import { AddToShoppingButton } from "@/components/stepper";
 import { getDashboardData } from "@/lib/queries";
 import { auth } from "@/auth";
 import { requireUserId } from "@/lib/access";
-import { daysUntil, formatCount, formatDate, formatEventKind, shortLabel } from "@/lib/format";
+import { daysUntil, formatCount, formatDate, formatEventKind } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { badge } from "@/components/badge";
 import { button } from "@/components/button";
 import { level } from "@/components/level";
 import { SectionTitle } from "@/components/section-title";
+import { ItemThumbnail } from "@/components/item-thumbnail";
 
 export const dynamic = "force-dynamic";
 
@@ -153,9 +154,7 @@ export default async function DashboardPage() {
                     aria-label={it.name}
                     className="absolute inset-0 z-0"
                   />
-                  <div className="relative bg-[repeating-linear-gradient(45deg,var(--color-paper-2)_0_6px,var(--color-paper-1)_6px_12px)] border border-paper-3 rounded-md grid place-items-center text-ink-4 font-mono text-2xs tracking-widest uppercase overflow-hidden h-14 w-14">
-                    {shortLabel(it.name, 4)}
-                  </div>
+                  <ItemThumbnail name={it.name} photoUrl={it.photoUrl} className="h-14 w-14" abbrevLength={4} sizes="56px" />
                   <div className="min-w-0">
                     <div className="block truncate font-display text-lg transition-colors group-hover:text-olive-2">
                       {it.name}

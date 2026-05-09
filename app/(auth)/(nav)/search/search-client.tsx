@@ -11,13 +11,14 @@ import { button } from "@/components/button";
 import { chip } from "@/components/chip";
 import { level } from "@/components/level";
 
-import { formatCount, ItemStatus, shortLabel } from "@/lib/format";
+import { formatCount, ItemStatus } from "@/lib/format";
+import { ItemThumbnail } from "@/components/item-thumbnail";
 import type { Item as ItemRow, Room as RoomRow } from "@/db/schema";
 
 type RoomLite = Pick<RoomRow, "id" | "name">;
 type ItemLite = Pick<
   ItemRow,
-  "id" | "name" | "brand" | "barcode" | "roomId" | "category" | "shelf" | "count" | "unit" | "threshold"
+  "id" | "name" | "brand" | "barcode" | "roomId" | "category" | "shelf" | "count" | "unit" | "threshold" | "photoUrl"
 > & { status: ItemStatus };
 type StatusFilter = "all" | "low" | "soon";
 
@@ -138,7 +139,7 @@ export function SearchClient({
           placeholder="Search by name, brand, barcode, room…"
           autoFocus
           aria-label="Search"
-          className="w-full border-0 bg-transparent font-display text-xl font-light tracking-[-0.02em] text-ink-1 outline-none placeholder:text-ink-4 placeholder:italic sm:text-2xl lg:text-4xl"
+          className="w-full border-0 bg-transparent font-display text-xl leading-tight font-light tracking-[-0.02em] text-ink-1 outline-none placeholder:text-ink-4 placeholder:italic sm:text-2xl lg:text-4xl"
         />
         <div className="flex items-center gap-3">
           <span className="caption">
@@ -270,11 +271,8 @@ export function SearchClient({
                     key={it.id}
                     className="grid grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-dashed border-paper-3 px-4 py-4 transition-[background,transform,box-shadow] duration-150 ease-pantry last:border-0 hover:bg-paper-1 sm:grid-cols-[56px_2fr_1fr_100px_80px] sm:gap-4 sm:px-6"
                   >
-                    <Link
-                      href={`/items/${it.id}`}
-                      className="relative grid h-14 w-14 place-items-center overflow-hidden rounded-md border border-paper-3 bg-[repeating-linear-gradient(45deg,var(--color-paper-2)_0_6px,var(--color-paper-1)_6px_12px)] font-mono text-2xs tracking-widest text-ink-4 uppercase"
-                    >
-                      {shortLabel(it.name, 3)}
+                    <Link href={`/items/${it.id}`} className="block h-14 w-14">
+                      <ItemThumbnail name={it.name} photoUrl={it.photoUrl} className="h-14 w-14" sizes="56px" />
                     </Link>
                     <div className="min-w-0">
                       <Link

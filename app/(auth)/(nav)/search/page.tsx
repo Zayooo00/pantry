@@ -33,6 +33,7 @@ export default async function SearchPage({
           count: i.count,
           unit: i.unit,
           threshold: i.threshold,
+          photoUrl: i.photoUrl,
           status: itemStatus({ count: i.count, threshold: i.threshold, expiresAt: i.expiresAt }),
         }))}
       />

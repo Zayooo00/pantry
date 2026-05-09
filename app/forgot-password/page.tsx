@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { SigninForm } from "./signin-form";
+import { ForgotPasswordForm } from "./forgot-password-form";
 
 export const dynamic = "force-dynamic";
 
-export default function SigninPage() {
+export default function ForgotPasswordPage() {
   return (
     <div className="grid min-h-screen grid-cols-1 bg-paper-0 md:grid-cols-2">
       <div className="ml-auto flex w-full max-w-140 flex-col justify-center px-[clamp(24px,6vw,96px)] py-12">
@@ -24,50 +24,28 @@ export default function SigninPage() {
         </Link>
 
         <div className="mb-4 font-mono text-xs tracking-[0.06em] text-ink-4 uppercase">
-          SIGN IN · NO. 0042
+          RESET PASSWORD
         </div>
         <h1 className="m-0 mb-3 font-display text-[clamp(56px,7vw,88px)] leading-[0.95] font-light tracking-[-0.03em] [&_em]:font-normal [&_em]:italic">
-          Welcome <em>back</em>.
+          Forgot the <em>key</em>?
         </h1>
         <p className="m-0 mb-10 font-display text-xl font-light text-ink-3 italic">
-          The shelf has been waiting.
+          Tell us your email — we'll send a fresh link.
         </p>
 
-        <SigninForm />
-
-        <div className="mt-6 text-right">
-          <Link
-            href="/forgot-password"
-            className="font-display text-sm text-ink-3 italic underline-offset-4 transition-colors duration-150 ease-pantry hover:text-olive-2 hover:underline"
-          >
-            Forgot password?
-          </Link>
-        </div>
+        <ForgotPasswordForm />
 
         <div className="mt-8 border-t border-dashed border-paper-3 pt-6 font-display text-sm text-ink-3 italic">
-          <span>New here?</span>{" "}
           <Link
-            href="/signup"
+            href="/signin"
             className="border-b border-ink-1 pb-px text-ink-1 not-italic transition-colors duration-150 ease-pantry hover:border-olive-2 hover:text-olive-2"
           >
-            Create an account →
+            ← Back to sign in
           </Link>
         </div>
       </div>
 
-      <aside className="hidden items-center justify-center bg-ink-1 bg-[radial-gradient(rgba(247,243,234,0.04)_1px,transparent_1px),radial-gradient(circle_at_80%_20%,rgba(90,107,58,0.15),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(184,65,43,0.10),transparent_50%)] bg-size-[4px_4px,auto,auto] p-16 text-paper-0 md:flex">
-        <div className="flex max-w-120 flex-col gap-8">
-          <div className="font-mono text-xs tracking-[0.06em] text-paper-3 uppercase">
-            A QUIET INVENTORY, KEPT HONEST.
-          </div>
-          <div className="font-display text-[clamp(36px,5vw,56px)] leading-[1.1] font-light tracking-[-0.02em] text-paper-0 text-balance [&_em]:font-normal [&_em]:text-amber-pantry-3 [&_em]:italic">
-            "Olive oil is at <em>0.4 L</em>. You set the floor at <em>1 L</em>."
-          </div>
-          <div className="font-mono text-xs tracking-[0.06em] text-paper-3 uppercase">
-            EST. ONE KITCHEN
-          </div>
-        </div>
-      </aside>
+      <aside className="hidden items-center justify-center bg-ink-1 bg-[radial-gradient(rgba(247,243,234,0.04)_1px,transparent_1px)] bg-size-[4px_4px] p-16 text-paper-0 md:flex" />
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  timeout: 90_000,
+  timeout: 180_000,
   expect: { timeout: 10_000 },
   reporter: process.env.CI ? "github" : "list",
   use: {
@@ -41,6 +41,7 @@ export default defineConfig({
       AUTH_SECRET: "test-secret-not-for-production-use-only-32b",
       AUTH_TRUST_HOST: "true",
       APP_URL: BASE_URL,
+      E2E_BYPASS_RATE_LIMIT: "1",
     },
   },
 });

@@ -54,6 +54,16 @@
   --radius-xl: 18px;
 
   --ease-pantry: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --tracking-display: -0.03em;
+  --tracking-display-md: -0.02em;
+  --tracking-display-sm: -0.01em;
+  --tracking-mono: 0.06em;
+  --tracking-label: 0.12em;
+  --tracking-eyebrow: 0.16em;
+  --tracking-eyebrow-loose: 0.18em;
+
+  --shadow-card-hover: 0 12px 28px rgba(26, 24, 20, 0.08), 0 1px 0 rgba(26, 24, 20, 0.04);
 }
 
 @media (prefers-color-scheme: dark) {

@@ -11,6 +11,7 @@ import {
   ActivityIcon,
   BellIcon,
   BrandMark,
+  ChevronIcon,
   GridIcon,
   HomeIcon,
   ListIcon,
@@ -311,25 +312,13 @@ export function Sidebar({
                     {session?.user?.email ?? ""}
                   </div>
                 </div>
-                <svg
-                  aria-hidden
-                  viewBox="0 0 12 12"
-                  width="10"
-                  height="10"
+                <ChevronIcon
+                  size={10}
                   className={cn(
                     "shrink-0 text-ink-4 transition-transform duration-200 ease-pantry origin-center",
-                    menuOpen ? "rotate-90" : "rotate-0",
+                    menuOpen ? "rotate-0" : "-rotate-90",
                   )}
-                >
-                  <path
-                    d="M4 2 L8 6 L4 10"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                />
               </button>
             </Popover.Trigger>
             <Popover.Portal>

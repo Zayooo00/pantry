@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import { JarMark } from "@/icons";
 import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
 
@@ -10,11 +11,7 @@ export default function WelcomePage() {
       <div className="flex flex-col justify-center px-[clamp(24px,6vw,96px)] py-12 max-w-140 w-full ml-auto">
         <Link href="/" className="flex gap-3 items-center mb-16 text-inherit no-underline">
           <div className="w-9.5 h-9.5 border-[1.5px] border-ink-1 rounded-sm grid place-items-center bg-paper-0 text-ink-1">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <rect x="3" y="5" width="16" height="14" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M3 11 H19" stroke="currentColor" strokeWidth="1.5" />
-              <circle cx="11" cy="15" r="1.2" fill="var(--color-olive)" />
-            </svg>
+            <JarMark size={22} />
           </div>
           <div>
             <div className="font-display text-xl font-normal tracking-[-0.01em]">Pantry</div>

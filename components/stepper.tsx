@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { button } from "@/components/button";
+import { ChevronIcon } from "@/icons";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { invalidateApi, useMutation } from "@/lib/api/client";
@@ -94,9 +95,7 @@ export function NumberStepper({
             aria-label="Increase"
             className="flex h-1/2 w-7 cursor-pointer items-center justify-center border-0 bg-transparent text-ink-3 transition-colors hover:bg-paper-2 hover:text-ink-0"
           >
-            <svg viewBox="0 0 10 10" width="10" height="10" fill="none">
-              <path d="M2 6.5 L5 3.5 L8 6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <ChevronIcon size={10} className="rotate-180" />
           </button>
           <button
             type="button"
@@ -104,9 +103,7 @@ export function NumberStepper({
             aria-label="Decrease"
             className="flex h-1/2 w-7 cursor-pointer items-center justify-center border-0 border-t border-paper-4 bg-transparent text-ink-3 transition-colors hover:bg-paper-2 hover:text-ink-0"
           >
-            <svg viewBox="0 0 10 10" width="10" height="10" fill="none">
-              <path d="M2 3.5 L5 6.5 L8 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <ChevronIcon size={10} />
           </button>
         </div>
       </div>

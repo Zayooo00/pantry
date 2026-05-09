@@ -304,7 +304,7 @@ export function SettingsClient({ user }: { user: User }) {
       <ConfirmDialog
         open={signOutOpen}
         onClose={() => setSignOutOpen(false)}
-        onConfirm={() => signOut({ callbackUrl: "/welcome" })}
+        onConfirm={() => signOut({ callbackUrl: "/sign-in" })}
         title="Sign out?"
         message={<>You'll need to sign back in to see the pantry.</>}
         confirmLabel="Sign out"

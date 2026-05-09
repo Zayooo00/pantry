@@ -9,3 +9,6 @@ test.db-journal
 *.log
 .vercel
 drizzle/.snapshot
+tsconfig.tsbuildinfo
+
+.vercel

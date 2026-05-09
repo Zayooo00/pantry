@@ -11,7 +11,7 @@ export default defineConfig({
     environment: "node",
     setupFiles: ["./tests/setup.ts"],
     env: {
-      DATABASE_URL: "file:test.db",
+      DATABASE_URL: process.env.CI ? ":memory:" : "file:test.db",
       AUTH_SECRET: "test-secret-not-real-just-for-vitest",
     },
     include: ["tests/**/*.test.ts"],

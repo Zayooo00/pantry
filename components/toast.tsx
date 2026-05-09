@@ -25,11 +25,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-100">
+      <div className="fixed right-6 bottom-6 z-100 flex flex-col gap-2">
         {items.map((it) => (
           <div
             key={it.id}
-            className="bg-ink-1 text-paper-0 px-5 py-3 rounded-full font-display text-base shadow-[0_12px_32px_rgba(0,0,0,0.2)] animate-[pantry-pop_0.25s_var(--ease-pantry)] [&_em]:italic [&_em]:text-amber-pantry-3"
+            className="animate-[pantry-pop_0.25s_var(--ease-pantry)] rounded-full bg-ink-1 px-5 py-3 font-display text-base text-paper-0 shadow-[0_12px_32px_rgba(0,0,0,0.2)] [&_em]:text-amber-pantry-3 [&_em]:italic"
           >
             {it.message}
           </div>

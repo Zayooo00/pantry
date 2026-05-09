@@ -90,11 +90,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .from(users)
     .where(eq(users.email, parsed.data.email))
     .limit(1);
-  const room = await db
-    .select({ name: rooms.name })
-    .from(rooms)
-    .where(eq(rooms.id, id))
-    .limit(1);
+  const room = await db.select({ name: rooms.name }).from(rooms).where(eq(rooms.id, id)).limit(1);
   const inviter = await db
     .select({ name: users.name, email: users.email })
     .from(users)

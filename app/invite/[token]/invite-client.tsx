@@ -92,7 +92,10 @@ export function InviteClient({ token }: { token: string }) {
     return (
       <div className="w-full max-w-md rounded-xl border border-tomato-2 bg-tomato-3 p-8 text-center">
         <div className="font-display text-2xl text-tomato-2">{state.message}</div>
-        <Link href="/dashboard" className={cn(button({ variant: "secondary" }), "mt-6 inline-block")}>
+        <Link
+          href="/dashboard"
+          className={cn(button({ variant: "secondary" }), "mt-6 inline-block")}
+        >
           Back to Pantry
         </Link>
       </div>

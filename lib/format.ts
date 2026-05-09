@@ -15,7 +15,20 @@ export function formatDate(d: Date | null | undefined, opts?: { dotted?: boolean
   if (opts?.dotted) {
     return `${dd}.${mm}.${yy}`;
   }
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   return `${dd} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
@@ -46,7 +59,10 @@ export function itemStatus(args: {
 }
 
 export function shortLabel(name: string, len = 3): string {
-  return name.split(/[\s,]+/)[0].slice(0, len).toUpperCase();
+  return name
+    .split(/[\s,]+/)[0]
+    .slice(0, len)
+    .toUpperCase();
 }
 
 export function formatEventKind(kind: string, _payload?: unknown): string {

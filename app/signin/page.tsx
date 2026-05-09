@@ -57,7 +57,7 @@ export default function SigninPage() {
           <div className="font-mono text-xs tracking-mono text-paper-3 uppercase">
             A QUIET INVENTORY, KEPT HONEST.
           </div>
-          <div className="font-display text-[clamp(36px,5vw,56px)] leading-[1.1] font-light tracking-display-md text-paper-0 text-balance [&_em]:font-normal [&_em]:text-amber-pantry-3 [&_em]:italic">
+          <div className="font-display text-[clamp(36px,5vw,56px)] leading-[1.1] font-light tracking-display-md text-balance text-paper-0 [&_em]:font-normal [&_em]:text-amber-pantry-3 [&_em]:italic">
             "Olive oil is at <em>0.4 L</em>. You set the floor at <em>1 L</em>."
           </div>
           <div className="font-mono text-xs tracking-mono text-paper-3 uppercase">

@@ -54,11 +54,7 @@ test("signs up a new user, lands on dashboard, and shows them in the sidebar", a
 test("signs out from the sidebar profile popover and returns to /welcome", async ({ page }) => {
   await loginAs(page);
 
-  await page
-    .locator("aside")
-    .locator("button")
-    .filter({ hasText: SEED_USER.email })
-    .click();
+  await page.locator("aside").locator("button").filter({ hasText: SEED_USER.email }).click();
 
   await page.getByRole("button", { name: /^sign out$/i }).click();
   await page.waitForURL("**/welcome");

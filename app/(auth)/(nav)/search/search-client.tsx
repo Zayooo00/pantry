@@ -18,7 +18,17 @@ import type { Item as ItemRow, Room as RoomRow } from "@/db/schema";
 type RoomLite = Pick<RoomRow, "id" | "name">;
 type ItemLite = Pick<
   ItemRow,
-  "id" | "name" | "brand" | "barcode" | "roomId" | "category" | "shelf" | "count" | "unit" | "threshold" | "photoUrl"
+  | "id"
+  | "name"
+  | "brand"
+  | "barcode"
+  | "roomId"
+  | "category"
+  | "shelf"
+  | "count"
+  | "unit"
+  | "threshold"
+  | "photoUrl"
 > & { status: ItemStatus };
 type StatusFilter = "all" | "low" | "soon";
 
@@ -252,7 +262,7 @@ export function SearchClient({
                 </>
               )}
             </div>
-            <span className={cn("caption","hidden sm:inline")}>
+            <span className={cn("caption", "hidden sm:inline")}>
               <ModKey /> K FOR QUICK SEARCH
             </span>
           </div>
@@ -272,7 +282,12 @@ export function SearchClient({
                     className="grid grid-cols-[56px_1fr_auto] items-center gap-3 border-b border-dashed border-paper-3 px-4 py-4 transition-[background,transform,box-shadow] duration-150 ease-pantry last:border-0 hover:bg-paper-1 sm:grid-cols-[56px_2fr_1fr_100px_80px] sm:gap-4 sm:px-6"
                   >
                     <Link href={`/items/${it.id}`} className="block h-14 w-14">
-                      <ItemThumbnail name={it.name} photoUrl={it.photoUrl} className="h-14 w-14" sizes="56px" />
+                      <ItemThumbnail
+                        name={it.name}
+                        photoUrl={it.photoUrl}
+                        className="h-14 w-14"
+                        sizes="56px"
+                      />
                     </Link>
                     <div className="min-w-0">
                       <Link
@@ -281,7 +296,7 @@ export function SearchClient({
                       >
                         {it.name}
                       </Link>
-                      <div className={cn("caption","mt-0.5 truncate")}>
+                      <div className={cn("caption", "mt-0.5 truncate")}>
                         {(it.category ?? "").toUpperCase()}
                         {room ? ` · ${room.name.toUpperCase()}` : ""}
                         {it.shelf ? ` / ${it.shelf}` : ""}
@@ -293,7 +308,10 @@ export function SearchClient({
                         </div>
                         <div
                           className={cn(
-                            level({ tone: it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok" }),
+                            level({
+                              tone:
+                                it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok",
+                            }),
                             "mt-1",
                           )}
                         >
@@ -308,7 +326,10 @@ export function SearchClient({
                       </div>
                       <div
                         className={cn(
-                          level({ tone: it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok" }),
+                          level({
+                            tone:
+                              it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok",
+                          }),
                           "mt-1",
                         )}
                       >
@@ -326,7 +347,10 @@ export function SearchClient({
                       {it.status === "low" ? (
                         <AddToShoppingButton itemId={it.id} />
                       ) : (
-                        <Link href={`/items/${it.id}`} className={button({ variant: "ghost", size: "sm" })}>
+                        <Link
+                          href={`/items/${it.id}`}
+                          className={button({ variant: "ghost", size: "sm" })}
+                        >
                           View
                         </Link>
                       )}

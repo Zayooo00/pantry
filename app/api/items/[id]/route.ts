@@ -54,8 +54,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
   if (typeof data.count === "number" || data.threshold !== undefined) {
     const newCount = typeof data.count === "number" ? data.count : before.count;
-    const newThreshold =
-      data.threshold === undefined ? before.threshold : data.threshold;
+    const newThreshold = data.threshold === undefined ? before.threshold : data.threshold;
     await maybeNotifyThresholdCross({
       itemId: id,
       itemName: data.name ?? before.name,

@@ -20,7 +20,14 @@ describe("GET /api/activity", () => {
     await db.insert(items).values({ id: "i1", roomId: "r1", name: "Salt", unit: "g", count: 100 });
     await db.insert(itemEvents).values([
       { id: "e1", itemId: "i1", kind: "created", countAfter: 100, createdAt: new Date(2026, 0, 1) },
-      { id: "e2", itemId: "i1", kind: "consume", delta: -10, countAfter: 90, createdAt: new Date(2026, 0, 2) },
+      {
+        id: "e2",
+        itemId: "i1",
+        kind: "consume",
+        delta: -10,
+        countAfter: 90,
+        createdAt: new Date(2026, 0, 2),
+      },
     ]);
 
     const res = await GET(new Request("http://localhost/api/activity") as never);

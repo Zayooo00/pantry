@@ -1,9 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { loginAs } from "./auth";
 
-test("adds a manual shopping item — appears in the list and the input clears", async ({
-  page,
-}) => {
+test("adds a manual shopping item — appears in the list and the input clears", async ({ page }) => {
   await loginAs(page);
   await page.goto("/shopping");
 

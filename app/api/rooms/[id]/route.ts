@@ -46,7 +46,11 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   if (!(await isRoomOwner(session.user.id, id))) {
     return NextResponse.json({ error: "Only the owner can delete this room." }, { status: 403 });
   }
-  const remaining = await db.select({ id: items.id }).from(items).where(eq(items.roomId, id)).limit(1);
+  const remaining = await db
+    .select({ id: items.id })
+    .from(items)
+    .where(eq(items.roomId, id))
+    .limit(1);
   if (remaining.length > 0) {
     return NextResponse.json(
       { error: "Move or remove items first — this room still holds inventory." },

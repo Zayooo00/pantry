@@ -103,7 +103,7 @@ export function ActivityClient({
     <>
       <div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-12">
         <div>
-          <div className={cn("caption","mb-3")}>PANTRY · LEDGER</div>
+          <div className={cn("caption", "mb-3")}>PANTRY · LEDGER</div>
           <h1 className="m-0 mb-2 font-display text-3xl leading-none font-light tracking-display sm:text-4xl lg:text-6xl">
             <em className="font-normal italic">Activity</em>.
           </h1>
@@ -120,7 +120,10 @@ export function ActivityClient({
               value={roomId}
               onChange={(v) => setRoomId(v)}
               size="sm"
-              options={[{ value: "all", label: "All rooms" }, ...rooms.map((r) => ({ value: r.id, label: r.name }))]}
+              options={[
+                { value: "all", label: "All rooms" },
+                ...rooms.map((r) => ({ value: r.id, label: r.name })),
+              ]}
             />
           </div>
           <div className="w-50">

@@ -4,9 +4,9 @@ import { eq } from "drizzle-orm";
 import { db, pendingInvites, rooms, roomMembers, users } from "@/db";
 
 const sessionMock = vi.hoisted(() => ({
-  value: { user: { id: "u1", name: "Owner", email: "owner@example.com" } } as
-    | { user: { id: string; name: string; email: string } }
-    | null,
+  value: { user: { id: "u1", name: "Owner", email: "owner@example.com" } } as {
+    user: { id: string; name: string; email: string };
+  } | null,
 }));
 
 vi.mock("@/auth", () => ({
@@ -14,9 +14,9 @@ vi.mock("@/auth", () => ({
 }));
 
 const sendMailMock = vi.hoisted(() =>
-  vi.fn<(opts: { to?: string | string[] }) => Promise<{ messageId: string }>>(
-    async () => ({ messageId: "msg_1" }),
-  ),
+  vi.fn<(opts: { to?: string | string[] }) => Promise<{ messageId: string }>>(async () => ({
+    messageId: "msg_1",
+  })),
 );
 
 vi.mock("nodemailer", () => ({
@@ -195,10 +195,7 @@ describe("PATCH /api/rooms/[id]/members/[userId]", () => {
       memberParams("r1", "u2"),
     );
     expect(res.status).toBe(200);
-    const found = await db
-      .select()
-      .from(roomMembers)
-      .where(eq(roomMembers.id, "m1"));
+    const found = await db.select().from(roomMembers).where(eq(roomMembers.id, "m1"));
     expect(found[0].role).toBe("editor");
   });
 });
@@ -284,9 +281,9 @@ describe("GET /api/rooms/[id]/members", () => {
 
 describe("GET /api/me/shared", () => {
   it("returns rooms shared with me and rooms I share", async () => {
-    await db.insert(rooms).values([
-      { id: "r2", ownerId: "u2", name: "Their kitchen", glyph: "🍳" },
-    ]);
+    await db
+      .insert(rooms)
+      .values([{ id: "r2", ownerId: "u2", name: "Their kitchen", glyph: "🍳" }]);
     await db.insert(roomMembers).values([
       { id: "m1", roomId: "r2", userId: "u1", role: "viewer", invitedBy: "u2" },
       { id: "m2", roomId: "r1", userId: "u3", role: "editor", invitedBy: "u1" },

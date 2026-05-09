@@ -69,9 +69,7 @@ const Member = z
 
 export const MembersResponse = z
   .object({
-    owner: z
-      .object({ id: z.string(), name: z.string(), email: z.string() })
-      .nullable(),
+    owner: z.object({ id: z.string(), name: z.string(), email: z.string() }).nullable(),
     members: z.array(Member),
     isOwner: z.boolean(),
   })
@@ -108,9 +106,7 @@ export const InviteMemberResponse = z
   .union([InviteMemberAdded, InviteMemberPending])
   .openapi("InviteMemberResponse");
 
-export const PatchMemberRequest = z
-  .object({ role: MemberRole })
-  .openapi("PatchMemberRequest");
+export const PatchMemberRequest = z.object({ role: MemberRole }).openapi("PatchMemberRequest");
 
 export const CreateItemRequest = z
   .object({
@@ -176,9 +172,7 @@ export const ShoppingPostRequest = z
   .union([ManualShoppingRequest, FromItemShoppingRequest])
   .openapi("ShoppingPostRequest");
 
-export const ShoppingPostResponse = z
-  .object({ id: z.string() })
-  .openapi("ShoppingPostResponse");
+export const ShoppingPostResponse = z.object({ id: z.string() }).openapi("ShoppingPostResponse");
 
 export const PatchShoppingRequest = z
   .object({
@@ -218,9 +212,7 @@ const SearchItem = z
   })
   .openapi("SearchItem");
 
-export const SearchResponse = z
-  .object({ items: z.array(SearchItem) })
-  .openapi("SearchResponse");
+export const SearchResponse = z.object({ items: z.array(SearchItem) }).openapi("SearchResponse");
 
 export const PatchMeRequest = z
   .object({
@@ -276,6 +268,4 @@ export const SignupRequest = z
 
 export const UploadResponse = z.object({ url: z.string() }).openapi("UploadResponse");
 
-export const ErrorResponse = z
-  .object({ error: z.unknown() })
-  .openapi("ErrorResponse");
+export const ErrorResponse = z.object({ error: z.unknown() }).openapi("ErrorResponse");

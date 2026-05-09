@@ -26,8 +26,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Account no longer exists." }, { status: 404 });
   }
   const update: Partial<typeof users.$inferInsert> = {};
-  const wantsEmailChange =
-    parsed.data.email !== undefined && parsed.data.email !== me[0].email;
+  const wantsEmailChange = parsed.data.email !== undefined && parsed.data.email !== me[0].email;
   const wantsPasswordChange = Boolean(parsed.data.newPassword);
 
   if ((wantsEmailChange || wantsPasswordChange) && !parsed.data.currentPassword) {

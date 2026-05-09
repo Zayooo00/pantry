@@ -7,50 +7,67 @@ export const dynamic = "force-dynamic";
 
 export default function WelcomePage() {
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-paper-0">
-      <div className="flex flex-col justify-center px-[clamp(24px,6vw,96px)] py-12 max-w-140 w-full ml-auto">
-        <Link href="/" className="flex gap-3 items-center mb-16 text-inherit no-underline">
-          <div className="w-9.5 h-9.5 border-[1.5px] border-ink-1 rounded-sm grid place-items-center bg-paper-0 text-ink-1">
+    <div className="grid min-h-screen grid-cols-1 bg-paper-0 md:grid-cols-2">
+      <div className="ml-auto flex w-full max-w-140 flex-col justify-center px-[clamp(24px,6vw,96px)] py-12">
+        <Link href="/" className="mb-16 flex items-center gap-3 text-inherit no-underline">
+          <div className="grid h-9.5 w-9.5 place-items-center rounded-sm border-[1.5px] border-ink-1 bg-paper-0 text-ink-1">
             <JarMark size={22} />
           </div>
           <div>
             <div className="font-display text-xl font-normal tracking-display-sm">Pantry</div>
-            <div className="font-mono text-xs tracking-mono uppercase text-ink-4">EST. KITCHEN · NO. 0001</div>
+            <div className="font-mono text-xs tracking-mono text-ink-4 uppercase">
+              EST. KITCHEN · NO. 0001
+            </div>
           </div>
         </Link>
 
-        <div className="font-mono text-xs tracking-mono uppercase text-ink-4 mb-4">WELCOME · NO. 0000</div>
-        <h1 className="font-display font-light text-[clamp(56px,7vw,88px)] tracking-display leading-[0.95] m-0 mb-3 [&_em]:italic [&_em]:font-normal">
-          A quiet inventory,<br />
+        <div className="mb-4 font-mono text-xs tracking-mono text-ink-4 uppercase">
+          WELCOME · NO. 0000
+        </div>
+        <h1 className="m-0 mb-3 font-display text-[clamp(56px,7vw,88px)] leading-[0.95] font-light tracking-display [&_em]:font-normal [&_em]:italic">
+          A quiet inventory,
+          <br />
           <em>kept honest</em>.
         </h1>
-        <p className="font-display italic font-light text-xl text-ink-3 m-0 mb-10">
+        <p className="m-0 mb-10 font-display text-xl font-light text-ink-3 italic">
           Track what's in the pantry, what's running low, and what to pick up next.
         </p>
 
-        <div className="flex flex-col gap-3 mt-8">
-          <Link href="/signup" className={cn(button({ variant: "primary", size: "lg" }), "w-full text-center")}>
+        <div className="mt-8 flex flex-col gap-3">
+          <Link
+            href="/signup"
+            className={cn(button({ variant: "primary", size: "lg" }), "w-full text-center")}
+          >
             Create an account
           </Link>
-          <Link href="/signin" className={cn(button({ variant: "secondary", size: "lg" }), "w-full text-center")}>
+          <Link
+            href="/signin"
+            className={cn(button({ variant: "secondary", size: "lg" }), "w-full text-center")}
+          >
             Sign in
           </Link>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-dashed border-paper-3 text-sm text-ink-3 font-display italic">
-          <span className="font-mono text-xs tracking-mono uppercase text-ink-4">No setup required · works on mobile and desktop</span>
+        <div className="mt-8 border-t border-dashed border-paper-3 pt-6 font-display text-sm text-ink-3 italic">
+          <span className="font-mono text-xs tracking-mono text-ink-4 uppercase">
+            No setup required · works on mobile and desktop
+          </span>
         </div>
       </div>
 
-      <aside className="hidden md:flex bg-ink-1 text-paper-0 items-center justify-center p-16 bg-[radial-gradient(rgba(247,243,234,0.04)_1px,transparent_1px),radial-gradient(circle_at_80%_20%,rgba(90,107,58,0.15),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(184,65,43,0.10),transparent_50%)] bg-size-[4px_4px,auto,auto]">
-        <div className="max-w-120 flex flex-col gap-8">
-          <div className="font-mono text-xs tracking-mono uppercase text-paper-3">A QUIET INVENTORY, KEPT HONEST.</div>
-          <div className="font-display font-light text-[clamp(36px,5vw,56px)] leading-[1.1] tracking-display-md text-paper-0 [&_em]:italic [&_em]:font-normal [&_em]:text-amber-pantry-3">
+      <aside className="hidden items-center justify-center bg-ink-1 bg-[radial-gradient(rgba(247,243,234,0.04)_1px,transparent_1px),radial-gradient(circle_at_80%_20%,rgba(90,107,58,0.15),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(184,65,43,0.10),transparent_50%)] bg-size-[4px_4px,auto,auto] p-16 text-paper-0 md:flex">
+        <div className="flex max-w-120 flex-col gap-8">
+          <div className="font-mono text-xs tracking-mono text-paper-3 uppercase">
+            A QUIET INVENTORY, KEPT HONEST.
+          </div>
+          <div className="font-display text-[clamp(36px,5vw,56px)] leading-[1.1] font-light tracking-display-md text-paper-0 [&_em]:font-normal [&_em]:text-amber-pantry-3 [&_em]:italic">
             Every <em>jar</em>,<br />
             every <em>bottle</em>,<br />
             every <em>bag</em>.
           </div>
-          <div className="font-mono text-xs tracking-mono uppercase text-paper-3">EST. ONE KITCHEN</div>
+          <div className="font-mono text-xs tracking-mono text-paper-3 uppercase">
+            EST. ONE KITCHEN
+          </div>
         </div>
       </aside>
     </div>

@@ -29,10 +29,12 @@ type InviteValues = z.infer<typeof InviteSchema>;
 
 export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomName: string }) {
   const queryParams = { params: { path: { id: roomId } } };
-  const { data, isLoading, error, mutate: refetchMembers } = useQuery(
-    "/api/rooms/{id}/members",
-    queryParams,
-  );
+  const {
+    data,
+    isLoading,
+    error,
+    mutate: refetchMembers,
+  } = useQuery("/api/rooms/{id}/members", queryParams);
   const { toast } = useToast();
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [removeTarget, setRemoveTarget] = useState<Member | null>(null);
@@ -102,49 +104,51 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
       toast(<>Couldn't remove access.</>);
       return;
     }
-    toast(<>Removed <em>{m.name}</em>.</>);
+    toast(
+      <>
+        Removed <em>{m.name}</em>.
+      </>,
+    );
     setRemoveTarget(null);
   }
 
   return (
     <section className="mt-12 md:mt-16">
-      <div className="flex items-baseline justify-between border-t border-ink-1 pt-3 mb-6">
-        <h2 className="font-display text-2xl m-0 tracking-display-sm">
+      <div className="mb-6 flex items-baseline justify-between border-t border-ink-1 pt-3">
+        <h2 className="m-0 font-display text-2xl tracking-display-sm">
           <em className="italic">Members</em>.
         </h2>
-        <span className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4">
-          OWNER ONLY
-        </span>
+        <span className="font-mono text-2xs tracking-eyebrow text-ink-4 uppercase">OWNER ONLY</span>
       </div>
 
-      <div className="bg-paper-1 border border-paper-3 rounded-xl p-5 md:p-8">
-        <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 mb-3">
+      <div className="rounded-xl border border-paper-3 bg-paper-1 p-5 md:p-8">
+        <div className="mb-3 font-mono text-2xs tracking-eyebrow text-ink-4 uppercase">
           INVITE BY EMAIL
         </div>
         <form
           onSubmit={form.handleSubmit(invite)}
-          className="grid gap-3 grid-cols-1 md:grid-cols-[1fr_240px_auto] items-end"
+          className="grid grid-cols-1 items-end gap-3 md:grid-cols-[1fr_240px_auto]"
           noValidate
         >
           <div>
-            <label className="block font-mono text-2xs tracking-eyebrow uppercase text-ink-3 mb-2">
+            <label className="mb-2 block font-mono text-2xs tracking-eyebrow text-ink-3 uppercase">
               Email
             </label>
             <input
-              className="w-full bg-paper-0 border border-paper-4 rounded-md px-3.5 py-3 text-base font-sans outline-none transition-[border-color] duration-150 ease-pantry hover:border-ink-3 focus:border-ink-1 placeholder:text-ink-4"
+              className="w-full rounded-md border border-paper-4 bg-paper-0 px-3.5 py-3 font-sans text-base transition-[border-color] duration-150 ease-pantry outline-none placeholder:text-ink-4 hover:border-ink-3 focus:border-ink-1"
               type="email"
               placeholder="someone@example.com"
               autoComplete="email"
               {...form.register("email")}
             />
             {form.formState.errors.email && (
-              <div className="text-tomato-2 text-sm mt-1">
+              <div className="mt-1 text-sm text-tomato-2">
                 {form.formState.errors.email.message}
               </div>
             )}
           </div>
           <div>
-            <label className="block font-mono text-2xs tracking-eyebrow uppercase text-ink-3 mb-2">
+            <label className="mb-2 block font-mono text-2xs tracking-eyebrow text-ink-3 uppercase">
               Role
             </label>
             <Controller
@@ -171,36 +175,30 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
           </button>
         </form>
         {inviteError && (
-          <div className="mt-3 bg-tomato-3 border border-tomato-2 text-tomato-2 rounded-md px-3 py-2 text-sm">
+          <div className="mt-3 rounded-md border border-tomato-2 bg-tomato-3 px-3 py-2 text-sm text-tomato-2">
             {inviteError}
           </div>
         )}
-        <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 mt-2">
+        <div className="mt-2 font-mono text-2xs tracking-eyebrow text-ink-4 uppercase">
           IF THEY DON'T HAVE AN ACCOUNT, WE'LL EMAIL THEM A SIGN-UP LINK.
         </div>
       </div>
 
-      <div className="mt-6 bg-paper-0 border border-paper-3 rounded-xl overflow-hidden">
-        {error && (
-          <div className="p-6 text-tomato-2 text-sm">
-            Couldn't load members.
-          </div>
-        )}
+      <div className="mt-6 overflow-hidden rounded-xl border border-paper-3 bg-paper-0">
+        {error && <div className="p-6 text-sm text-tomato-2">Couldn't load members.</div>}
         {isLoading && <RoomMembersListSkeleton />}
         {data && data.owner && (
-          <div className="grid items-center grid-cols-[1fr_auto_auto] gap-4 px-4 md:px-6 py-3 border-b border-dashed border-paper-3">
+          <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-dashed border-paper-3 px-4 py-3 md:px-6">
             <div className="min-w-0">
-              <div className="text-base font-medium truncate">{data.owner.name}</div>
-              <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 truncate">
+              <div className="truncate text-base font-medium">{data.owner.name}</div>
+              <div className="truncate font-mono text-2xs tracking-eyebrow text-ink-4 uppercase">
                 {data.owner.email.toUpperCase()}
               </div>
             </div>
-            <span className="font-mono text-2xs tracking-eyebrow uppercase px-2 py-1 rounded-full bg-ink-1 text-paper-0">
+            <span className="rounded-full bg-ink-1 px-2 py-1 font-mono text-2xs tracking-eyebrow text-paper-0 uppercase">
               OWNER
             </span>
-            <span className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4">
-              YOU
-            </span>
+            <span className="font-mono text-2xs tracking-eyebrow text-ink-4 uppercase">YOU</span>
           </div>
         )}
         {data && data.members.length === 0 && (
@@ -212,11 +210,11 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
           data.members.map((m) => (
             <div
               key={m.id}
-              className="grid items-center grid-cols-[1fr_auto_auto] gap-3 md:gap-4 px-4 md:px-6 py-3 border-b border-dashed border-paper-3 last:border-0"
+              className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-dashed border-paper-3 px-4 py-3 last:border-0 md:gap-4 md:px-6"
             >
               <div className="min-w-0">
-                <div className="text-base font-medium truncate">{m.name}</div>
-                <div className="font-mono text-2xs tracking-eyebrow uppercase text-ink-4 truncate">
+                <div className="truncate text-base font-medium">{m.name}</div>
+                <div className="truncate font-mono text-2xs tracking-eyebrow text-ink-4 uppercase">
                   {m.email.toUpperCase()}
                 </div>
               </div>
@@ -234,7 +232,7 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
                 onClick={() => setRemoveTarget(m)}
                 className={cn(
                   button({ variant: "ghost", size: "sm" }),
-                  "text-tomato-2 hover:bg-tomato-3! hover:border-tomato-2!",
+                  "text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!",
                 )}
               >
                 Revoke
@@ -250,8 +248,7 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
         title="Revoke access?"
         message={
           <>
-            <em>{removeTarget?.name ?? "This person"}</em> will no longer see{" "}
-            <em>{roomName}</em>.
+            <em>{removeTarget?.name ?? "This person"}</em> will no longer see <em>{roomName}</em>.
           </>
         }
         confirmLabel="Revoke"
@@ -267,11 +264,11 @@ export function RoomMembersListSkeleton({ rows = 2 }: { rows?: number }) {
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className="grid items-center grid-cols-[1fr_auto_auto] gap-4 px-4 md:px-6 py-3 border-b border-dashed border-paper-3 last:border-0"
+          className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-dashed border-paper-3 px-4 py-3 last:border-0 md:px-6"
         >
           <div className="min-w-0">
             <div className="h-4 w-32 rounded-sm bg-paper-2" />
-            <div className="h-3 w-44 rounded-sm bg-paper-2 mt-2" />
+            <div className="mt-2 h-3 w-44 rounded-sm bg-paper-2" />
           </div>
           <div className="h-7 w-24 rounded-sm bg-paper-2" />
           <div className="h-7 w-16 rounded-sm bg-paper-2" />

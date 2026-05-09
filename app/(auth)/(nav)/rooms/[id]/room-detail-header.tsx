@@ -60,7 +60,15 @@ export function RoomDetailHeader({
     }
     await invalidateApi("/api/sidebar");
     toast(
-      next ? <>Archived <em>{room.name}</em>.</> : <>Restored <em>{room.name}</em>.</>,
+      next ? (
+        <>
+          Archived <em>{room.name}</em>.
+        </>
+      ) : (
+        <>
+          Restored <em>{room.name}</em>.
+        </>
+      ),
     );
     router.refresh();
   }
@@ -73,7 +81,11 @@ export function RoomDetailHeader({
       return;
     }
     await invalidateApi("/api/sidebar");
-    toast(<>Removed <em>{room.name}</em>.</>);
+    toast(
+      <>
+        Removed <em>{room.name}</em>.
+      </>,
+    );
     router.push("/rooms");
     router.refresh();
   }
@@ -89,7 +101,7 @@ export function RoomDetailHeader({
             </span>
             <span className={roleBadge({ role })}>{ROLE_LABEL[role]}</span>
             {archived && (
-              <span className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose uppercase text-ink-3">
+              <span className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose text-ink-3 uppercase">
                 ARCHIVED
               </span>
             )}
@@ -103,7 +115,11 @@ export function RoomDetailHeader({
         </div>
         <div className="flex flex-wrap gap-3">
           {canEdit && (
-            <button type="button" onClick={() => setEditOpen(true)} className={button({ variant: "ghost" })}>
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              className={button({ variant: "ghost" })}
+            >
               Edit room
             </button>
           )}
@@ -134,7 +150,8 @@ export function RoomDetailHeader({
 
       {archived && (
         <div className="mb-8 rounded-md border border-paper-3 bg-paper-1 px-4 py-3 font-display text-sm text-ink-3 italic">
-          This room is archived — hidden from the sidebar, dashboard and search. Restore to use it again.
+          This room is archived — hidden from the sidebar, dashboard and search. Restore to use it
+          again.
         </div>
       )}
 

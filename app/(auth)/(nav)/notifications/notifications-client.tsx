@@ -181,9 +181,7 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
 
       {visible.length === 0 ? (
         <div className="rounded-xl border border-paper-3 bg-paper-1 p-16 text-center font-display text-ink-3 italic">
-          {view === "unread"
-            ? "No unread notifications."
-            : "No notifications recorded."}
+          {view === "unread" ? "No unread notifications." : "No notifications recorded."}
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-paper-3 bg-paper-0">
@@ -191,7 +189,7 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
             const unread = !n.readAt;
             const Inner = (
               <>
-                <div className="flex items-baseline gap-2 mb-1">
+                <div className="mb-1 flex items-baseline gap-2">
                   {unread && (
                     <span className="inline-block h-1.5 w-1.5 rounded-full bg-tomato" aria-hidden />
                   )}
@@ -223,12 +221,7 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
               n.link && "hover:bg-paper-2",
             );
             return n.link ? (
-              <Link
-                key={n.id}
-                href={n.link}
-                className={baseClass}
-                onClick={() => markRead(n.id)}
-              >
+              <Link key={n.id} href={n.link} className={baseClass} onClick={() => markRead(n.id)}>
                 {Inner}
               </Link>
             ) : (

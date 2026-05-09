@@ -13,8 +13,6 @@ export async function GET() {
   const rows = await db
     .select({ count: sql<number>`count(*)` })
     .from(notifications)
-    .where(
-      and(eq(notifications.userId, session.user.id), isNull(notifications.readAt)),
-    );
+    .where(and(eq(notifications.userId, session.user.id), isNull(notifications.readAt)));
   return NextResponse.json({ count: rows[0]?.count ?? 0 });
 }

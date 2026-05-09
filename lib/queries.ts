@@ -31,7 +31,9 @@ export async function getRoomsWithCounts(
     .select()
     .from(rooms)
     .where(
-      archivedClause ? and(inArray(rooms.id, accessibleIds), archivedClause) : inArray(rooms.id, accessibleIds),
+      archivedClause
+        ? and(inArray(rooms.id, accessibleIds), archivedClause)
+        : inArray(rooms.id, accessibleIds),
     )
     .orderBy(asc(rooms.position));
   const visibleIds = all.map((r) => r.id);
@@ -42,10 +44,12 @@ export async function getRoomsWithCounts(
   return all.map((r) => {
     const roomItems = allItems.filter((i) => i.roomId === r.id);
     const low = roomItems.filter(
-      (i) => itemStatus({ count: i.count, threshold: i.threshold, expiresAt: i.expiresAt }) === "low",
+      (i) =>
+        itemStatus({ count: i.count, threshold: i.threshold, expiresAt: i.expiresAt }) === "low",
     ).length;
     const soon = roomItems.filter(
-      (i) => itemStatus({ count: i.count, threshold: i.threshold, expiresAt: i.expiresAt }) === "soon",
+      (i) =>
+        itemStatus({ count: i.count, threshold: i.threshold, expiresAt: i.expiresAt }) === "soon",
     ).length;
     return { ...r, count: roomItems.length, low, soon };
   });
@@ -106,9 +110,7 @@ export async function getDashboardData(userId: string) {
     .orderBy(asc(rooms.position));
   const liveIds = allRooms.map((r) => r.id);
   const allItems =
-    liveIds.length === 0
-      ? []
-      : await db.select().from(items).where(inArray(items.roomId, liveIds));
+    liveIds.length === 0 ? [] : await db.select().from(items).where(inArray(items.roomId, liveIds));
 
   const enriched = allItems.map((i) => ({
     ...i,
@@ -122,14 +124,15 @@ export async function getDashboardData(userId: string) {
 
   const accessibleItemIds = allItems.map((i) => i.id);
   const itemById = new Map(allItems.map((i) => [i.id, i]));
-  const rawRecentEvents = accessibleItemIds.length === 0
-    ? []
-    : await db
-        .select()
-        .from(itemEvents)
-        .where(inArray(itemEvents.itemId, accessibleItemIds))
-        .orderBy(desc(itemEvents.createdAt))
-        .limit(8);
+  const rawRecentEvents =
+    accessibleItemIds.length === 0
+      ? []
+      : await db
+          .select()
+          .from(itemEvents)
+          .where(inArray(itemEvents.itemId, accessibleItemIds))
+          .orderBy(desc(itemEvents.createdAt))
+          .limit(8);
   const recentEvents = rawRecentEvents.map((ev) => {
     const item = itemById.get(ev.itemId);
     const room = item ? roomById.get(item.roomId) : undefined;
@@ -150,7 +153,7 @@ export async function getDashboardData(userId: string) {
     lowItems: low.map((i) => ({ ...i, room: roomById.get(i.roomId) })),
     soonItems: soon
       .filter((i) => i.expiresAt)
-      .sort((a, b) => (a.expiresAt!.getTime() - b.expiresAt!.getTime()))
+      .sort((a, b) => a.expiresAt!.getTime() - b.expiresAt!.getTime())
       .map((i) => ({ ...i, room: roomById.get(i.roomId) })),
     recentEvents,
   };
@@ -300,10 +303,7 @@ export async function updateItemCount(
   if (!existing) {
     throw new Error("Item not found");
   }
-  await db
-    .update(items)
-    .set({ count: newCount, updatedAt: new Date() })
-    .where(eq(items.id, id));
+  await db.update(items).set({ count: newCount, updatedAt: new Date() }).where(eq(items.id, id));
   await recordCountChange({ itemId: id, oldCount: existing.count, newCount, user });
   await maybeNotifyThresholdCross({
     itemId: id,

@@ -72,7 +72,11 @@ export function MoveItemForm({
     }
     const target = rooms.find((r) => r.id === values.roomId);
     await invalidateApi("/api/sidebar");
-    toast(<>Moved <em>{itemName}</em> to {target?.name ?? "another room"}.</>);
+    toast(
+      <>
+        Moved <em>{itemName}</em> to {target?.name ?? "another room"}.
+      </>,
+    );
     onClose();
     router.refresh();
   }
@@ -80,7 +84,9 @@ export function MoveItemForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
       <div>
-        <label className="block font-mono text-xs tracking-label uppercase text-ink-3 mb-2">New room</label>
+        <label className="mb-2 block font-mono text-xs tracking-label text-ink-3 uppercase">
+          New room
+        </label>
         <Controller
           control={control}
           name="roomId"
@@ -94,21 +100,29 @@ export function MoveItemForm({
         />
       </div>
       <div>
-        <label className="block font-mono text-xs tracking-label uppercase text-ink-3 mb-2">New shelf / bin (optional)</label>
+        <label className="mb-2 block font-mono text-xs tracking-label text-ink-3 uppercase">
+          New shelf / bin (optional)
+        </label>
         <input
-          className="w-full px-3.5 py-3 bg-paper-0 border border-paper-4 rounded-md font-sans text-base text-ink-1 transition-[border-color] duration-150 ease-pantry focus:outline-none focus:border-ink-1 placeholder:text-ink-4"
+          className="w-full rounded-md border border-paper-4 bg-paper-0 px-3.5 py-3 font-sans text-base text-ink-1 transition-[border-color] duration-150 ease-pantry placeholder:text-ink-4 focus:border-ink-1 focus:outline-none"
           placeholder="Leave blank to keep current"
           {...register("shelf")}
         />
       </div>
       {serverError && (
-        <div className="bg-tomato-3 border border-tomato-2 text-tomato-2 rounded-md px-3 py-2 text-sm font-display">
+        <div className="rounded-md border border-tomato-2 bg-tomato-3 px-3 py-2 font-display text-sm text-tomato-2">
           {serverError}
         </div>
       )}
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={onClose} className={button({ variant: "ghost" })}>Cancel</button>
-        <button type="submit" disabled={isSubmitting || noChange} className={button({ variant: "primary" })}>
+        <button type="button" onClick={onClose} className={button({ variant: "ghost" })}>
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={isSubmitting || noChange}
+          className={button({ variant: "primary" })}
+        >
           {isSubmitting ? "Moving…" : "Move item"}
         </button>
       </div>

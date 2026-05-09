@@ -41,10 +41,7 @@ async function run(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
   if (!isEmailConfigured()) {
-    return NextResponse.json(
-      { error: "Email isn't configured.", sent: 0 },
-      { status: 503 },
-    );
+    return NextResponse.json({ error: "Email isn't configured.", sent: 0 }, { status: 503 });
   }
   const url = new URL(req.url);
   const force = url.searchParams.get("force") === "1";
@@ -87,10 +84,7 @@ async function run(req: NextRequest) {
       skipped.push(user.id);
       continue;
     }
-    const userItems = await db
-      .select()
-      .from(items)
-      .where(inArray(items.roomId, roomIds));
+    const userItems = await db.select().from(items).where(inArray(items.roomId, roomIds));
     const lowItems = userItems
       .map((i) => ({
         ...i,
@@ -103,10 +97,7 @@ async function run(req: NextRequest) {
       .filter((i) => i.status === "low");
 
     if (lowItems.length === 0) {
-      await db
-        .update(users)
-        .set({ lastDigestSentAt: now })
-        .where(eq(users.id, user.id));
+      await db.update(users).set({ lastDigestSentAt: now }).where(eq(users.id, user.id));
       skipped.push(user.id);
       continue;
     }
@@ -163,10 +154,7 @@ async function run(req: NextRequest) {
       errors.push({ userId: user.id, reason: send.message });
       continue;
     }
-    await db
-      .update(users)
-      .set({ lastDigestSentAt: now })
-      .where(eq(users.id, user.id));
+    await db.update(users).set({ lastDigestSentAt: now }).where(eq(users.id, user.id));
     sent++;
   }
 
@@ -179,4 +167,3 @@ async function run(req: NextRequest) {
     ranAt: now.toISOString(),
   });
 }
-

@@ -31,9 +31,7 @@ export async function GET() {
     .orderBy(asc(rooms.position));
   const liveIds = allRooms.map((r) => r.id);
   const allItems =
-    liveIds.length === 0
-      ? []
-      : await db.select().from(items).where(inArray(items.roomId, liveIds));
+    liveIds.length === 0 ? [] : await db.select().from(items).where(inArray(items.roomId, liveIds));
   const shopping = await db
     .select()
     .from(shoppingItems)

@@ -2,7 +2,7 @@ export function BrandMark({ size = 32 }: { size?: number }) {
   const inner = Math.round(size * 0.55);
   return (
     <div
-      className="grid place-items-center bg-paper-0 border-[1.5px] border-ink-1 rounded-sm text-ink-1"
+      className="grid place-items-center rounded-sm border-[1.5px] border-ink-1 bg-paper-0 text-ink-1"
       style={{ width: size, height: size }}
     >
       <svg width={inner} height={inner} viewBox="0 0 18 18" fill="none">

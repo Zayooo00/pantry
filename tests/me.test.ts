@@ -22,7 +22,9 @@ function jsonReq(body: unknown) {
 
 beforeEach(async () => {
   const passwordHash = await hashPassword("hunter2hunter");
-  await db.insert(users).values({ id: "u1", email: "alex@example.com", name: "Alex", passwordHash });
+  await db
+    .insert(users)
+    .values({ id: "u1", email: "alex@example.com", name: "Alex", passwordHash });
   sessionMock.value = { user: { id: "u1" } };
 });
 
@@ -63,7 +65,9 @@ describe("PATCH /api/me", () => {
   });
 
   it("changes password when current password matches", async () => {
-    const res = await PATCH(jsonReq({ currentPassword: "hunter2hunter", newPassword: "newpass12345" }));
+    const res = await PATCH(
+      jsonReq({ currentPassword: "hunter2hunter", newPassword: "newpass12345" }),
+    );
     expect(res.status).toBe(200);
     const found = await db.select().from(users).where(eq(users.id, "u1"));
     expect(await verifyPassword("newpass12345", found[0].passwordHash)).toBe(true);

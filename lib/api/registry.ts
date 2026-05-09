@@ -9,7 +9,6 @@ import {
   ErrorResponse,
   InviteMemberRequest,
   InviteMemberResponse,
-  ManualShoppingRequest,
   MembersResponse,
   MeSharedResponse,
   OkResponse,

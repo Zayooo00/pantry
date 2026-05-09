@@ -24,7 +24,7 @@ export function Kbd({ keys }: { keys: string[] }) {
     return k;
   });
   return (
-    <span className="inline-flex items-center gap-0.5 font-mono text-2xs text-ink-4 border border-paper-4 px-1.5 py-0.5 rounded-sm bg-paper-0 leading-none">
+    <span className="inline-flex items-center gap-0.5 rounded-sm border border-paper-4 bg-paper-0 px-1.5 py-0.5 font-mono text-2xs leading-none text-ink-4">
       {display.map((d, i) => (
         <span key={i}>{d}</span>
       ))}

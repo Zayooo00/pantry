@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { auth } from "@/auth";
 import { SessionProvider } from "@/components/session-provider";
 import { ThemeProvider } from "@/components/theme";
 import { THEME_COOKIE_NAME, type Theme } from "@/components/theme-shared";
@@ -39,6 +40,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const cookieValue = (await cookies()).get(THEME_COOKIE_NAME)?.value;
   const initialTheme: Theme | null =
     cookieValue === "light" || cookieValue === "dark" ? cookieValue : null;
+  const session = await auth();
 
   return (
     <html
@@ -47,7 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${fraunces.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
       <body>
-        <SessionProvider>
+        <SessionProvider session={session}>
           <ThemeProvider initialTheme={initialTheme}>
             <ToastProvider>{children}</ToastProvider>
           </ThemeProvider>

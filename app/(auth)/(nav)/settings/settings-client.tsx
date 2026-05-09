@@ -108,7 +108,7 @@ export function SettingsClient({ user }: { user: User }) {
       </>,
     );
     profileForm.reset(values);
-    await updateSession();
+    await updateSession({ user: { name: values.name, email: values.email } });
     router.refresh();
   }
 

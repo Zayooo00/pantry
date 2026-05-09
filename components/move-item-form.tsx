@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { mutate as globalMutate } from "swr";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Select } from "./select";
 import { useToast } from "./toast";
 import { button } from "@/components/button";
-import { useMutation } from "@/lib/api/client";
+import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Room as RoomRow } from "@/db/schema";
 
 const MoveItemSchema = z.object({
@@ -72,7 +71,7 @@ export function MoveItemForm({
       return;
     }
     const target = rooms.find((r) => r.id === values.roomId);
-    globalMutate(["pantry", "/api/sidebar"]);
+    await invalidateApi("/api/sidebar");
     toast(<>Moved <em>{itemName}</em> to {target?.name ?? "another room"}.</>);
     onClose();
     router.refresh();

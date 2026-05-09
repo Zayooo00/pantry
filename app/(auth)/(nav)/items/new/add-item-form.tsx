@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { mutate as globalMutate } from "swr";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,7 +14,7 @@ import { badge } from "@/components/badge";
 import { button } from "@/components/button";
 import { chip } from "@/components/chip";
 import { TextArea, TextInput } from "@/components/text-input";
-import { useMutation } from "@/lib/api/client";
+import { invalidateApi, useMutation } from "@/lib/api/client";
 import { formatCount } from "@/lib/format";
 import type { Room as RoomRow } from "@/db/schema";
 
@@ -167,7 +166,7 @@ export function AddItemForm({
       setServerError("Could not save item.");
       return;
     }
-    globalMutate(["pantry", "/api/sidebar"]);
+    await invalidateApi("/api/sidebar");
     toast(
       <>
         Added <em>{formValues.name}</em> to the ledger.

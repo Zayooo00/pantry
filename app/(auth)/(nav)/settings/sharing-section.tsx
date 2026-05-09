@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { mutate as globalMutate } from "swr";
 import { useToast } from "@/components/toast";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { RoomGlyph } from "@/icons";
 import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
-import { useMutation, useQuery } from "@/lib/api/client";
+import { invalidateApi, useMutation, useQuery } from "@/lib/api/client";
 
 type SharedWithMe = {
   roomId: string;
@@ -38,7 +37,7 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
   const { trigger: triggerDelete } = useMutation("delete", "/api/rooms/{id}/members/{userId}", {
     onSuccess: () => {
       refetchShared();
-      globalMutate(["pantry", "/api/sidebar"]);
+      void invalidateApi("/api/sidebar");
     },
   });
 

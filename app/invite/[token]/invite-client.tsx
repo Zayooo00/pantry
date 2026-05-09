@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { mutate as globalMutate } from "swr";
 import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
+import { invalidateApi } from "@/lib/api/client";
 
 type InviteState =
   | { status: "loading" }
@@ -78,7 +78,7 @@ export function InviteClient({ token }: { token: string }) {
       setAccepting(false);
       return;
     }
-    globalMutate(["pantry", "/api/sidebar"]);
+    await invalidateApi("/api/sidebar");
     router.push(`/rooms/${json.roomId}`);
   }
 

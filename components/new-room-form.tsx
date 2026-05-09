@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { mutate as globalMutate } from "swr";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,7 +11,7 @@ import { useToast } from "./toast";
 import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
-import { useMutation } from "@/lib/api/client";
+import { invalidateApi, useMutation } from "@/lib/api/client";
 
 const NewRoomSchema = z.object({
   name: z.string().trim().min(1, "Name your room first."),
@@ -57,7 +56,7 @@ export function NewRoomForm({ onClose }: { onClose: () => void }) {
       setServerError(err instanceof Error ? err.message : "Could not create room.");
       return;
     }
-    globalMutate(["pantry", "/api/sidebar"]);
+    await invalidateApi("/api/sidebar");
     toast(<>Room <em>{values.name}</em> opened.</>);
     onClose();
     router.refresh();

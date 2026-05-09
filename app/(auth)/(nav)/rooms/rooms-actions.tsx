@@ -2,13 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { mutate as globalMutate } from "swr";
 import { Modal } from "@/components/modal";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EditRoomForm } from "@/components/edit-room-form";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/cn";
-import { useMutation } from "@/lib/api/client";
+import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Room as RoomRow } from "@/db/schema";
 
 type Room = Pick<RoomRow, "id" | "name" | "glyph" | "subtitle" | "tinted"> & {
@@ -32,7 +31,7 @@ export function RoomRowActions({ room }: { room: Room }) {
       toast(<>Couldn't delete: {message}</>);
       return;
     }
-    globalMutate(["pantry", "/api/sidebar"]);
+    await invalidateApi("/api/sidebar");
     toast(<>Removed <em>{room.name}</em>.</>);
     router.refresh();
   }
@@ -49,7 +48,7 @@ export function RoomRowActions({ room }: { room: Room }) {
       toast(<>Couldn't update: {message}</>);
       return;
     }
-    globalMutate(["pantry", "/api/sidebar"]);
+    await invalidateApi("/api/sidebar");
     toast(
       archive ? (
         <>Archived <em>{room.name}</em>.</>

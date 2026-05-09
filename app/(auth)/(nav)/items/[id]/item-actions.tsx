@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { mutate as globalMutate } from "swr";
 import { Modal } from "@/components/modal";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EditItemForm } from "@/components/edit-item-form";
@@ -10,7 +9,7 @@ import { MoveItemForm } from "@/components/move-item-form";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/cn";
 import { button } from "@/components/button";
-import { useMutation } from "@/lib/api/client";
+import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Item as ItemRow, Room as RoomRow } from "@/db/schema";
 
 type Item = Omit<ItemRow, "count" | "createdAt" | "updatedAt">;
@@ -27,7 +26,7 @@ export function ItemActions({ item, rooms }: { item: Item; rooms: RoomLite[] }) 
 
   async function deleteItem() {
     await triggerDelete({ params: { path: { id: item.id } } });
-    globalMutate(["pantry", "/api/sidebar"]);
+    await invalidateApi("/api/sidebar");
     toast(<>Removed <em>{item.name}</em>.</>);
     router.push(`/rooms/${item.roomId}`);
     router.refresh();

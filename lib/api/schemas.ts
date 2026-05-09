@@ -266,13 +266,13 @@ export const MeSharedResponse = z
   })
   .openapi("MeSharedResponse");
 
-export const SignupRequest = z
+export const SignUpRequest = z
   .object({
     email: z.string().trim().toLowerCase().email().max(160),
     name: z.string().min(1).max(80),
     password: z.string().min(8).max(200),
   })
-  .openapi("SignupRequest");
+  .openapi("SignUpRequest");
 
 export const UploadResponse = z.object({ url: z.string() }).openapi("UploadResponse");
 

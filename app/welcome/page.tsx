@@ -29,10 +29,10 @@ export default function WelcomePage() {
         </p>
 
         <div className="flex flex-col gap-3 mt-8">
-          <Link href="/signup" className={cn(button({ variant: "primary", size: "lg" }), "w-full text-center")}>
+          <Link href="/sign-up" className={cn(button({ variant: "primary", size: "lg" }), "w-full text-center")}>
             Create an account
           </Link>
-          <Link href="/signin" className={cn(button({ variant: "secondary", size: "lg" }), "w-full text-center")}>
+          <Link href="/sign-in" className={cn(button({ variant: "secondary", size: "lg" }), "w-full text-center")}>
             Sign in
           </Link>
         </div>

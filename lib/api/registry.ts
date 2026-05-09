@@ -23,7 +23,7 @@ import {
   ShoppingPostRequest,
   ShoppingPostResponse,
   SidebarResponse,
-  SignupRequest,
+  SignUpRequest,
   UploadResponse,
 } from "./schemas";
 
@@ -288,8 +288,8 @@ export function buildRegistry() {
 
   registry.registerPath({
     method: "post",
-    path: "/api/signup",
-    request: { body: json(SignupRequest) },
+    path: "/api/sign-up",
+    request: { body: json(SignUpRequest) },
     responses: {
       200: { description: "Signed up", ...json(OkResponse) },
       400: { description: "Invalid", ...json(ErrorResponse) },

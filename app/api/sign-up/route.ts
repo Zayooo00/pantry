@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { db, users } from "@/db";
 import { hashPassword } from "@/lib/password";
-import { SignupRequest } from "@/lib/api/schemas";
+import { SignUpRequest } from "@/lib/api/schemas";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
 import { readJsonOr400 } from "@/lib/json";
 
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   if (body instanceof NextResponse) {
     return body;
   }
-  const parsed = SignupRequest.safeParse(body);
+  const parsed = SignUpRequest.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Invalid input. Email must be valid; password ≥ 8 chars." },
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     );
   }
   const limited = rateLimit({
-    bucket: "signup",
+    bucket: "sign-up",
     key: clientKey(req),
     max: 10,
     windowMs: 60 * 60 * 1000,

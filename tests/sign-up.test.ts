@@ -1,19 +1,19 @@
 import { describe, it, expect } from "vitest";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
-import { POST } from "@/app/api/signup/route";
+import { POST } from "@/app/api/sign-up/route";
 import { db, users } from "@/db";
 import { verifyPassword } from "@/lib/password";
 
 function jsonReq(body: unknown) {
-  return new NextRequest("http://localhost/api/signup", {
+  return new NextRequest("http://localhost/api/sign-up", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
   });
 }
 
-describe("POST /api/signup", () => {
+describe("POST /api/sign-up", () => {
   it("creates a user and stores a verifiable password hash", async () => {
     const res = await POST(jsonReq({ name: "Alex", email: "alex@example.com", password: "hunter2hunter" }));
     expect(res.status).toBe(200);

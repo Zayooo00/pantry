@@ -138,13 +138,13 @@ export function InviteClient({ token }: { token: string }) {
               </p>
               <div className="flex flex-wrap gap-2">
                 <Link
-                  href={`/signup?email=${encodeURIComponent(invite.email)}&next=${encodeURIComponent(callbackPath)}`}
+                  href={`/sign-up?email=${encodeURIComponent(invite.email)}&next=${encodeURIComponent(callbackPath)}`}
                   className={button({ variant: "primary" })}
                 >
                   Create account
                 </Link>
                 <Link
-                  href={`/signin?next=${encodeURIComponent(callbackPath)}`}
+                  href={`/sign-in?next=${encodeURIComponent(callbackPath)}`}
                   className={button({ variant: "secondary" })}
                 >
                   Sign in
@@ -159,7 +159,7 @@ export function InviteClient({ token }: { token: string }) {
                 You're signed in as {session?.user?.email}, but this invite is for {invite.email}.
               </div>
               <Link
-                href={`/api/auth/signout?callbackUrl=${encodeURIComponent(`/signin?next=${encodeURIComponent(callbackPath)}`)}`}
+                href={`/api/auth/signout?callbackUrl=${encodeURIComponent(`/sign-in?next=${encodeURIComponent(callbackPath)}`)}`}
                 className={cn(button({ variant: "secondary" }), "mt-3 inline-block")}
               >
                 Sign out & switch

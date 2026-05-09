@@ -44,7 +44,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
         const ip = request ? clientKey({ headers: request.headers }) : "unknown";
         const limited = rateLimit({
-          bucket: "signin",
+          bucket: "sign-in",
           key: `${parsed.data.email.toLowerCase()}|${ip}`,
           max: 10,
           windowMs: 15 * 60 * 1000,

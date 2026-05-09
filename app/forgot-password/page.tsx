@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
 
         <div className="mt-8 border-t border-dashed border-paper-3 pt-6 font-display text-sm text-ink-3 italic">
           <Link
-            href="/signin"
+            href="/sign-in"
             className="border-b border-ink-1 pb-px text-ink-1 not-italic transition-colors duration-150 ease-pantry hover:border-olive-2 hover:text-olive-2"
           >
             ← Back to sign in

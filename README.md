@@ -111,7 +111,7 @@ app/                            routes (App Router) + api/
   layout.tsx                    fonts + SessionProvider + ToastProvider
   page.tsx                      redirect → /dashboard or /welcome
   globals.css                   @theme tokens + base resets
-  welcome/  signin/  signup/    auth pages
+  welcome/  sign-in/  sign-up/  auth pages
   forgot-password/              request a reset link
   reset-password/               set a new password from a token
   invite/[token]/               accept-invite landing page

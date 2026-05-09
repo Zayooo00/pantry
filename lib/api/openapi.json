@@ -230,7 +230,7 @@
           "isOwner"
         ]
       },
-      "InviteMemberResponse": {
+      "InviteMemberAdded": {
         "type": "object",
         "properties": {
           "member": {
@@ -263,6 +263,43 @@
         },
         "required": [
           "member"
+        ]
+      },
+      "InviteMemberPending": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "viewer",
+                  "editor"
+                ]
+              }
+            },
+            "required": [
+              "email",
+              "role"
+            ]
+          }
+        },
+        "required": [
+          "pending"
+        ]
+      },
+      "InviteMemberResponse": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/InviteMemberAdded"
+          },
+          {
+            "$ref": "#/components/schemas/InviteMemberPending"
+          }
         ]
       },
       "InviteMemberRequest": {
@@ -1135,7 +1172,7 @@
         },
         "responses": {
           "200": {
-            "description": "Invited",
+            "description": "Invited or pending",
             "content": {
               "application/json": {
                 "schema": {
@@ -1174,8 +1211,8 @@
               }
             }
           },
-          "404": {
-            "description": "User not registered",
+          "409": {
+            "description": "Already a member",
             "content": {
               "application/json": {
                 "schema": {
@@ -1184,8 +1221,8 @@
               }
             }
           },
-          "409": {
-            "description": "Already a member",
+          "503": {
+            "description": "Email not configured",
             "content": {
               "application/json": {
                 "schema": {

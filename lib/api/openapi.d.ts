@@ -336,7 +336,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Invited */
+                /** @description Invited or pending */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -372,8 +372,8 @@ export interface paths {
                         "application/json": components["schemas"]["ErrorResponse"];
                     };
                 };
-                /** @description User not registered */
-                404: {
+                /** @description Already a member */
+                409: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -381,8 +381,8 @@ export interface paths {
                         "application/json": components["schemas"]["ErrorResponse"];
                     };
                 };
-                /** @description Already a member */
-                409: {
+                /** @description Email not configured */
+                503: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -1367,7 +1367,7 @@ export interface components {
             members: components["schemas"]["Member"][];
             isOwner: boolean;
         };
-        InviteMemberResponse: {
+        InviteMemberAdded: {
             member: {
                 userId: string;
                 name: string;
@@ -1376,6 +1376,14 @@ export interface components {
                 role: "viewer" | "editor";
             };
         };
+        InviteMemberPending: {
+            pending: {
+                email: string;
+                /** @enum {string} */
+                role: "viewer" | "editor";
+            };
+        };
+        InviteMemberResponse: components["schemas"]["InviteMemberAdded"] | components["schemas"]["InviteMemberPending"];
         InviteMemberRequest: {
             /** Format: email */
             email: string;

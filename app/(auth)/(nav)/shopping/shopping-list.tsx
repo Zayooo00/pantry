@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { mutate as globalMutate } from "swr";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -17,8 +16,9 @@ import { chip } from "@/components/chip";
 import { stamp } from "@/components/stamp";
 import { TextInput } from "@/components/text-input";
 import { Select } from "@/components/select";
+import { NumberStepper } from "@/components/stepper";
 import { formatCount } from "@/lib/format";
-import { useMutation } from "@/lib/api/client";
+import { apiClient, invalidateApi, useMutation } from "@/lib/api/client";
 
 const TOGGLE_DEBOUNCE_MS = 400;
 
@@ -71,13 +71,13 @@ export function ShoppingList({
   const inFlightRef = useRef<Set<Promise<unknown>>>(new Set());
 
   const { trigger: triggerToggle } = useMutation("patch", "/api/shopping/{id}", {
-    onSuccess: () => globalMutate(["pantry", "/api/sidebar"]),
+    onSuccess: () => void invalidateApi("/api/sidebar"),
   });
   const { trigger: triggerClear } = useMutation("post", "/api/shopping/clear-done", {
-    onSuccess: () => globalMutate(["pantry", "/api/sidebar"]),
+    onSuccess: () => void invalidateApi("/api/sidebar"),
   });
   const { trigger: triggerManualAdd } = useMutation("post", "/api/shopping", {
-    onSuccess: () => globalMutate(["pantry", "/api/sidebar"]),
+    onSuccess: () => void invalidateApi("/api/sidebar"),
   });
 
   const manualForm = useForm<ManualValues>({
@@ -145,11 +145,9 @@ export function ShoppingList({
         continue;
       }
       pending.delete(id);
-      // `keepalive` lets the request outlive the page unload (~64KB cap is fine here).
-      void fetch(`/api/shopping/${encodeURIComponent(id)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ done }),
+      void apiClient.PATCH("/api/shopping/{id}", {
+        params: { path: { id } },
+        body: { done },
         keepalive: true,
       });
     }
@@ -288,7 +286,7 @@ export function ShoppingList({
       <form
         onSubmit={manualForm.handleSubmit(addManual)}
         noValidate
-        className="no-print mx-auto mb-6 grid max-w-180 grid-cols-1 gap-2 rounded-md border border-paper-3 bg-paper-1 px-3 py-3 sm:grid-cols-[1fr_88px_96px_140px_auto] sm:items-end"
+        className="no-print mx-auto mb-6 grid max-w-180 grid-cols-1 gap-2 rounded-md border border-paper-3 bg-paper-1 px-3 py-3 sm:grid-cols-[1fr_auto_96px_140px_auto] sm:items-end"
       >
         <div className="sm:col-span-5 sm:mb-1">
           <span className="caption">ADD A CUSTOM ITEM</span>
@@ -301,12 +299,20 @@ export function ShoppingList({
             </div>
           )}
         </div>
-        <TextInput
-          type="number"
-          step="0.1"
-          min="0"
-          aria-label="Quantity"
-          {...manualForm.register("quantity", { valueAsNumber: true })}
+        <Controller
+          control={manualForm.control}
+          name="quantity"
+          render={({ field }) => (
+            <NumberStepper
+              value={field.value}
+              onChange={field.onChange}
+              variant="native"
+              step={1}
+              min={0.01}
+              ariaLabel="Quantity"
+              className="w-26"
+            />
+          )}
         />
         <Controller
           control={manualForm.control}
@@ -368,26 +374,28 @@ export function ShoppingList({
               </span>
             </div>
             {rows.map((it) => (
-              <label
+              <div
                 key={it.id}
-                className="grid cursor-pointer grid-cols-[24px_1fr_auto] items-center gap-2 border-b border-dotted border-paper-3 py-2 transition-colors last:border-0 hover:bg-paper-1/40 sm:grid-cols-[28px_1fr_auto_auto] sm:gap-3"
+                className="grid grid-cols-[24px_1fr_auto] items-center gap-2 border-b border-dotted border-paper-3 py-2 transition-colors last:border-0 hover:bg-paper-1/40 sm:grid-cols-[28px_1fr_auto_auto] sm:gap-3"
               >
-                <Checkbox checked={it.done} onChange={() => toggle(it.id)} />
-                <div className={cn("min-w-0", it.done && "opacity-50")}>
-                  <span
-                    className={cn(
-                      "block truncate font-display text-md sm:text-lg",
-                      it.done && "line-through",
-                    )}
-                  >
-                    {it.name}
-                  </span>
-                  {it.reason && (
-                    <span className="font-mono text-2xs tracking-widest text-ink-4 uppercase">
-                      {it.reason}
+                <label className="contents cursor-pointer">
+                  <Checkbox checked={it.done} onChange={() => toggle(it.id)} />
+                  <div className={cn("min-w-0", it.done && "opacity-50")}>
+                    <span
+                      className={cn(
+                        "block truncate font-display text-md sm:text-lg",
+                        it.done && "line-through",
+                      )}
+                    >
+                      {it.name}
                     </span>
-                  )}
-                </div>
+                    {it.reason && (
+                      <span className="font-mono text-2xs tracking-widest text-ink-4 uppercase">
+                        {it.reason}
+                      </span>
+                    )}
+                  </div>
+                </label>
                 <span
                   className={cn(
                     "num font-mono text-sm whitespace-nowrap",
@@ -407,7 +415,7 @@ export function ShoppingList({
                 >
                   {it.estPrice ? `$${it.estPrice.toFixed(2)}` : ""}
                 </span>
-              </label>
+              </div>
             ))}
           </div>
         ))}

@@ -26,7 +26,6 @@ export function ItemActions({ item, rooms }: { item: Item; rooms: RoomLite[] }) 
 
   async function deleteItem() {
     await triggerDelete({ params: { path: { id: item.id } } });
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Removed <em>{item.name}</em>.
@@ -34,6 +33,7 @@ export function ItemActions({ item, rooms }: { item: Item; rooms: RoomLite[] }) 
     );
     router.push(`/rooms/${item.roomId}`);
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   return (

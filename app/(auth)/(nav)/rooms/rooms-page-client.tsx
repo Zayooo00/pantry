@@ -151,7 +151,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
     }
     setReorderActive(false);
     const draftIds = reorderDraft.map((r) => r.id);
-    await mutateApi("/api/sidebar", (current) => {
+    void mutateApi("/api/sidebar", (current) => {
       if (!current?.rooms) {
         return current;
       }
@@ -162,13 +162,13 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
       });
       return { ...current, rooms: reordered };
     });
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Order <em>saved</em>.
       </>,
     );
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   return (

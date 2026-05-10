@@ -78,8 +78,8 @@ export function InviteClient({ token }: { token: string }) {
       setAccepting(false);
       return;
     }
-    await invalidateApi("/api/sidebar");
     router.push(`/rooms/${json.roomId}`);
+    void invalidateApi("/api/sidebar");
   }
 
   if (state.status === "loading") {

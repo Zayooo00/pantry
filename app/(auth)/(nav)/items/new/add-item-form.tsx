@@ -168,7 +168,6 @@ export function AddItemForm({
       setServerError("Could not save item.");
       return;
     }
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Added <em>{formValues.name}</em> to the ledger.
@@ -186,6 +185,7 @@ export function AddItemForm({
     } else {
       router.push(`/items/${json.id}`);
     }
+    void invalidateApi("/api/sidebar");
   }
 
   const onSubmitAndStay = handleSubmit((v) => save(v, true));

@@ -71,7 +71,6 @@ export function MoveItemForm({
       return;
     }
     const target = rooms.find((r) => r.id === values.roomId);
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Moved <em>{itemName}</em> to {target?.name ?? "another room"}.
@@ -79,6 +78,7 @@ export function MoveItemForm({
     );
     onClose();
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   return (

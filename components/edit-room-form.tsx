@@ -65,7 +65,6 @@ export function EditRoomForm({ room, onClose }: { room: Room; onClose: () => voi
       setServerError(err instanceof Error ? err.message : "Could not save changes.");
       return;
     }
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Updated <em>{values.name}</em>.
@@ -73,6 +72,7 @@ export function EditRoomForm({ room, onClose }: { room: Room; onClose: () => voi
     );
     onClose();
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   return (

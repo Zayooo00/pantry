@@ -31,13 +31,13 @@ export function RoomRowActions({ room }: { room: Room }) {
       toast(<>Couldn't delete: {message}</>);
       return;
     }
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Removed <em>{room.name}</em>.
       </>,
     );
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   async function toggleArchive() {
@@ -52,7 +52,6 @@ export function RoomRowActions({ room }: { room: Room }) {
       toast(<>Couldn't update: {message}</>);
       return;
     }
-    await invalidateApi("/api/sidebar");
     toast(
       archive ? (
         <>
@@ -65,6 +64,7 @@ export function RoomRowActions({ room }: { room: Room }) {
       ),
     );
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   return (

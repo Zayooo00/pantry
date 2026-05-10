@@ -171,7 +171,6 @@ export function EditItemForm({ item, onClose }: { item: ItemEditable; onClose: (
       setServerError(err instanceof Error ? err.message : "Could not save changes.");
       return;
     }
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Saved <em>{values.name}</em>.
@@ -179,6 +178,7 @@ export function EditItemForm({ item, onClose }: { item: ItemEditable; onClose: (
     );
     onClose();
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   return (

@@ -58,7 +58,6 @@ export function RoomDetailHeader({
       toast(<>Couldn't update: {err instanceof Error ? err.message : "unknown error"}</>);
       return;
     }
-    await invalidateApi("/api/sidebar");
     toast(
       next ? (
         <>
@@ -71,6 +70,7 @@ export function RoomDetailHeader({
       ),
     );
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   async function deleteRoom() {
@@ -80,7 +80,6 @@ export function RoomDetailHeader({
       toast(<>Couldn't delete: {err instanceof Error ? err.message : "unknown error"}</>);
       return;
     }
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Removed <em>{room.name}</em>.
@@ -88,6 +87,7 @@ export function RoomDetailHeader({
     );
     router.push("/rooms");
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   return (

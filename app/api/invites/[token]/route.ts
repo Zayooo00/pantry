@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { db, pendingInvites, roomMembers, rooms, users } from "@/db";
 import { auth } from "@/auth";
+import { appendRoomPosition } from "@/lib/access";
 import { hashToken } from "@/lib/tokens";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +79,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ to
       target: [roomMembers.roomId, roomMembers.userId],
       set: { role: invite.role, invitedBy: invite.invitedBy },
     });
+  await appendRoomPosition(session.user.id, invite.roomId);
   await db
     .update(pendingInvites)
     .set({ acceptedAt: new Date() })

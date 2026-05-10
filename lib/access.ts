@@ -1,6 +1,6 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { db, items, roomMembers, rooms, type Room, type RoomRole } from "@/db";
+import { db, items, roomMembers, roomPositions, rooms, type Room, type RoomRole } from "@/db";
 import { auth } from "@/auth";
 
 export type AccessRole = RoomRole | "owner";
@@ -113,6 +113,22 @@ export async function getRoomWithRole(
     return null;
   }
   return { room, role: memberRows[0].role as RoomRole };
+}
+
+// Append a per-user position for a newly accessible room (created or joined),
+// so it lands at the bottom of the user's sidebar without colliding with the
+// owner-set rooms.position fallback. No-op if the (userId, roomId) already
+// has a row.
+export async function appendRoomPosition(userId: string, roomId: string): Promise<void> {
+  const max = await db
+    .select({ max: sql<number | null>`max(${roomPositions.position})` })
+    .from(roomPositions)
+    .where(eq(roomPositions.userId, userId));
+  const nextPos = (max[0]?.max ?? -1) + 1;
+  await db
+    .insert(roomPositions)
+    .values({ userId, roomId, position: nextPos })
+    .onConflictDoNothing({ target: [roomPositions.userId, roomPositions.roomId] });
 }
 
 export async function getItemRoomId(itemId: string): Promise<string | null> {

@@ -3,6 +3,7 @@ import { db, rooms } from "@/db";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { auth } from "@/auth";
+import { appendRoomPosition } from "@/lib/access";
 import { CreateRoomRequest } from "@/lib/api/schemas";
 import { readJsonOr400 } from "@/lib/json";
 
@@ -33,5 +34,6 @@ export async function POST(req: NextRequest) {
     tinted: parsed.data.tinted ?? false,
     position: owned.length,
   });
+  await appendRoomPosition(userId, id);
   return NextResponse.json({ id });
 }

@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { db, pendingInvites, roomMembers, rooms, users } from "@/db";
 import { auth } from "@/auth";
-import { canViewRoom, isRoomOwner } from "@/lib/access";
+import { appendRoomPosition, canViewRoom, isRoomOwner } from "@/lib/access";
 import { InviteMemberRequest } from "@/lib/api/schemas";
 import { appUrl, emailLayout, escapeHtml, isEmailConfigured, sendEmail } from "@/lib/email";
 import { generateToken, hashToken } from "@/lib/tokens";
@@ -179,6 +179,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (inserted.length === 0) {
     return NextResponse.json({ error: "Already a member." }, { status: 409 });
   }
+  await appendRoomPosition(target.id, id);
   return NextResponse.json({
     member: {
       userId: target.id,

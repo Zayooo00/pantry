@@ -1,3 +1,5 @@
+import { cva } from "class-variance-authority";
+import { button } from "@/components/button";
 import { cn } from "@/lib/cn";
 
 const sizeClass = {
@@ -53,5 +55,58 @@ export function TextSkeleton({
 export function BlockSkeleton({ className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div aria-hidden className={cn("animate-pulse rounded-md bg-paper-3", className)} {...rest} />
+  );
+}
+
+// Pill-shaped placeholder that inherits the real button's padding/radius/text-size
+// so its width auto-sizes to the (invisible) label inside — i.e. pass the same
+// label the real button will have.
+export function ButtonSkeleton({
+  size,
+  children,
+  className,
+}: {
+  size?: "sm" | "md" | "lg";
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        button({ size }),
+        "pointer-events-none animate-pulse cursor-default border-paper-3 bg-paper-3 text-paper-3",
+        className,
+      )}
+    >
+      <span className="invisible">{children ?? "."}</span>
+    </span>
+  );
+}
+
+// Square-ish placeholder for badges (rounded-sm, small text).
+export const badgeSkeleton = cva("inline-flex animate-pulse items-center rounded-sm bg-paper-3", {
+  variants: {
+    size: {
+      sm: "px-2 py-0.5 text-2xs",
+      md: "px-2.5 py-1 text-xs",
+    },
+  },
+  defaultVariants: { size: "sm" },
+});
+
+export function BadgeSkeleton({
+  size,
+  children,
+  className,
+}: {
+  size?: "sm" | "md";
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <span aria-hidden className={cn(badgeSkeleton({ size }), className)}>
+      <span className="invisible">{children ?? "."}</span>
+    </span>
   );
 }

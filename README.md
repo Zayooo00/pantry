@@ -85,7 +85,7 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with **alex@pant
 | `SMTP_USER` / `SMTP_PASS` | no | SMTP credentials. For Gmail, use an App Password. Without these, password-reset and pending-invite emails are disabled (the API returns a clear 503). |
 | `EMAIL_FROM` | no | Sender address shown in outbound mail. Required alongside `SMTP_USER`/`SMTP_PASS`. |
 | `APP_URL` | no | Public URL of the app — used to build links in emails. Defaults to `http://localhost:3000` in dev; required in production. |
-| `CRON_SECRET` | no | Shared secret for `/api/cron/digest`. Pass as `?secret=...` or in headers from your cron service. |
+| `CRON_SECRET` | no | Shared secret for `/api/cron/digest`. Sent as `Authorization: Bearer <CRON_SECRET>`; Vercel Cron does this automatically. |
 
 ## Scripts
 

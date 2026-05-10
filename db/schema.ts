@@ -103,6 +103,25 @@ export const roomMembers = sqliteTable(
 
 export type RoomRole = "viewer" | "editor";
 
+export const roomPositions = sqliteTable(
+  "room_positions",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    roomId: text("room_id")
+      .notNull()
+      .references(() => rooms.id, { onDelete: "cascade" }),
+    position: integer("position").notNull(),
+  },
+  (t) => ({
+    pk: uniqueIndex("room_positions_user_room_unique").on(t.userId, t.roomId),
+  }),
+);
+
+export type RoomPosition = typeof roomPositions.$inferSelect;
+export type RoomPositionInsert = typeof roomPositions.$inferInsert;
+
 export const items = sqliteTable("items", {
   id: text("id").primaryKey(),
   roomId: text("room_id")

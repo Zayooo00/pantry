@@ -3,6 +3,7 @@ import {
   items,
   rooms,
   roomMembers,
+  roomPositions,
   shoppingItems,
   shoppingTrips,
   itemEvents,
@@ -27,15 +28,20 @@ export async function getRoomsWithCounts(
     : opts.includeArchived
       ? undefined
       : isNull(rooms.archivedAt);
-  const all = await db
-    .select()
+  const rowsWithPos = await db
+    .select({ room: rooms, userPos: roomPositions.position })
     .from(rooms)
+    .leftJoin(
+      roomPositions,
+      and(eq(roomPositions.roomId, rooms.id), eq(roomPositions.userId, userId)),
+    )
     .where(
       archivedClause
         ? and(inArray(rooms.id, accessibleIds), archivedClause)
         : inArray(rooms.id, accessibleIds),
     )
-    .orderBy(asc(rooms.position));
+    .orderBy(asc(sql`coalesce(${roomPositions.position}, ${rooms.position})`));
+  const all = rowsWithPos.map((r) => r.room);
   const visibleIds = all.map((r) => r.id);
   const allItems =
     visibleIds.length === 0
@@ -103,11 +109,16 @@ export async function getDashboardData(userId: string) {
       recentEvents: [],
     };
   }
-  const allRooms = await db
-    .select()
+  const dashRows = await db
+    .select({ room: rooms })
     .from(rooms)
+    .leftJoin(
+      roomPositions,
+      and(eq(roomPositions.roomId, rooms.id), eq(roomPositions.userId, userId)),
+    )
     .where(and(inArray(rooms.id, accessibleIds), isNull(rooms.archivedAt)))
-    .orderBy(asc(rooms.position));
+    .orderBy(asc(sql`coalesce(${roomPositions.position}, ${rooms.position})`));
+  const allRooms = dashRows.map((r) => r.room);
   const liveIds = allRooms.map((r) => r.id);
   const allItems =
     liveIds.length === 0 ? [] : await db.select().from(items).where(inArray(items.roomId, liveIds));

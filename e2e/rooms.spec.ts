@@ -14,7 +14,7 @@ async function createRoom(page: Page, name: string, subtitle = "End-to-end test 
   await expect(dialog).not.toBeVisible();
 }
 
-test("creates a room — modal closes, tile + sidebar update, link navigates", async ({ page }) => {
+test("creates a room - modal closes, tile + sidebar update, link navigates", async ({ page }) => {
   await loginAs(page);
   await page.goto("/rooms");
 
@@ -30,7 +30,7 @@ test("creates a room — modal closes, tile + sidebar update, link navigates", a
   await expect(page).toHaveURL(/\/rooms\/[^/]+$/);
 });
 
-test("renames a room — modal closes and the new name shows in sidebar and page header", async ({
+test("renames a room - modal closes and the new name shows in sidebar and page header", async ({
   page,
 }) => {
   await loginAs(page);
@@ -59,7 +59,7 @@ test("renames a room — modal closes and the new name shows in sidebar and page
   ).toHaveCount(0);
 });
 
-test("archives a room — disappears from sidebar and All tab, appears under Archived", async ({
+test("archives a room - disappears from sidebar and All tab, appears under Archived", async ({
   page,
 }) => {
   await loginAs(page);
@@ -85,7 +85,7 @@ test("archives a room — disappears from sidebar and All tab, appears under Arc
   await expect(page.getByRole("link", { name: name, exact: true })).toBeVisible();
 });
 
-test("deletes an empty room via confirm dialog — gone from list and sidebar", async ({ page }) => {
+test("deletes an empty room via confirm dialog - gone from list and sidebar", async ({ page }) => {
   await loginAs(page);
   await page.goto("/rooms");
 
@@ -108,7 +108,7 @@ test("deletes an empty room via confirm dialog — gone from list and sidebar", 
   await expect(page.getByRole("link", { name: name, exact: true })).toHaveCount(0);
 });
 
-test("restores an archived room — reappears in sidebar and on the All tab", async ({ page }) => {
+test("restores an archived room - reappears in sidebar and on the All tab", async ({ page }) => {
   await loginAs(page);
   await page.goto("/rooms");
 
@@ -149,4 +149,73 @@ test("blocks deleting a non-empty seeded room with a clear message", async ({ pa
   await confirm.getByRole("button", { name: /^Cancel$/ }).click();
   await expect(confirm).not.toBeVisible();
   await expect(page).toHaveURL(/\/rooms\/pantry$/);
+});
+
+const MAYA = { email: "maya@pantry.local", password: "password123", name: "Maya Hsu" };
+
+test("reorder includes shared rooms in the user's view (sidebar + rooms page)", async ({
+  page,
+}) => {
+  await loginAs(page);
+
+  const beforeRes = await page.request.get("/api/sidebar");
+  expect(beforeRes.ok()).toBeTruthy();
+  const beforeOrder: string[] = (await beforeRes.json()).rooms.map((r: { id: string }) => r.id);
+  expect(beforeOrder).toContain("maya-pantry");
+
+  const newOrder = ["maya-pantry", ...beforeOrder.filter((id) => id !== "maya-pantry")];
+  const reorder = await page.request.post("/api/rooms/reorder", { data: { order: newOrder } });
+  expect(reorder.ok()).toBeTruthy();
+
+  const afterRes = await page.request.get("/api/sidebar");
+  const afterOrder: string[] = (await afterRes.json()).rooms.map((r: { id: string }) => r.id);
+  expect(afterOrder[0]).toBe("maya-pantry");
+
+  await page.goto("/rooms");
+  const tiles = page.getByRole("main").locator('a[href^="/rooms/"]');
+  await expect(tiles.first()).toHaveAttribute("href", "/rooms/maya-pantry");
+
+  const sidebarLinks = page.locator("aside").locator('a[href^="/rooms/"]');
+  await expect(sidebarLinks.first()).toHaveAttribute("href", "/rooms/maya-pantry");
+
+  await page.request.post("/api/rooms/reorder", { data: { order: beforeOrder } });
+});
+
+test("reorder is per-user - alex moving rooms doesn't change maya's order", async ({ browser }) => {
+  test.setTimeout(120_000);
+  const alexCtx = await browser.newContext();
+  const alexPage = await alexCtx.newPage();
+  await loginAs(alexPage);
+
+  const mayaCtx = await browser.newContext();
+  const mayaPage = await mayaCtx.newPage();
+  await loginAs(mayaPage, MAYA);
+
+  const mayaBefore: string[] = (
+    await (await mayaPage.request.get("/api/sidebar")).json()
+  ).rooms.map((r: { id: string }) => r.id);
+
+  const alexBefore: string[] = (
+    await (await alexPage.request.get("/api/sidebar")).json()
+  ).rooms.map((r: { id: string }) => r.id);
+  const alexNewOrder = [...alexBefore].reverse();
+  const reorderRes = await alexPage.request.post("/api/rooms/reorder", {
+    data: { order: alexNewOrder },
+  });
+  expect(reorderRes.ok()).toBeTruthy();
+
+  const mayaAfter: string[] = (await (await mayaPage.request.get("/api/sidebar")).json()).rooms.map(
+    (r: { id: string }) => r.id,
+  );
+  expect(mayaAfter).toEqual(mayaBefore);
+
+  const alexAfter: string[] = (await (await alexPage.request.get("/api/sidebar")).json()).rooms.map(
+    (r: { id: string }) => r.id,
+  );
+  expect(alexAfter).toEqual(alexNewOrder);
+
+  await alexPage.request.post("/api/rooms/reorder", { data: { order: alexBefore } });
+
+  await alexCtx.close();
+  await mayaCtx.close();
 });

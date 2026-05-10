@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   DndContext,
@@ -85,14 +85,30 @@ const palettes: Record<string, string[]> = {
 export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
   const router = useRouter();
   const { toast } = useToast();
-  // Local draft only used while reordering; otherwise mirror server props so
-  // adds/edits/deletes (which trigger router.refresh) appear immediately.
+  // Local draft holds the displayed order from the moment the user enters
+  // reorder mode until the server props (initialRooms) catch up to it. Without
+  // this, the sidebar/grid would briefly snap back to the old order between
+  // "Save" and the router.refresh() landing.
   const [reorderDraft, setReorderDraft] = useState<Room[] | null>(null);
-  const reordering = reorderDraft !== null;
+  const [reorderActive, setReorderActive] = useState(false);
+  const reordering = reorderActive;
   const rooms = reorderDraft ?? initialRooms;
   const [newRoomOpen, setNewRoomOpen] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>("all");
+
+  useEffect(() => {
+    if (reorderActive || !reorderDraft) {
+      return;
+    }
+    const matches =
+      initialRooms.length === reorderDraft.length &&
+      initialRooms.every((r, i) => r.id === reorderDraft[i].id);
+    if (matches) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync the post-save draft cleanup with router.refresh() landing; without this the displayed order would briefly snap back between save and refresh
+      setReorderDraft(null);
+    }
+  }, [initialRooms, reorderActive, reorderDraft]);
 
   const effectiveTab: TabKey = reordering ? "all" : activeTab;
   const visibleRooms = useMemo(() => filterRooms(rooms, effectiveTab), [rooms, effectiveTab]);
@@ -133,7 +149,7 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
     } finally {
       setSavingOrder(false);
     }
-    setReorderDraft(null);
+    setReorderActive(false);
     await invalidateApi("/api/sidebar");
     toast(
       <>
@@ -162,7 +178,10 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
             <>
               <button
                 type="button"
-                onClick={() => setReorderDraft(null)}
+                onClick={() => {
+                  setReorderActive(false);
+                  setReorderDraft(null);
+                }}
                 className={button({ variant: "ghost" })}
                 disabled={savingOrder}
               >
@@ -181,7 +200,10 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
             <>
               <button
                 type="button"
-                onClick={() => setReorderDraft(initialRooms)}
+                onClick={() => {
+                  setReorderDraft(initialRooms);
+                  setReorderActive(true);
+                }}
                 className={button({ variant: "secondary" })}
               >
                 Reorder

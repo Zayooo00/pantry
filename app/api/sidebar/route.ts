@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { db, items, rooms, shoppingItems } from "@/db";
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { db, items, roomPositions, rooms, shoppingItems } from "@/db";
+import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { itemStatus } from "@/lib/format";
 import { auth } from "@/auth";
 import { getRoomRolesForUser } from "@/lib/access";
@@ -24,11 +24,16 @@ export async function GET() {
     return NextResponse.json({ rooms: [], shoppingCount: shopping.length });
   }
 
-  const allRooms = await db
-    .select()
+  const sidebarRows = await db
+    .select({ room: rooms })
     .from(rooms)
+    .leftJoin(
+      roomPositions,
+      and(eq(roomPositions.roomId, rooms.id), eq(roomPositions.userId, userId)),
+    )
     .where(and(inArray(rooms.id, accessibleIds), isNull(rooms.archivedAt)))
-    .orderBy(asc(rooms.position));
+    .orderBy(asc(sql`coalesce(${roomPositions.position}, ${rooms.position})`));
+  const allRooms = sidebarRows.map((r) => r.room);
   const liveIds = allRooms.map((r) => r.id);
   const allItems =
     liveIds.length === 0 ? [] : await db.select().from(items).where(inArray(items.roomId, liveIds));

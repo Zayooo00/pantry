@@ -3,6 +3,7 @@ import {
   items,
   rooms,
   roomMembers,
+  roomPositions,
   shoppingItems,
   shoppingTrips,
   itemEvents,
@@ -58,6 +59,7 @@ export async function seedDemoData(opts: { password: string }): Promise<SeedResu
   await db.delete(shoppingTrips).where(inArray(shoppingTrips.userId, demoIds));
   await db.delete(passwordResets).where(inArray(passwordResets.userId, demoIds));
   await db.delete(pendingInvites).where(inArray(pendingInvites.invitedBy, demoIds));
+  await db.delete(roomPositions).where(inArray(roomPositions.userId, demoIds));
   await db.delete(roomMembers).where(inArray(roomMembers.userId, demoIds));
   await db.delete(rooms).where(inArray(rooms.ownerId, demoIds));
   const alexId = userIdByEmail.get("alex@pantry.local")!;
@@ -171,6 +173,29 @@ export async function seedDemoData(opts: { password: string }): Promise<SeedResu
     { id: randomUUID(), roomId: "kitchen", userId: noraId, role: "viewer", invitedBy: alexId },
     { id: randomUUID(), roomId: "maya-pantry", userId: alexId, role: "editor", invitedBy: mayaId },
   ]);
+
+  // Per-user room positions — gives each demo user a deterministic order that
+  // includes their shared rooms (instead of relying on owner-set positions).
+  const alexRoomOrder = [
+    "pantry",
+    "basement",
+    "kitchen",
+    "fridge",
+    "freezer",
+    "spice",
+    "garage",
+    "old-cellar",
+    "maya-pantry",
+  ];
+  const mayaRoomOrder = ["maya-pantry", "pantry", "fridge"];
+  const noraRoomOrder = ["kitchen"];
+  await db
+    .insert(roomPositions)
+    .values([
+      ...alexRoomOrder.map((roomId, position) => ({ userId: alexId, roomId, position })),
+      ...mayaRoomOrder.map((roomId, position) => ({ userId: mayaId, roomId, position })),
+      ...noraRoomOrder.map((roomId, position) => ({ userId: noraId, roomId, position })),
+    ]);
 
   const inviteToken = generateToken();
   await db.insert(pendingInvites).values({

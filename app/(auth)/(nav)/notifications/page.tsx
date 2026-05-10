@@ -1,5 +1,4 @@
 import { desc, eq } from "drizzle-orm";
-import { AppShell } from "@/components/app-shell";
 import { db, notifications } from "@/db";
 import { requireUserId } from "@/lib/access";
 import { NotificationsClient } from "./notifications-client";
@@ -15,14 +14,12 @@ export default async function NotificationsPage() {
     .orderBy(desc(notifications.createdAt))
     .limit(100);
   return (
-    <AppShell>
-      <NotificationsClient
-        initial={rows.map((n) => ({
-          ...n,
-          createdAt: n.createdAt.toISOString(),
-          readAt: n.readAt ? n.readAt.toISOString() : null,
-        }))}
-      />
-    </AppShell>
+    <NotificationsClient
+      initial={rows.map((n) => ({
+        ...n,
+        createdAt: n.createdAt.toISOString(),
+        readAt: n.readAt ? n.readAt.toISOString() : null,
+      }))}
+    />
   );
 }

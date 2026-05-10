@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 import { CommandPalette } from "./command-palette";
 
-export function AppShell({
-  children,
-  topbarPlaceholder,
-}: {
-  children: React.ReactNode;
-  topbarPlaceholder?: string;
-}) {
+const placeholderByPath: Record<string, string> = {
+  "/search": "Search by name, brand, barcode, room…",
+};
+
+export function AppShell({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const pathname = usePathname();
+  const topbarPlaceholder = placeholderByPath[pathname];
 
   return (
     <div className="md:grid md:min-h-screen md:grid-cols-[240px_1fr]">

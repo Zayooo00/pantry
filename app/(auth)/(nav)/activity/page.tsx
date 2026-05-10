@@ -1,4 +1,3 @@
-import { AppShell } from "@/components/app-shell";
 import { requireUserId } from "@/lib/access";
 import { getRecentEvents, getRoomsWithCounts } from "@/lib/queries";
 import { ActivityClient } from "./activity-client";
@@ -12,14 +11,12 @@ export default async function ActivityPage() {
     getRoomsWithCounts(userId),
   ]);
   return (
-    <AppShell>
-      <ActivityClient
-        rooms={rooms.map((r) => ({ id: r.id, name: r.name }))}
-        initialEvents={events.map((e) => ({
-          ...e,
-          createdAt: e.createdAt.toISOString(),
-        }))}
-      />
-    </AppShell>
+    <ActivityClient
+      rooms={rooms.map((r) => ({ id: r.id, name: r.name }))}
+      initialEvents={events.map((e) => ({
+        ...e,
+        createdAt: e.createdAt.toISOString(),
+      }))}
+    />
   );
 }

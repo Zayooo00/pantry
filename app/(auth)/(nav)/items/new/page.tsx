@@ -1,4 +1,3 @@
-import { AppShell } from "@/components/app-shell";
 import { getRoomsWithCounts } from "@/lib/queries";
 import { getRoomRolesForUser, requireUserId } from "@/lib/access";
 import { AddItemForm } from "./add-item-form";
@@ -19,8 +18,6 @@ export default async function NewItemPage({
     return role === "owner" || role === "editor";
   });
   return (
-    <AppShell>
-      <AddItemForm rooms={editableRooms} initialRoomId={sp.room ?? editableRooms[0]?.id ?? ""} />
-    </AppShell>
+    <AddItemForm rooms={editableRooms} initialRoomId={sp.room ?? editableRooms[0]?.id ?? ""} />
   );
 }

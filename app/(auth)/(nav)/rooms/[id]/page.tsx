@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AppShell } from "@/components/app-shell";
 import { auth } from "@/auth";
 import { getRoomWithRole } from "@/lib/access";
 import { RoomViews } from "./room-views";
@@ -51,7 +50,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
   const maxCatCount = Math.max(...catCounts.map((x) => x.count), 1);
 
   return (
-    <AppShell>
+    <>
       <nav className="mb-3 flex flex-wrap items-center gap-2 text-xs text-ink-3">
         <Link
           href="/dashboard"
@@ -132,7 +131,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
         </span>
         <span className="caption">PANTRY · {(session?.user?.name ?? "—").toUpperCase()}</span>
       </footer>
-    </AppShell>
+    </>
   );
 }
 

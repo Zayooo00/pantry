@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { AppShell } from "@/components/app-shell";
 import { requireUserId } from "@/lib/access";
 import { getCurrentUser } from "@/lib/queries";
 import { SettingsClient } from "./settings-client";
@@ -13,16 +12,14 @@ export default async function SettingsPage() {
     notFound();
   }
   return (
-    <AppShell>
-      <SettingsClient
-        user={{
-          id: me.id,
-          name: me.name,
-          email: me.email,
-          joined: me.createdAt,
-          notifyDigest: (me.notifyDigest as "off" | "daily" | "weekly") ?? "off",
-        }}
-      />
-    </AppShell>
+    <SettingsClient
+      user={{
+        id: me.id,
+        name: me.name,
+        email: me.email,
+        joined: me.createdAt,
+        notifyDigest: (me.notifyDigest as "off" | "daily" | "weekly") ?? "off",
+      }}
+    />
   );
 }

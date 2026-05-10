@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AppShell } from "@/components/app-shell";
 import { RoomGlyph } from "@/icons";
 import { AddToShoppingButton } from "@/components/stepper";
 import { getDashboardData } from "@/lib/queries";
@@ -55,7 +54,7 @@ export default async function DashboardPage() {
           : "Good evening";
 
   return (
-    <AppShell>
+    <>
       <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
         <div>
           <div className="caption mb-3">
@@ -367,7 +366,7 @@ export default async function DashboardPage() {
         <span className="caption">PANTRY · LEDGER</span>
         <span className="caption">{(session?.user?.name ?? "—").toUpperCase()}</span>
       </footer>
-    </AppShell>
+    </>
   );
 }
 

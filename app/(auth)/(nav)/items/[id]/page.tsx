@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { AppShell } from "@/components/app-shell";
 import { auth } from "@/auth";
 import { getRoomWithRole } from "@/lib/access";
 import { Stepper, AddToShoppingButton } from "@/components/stepper";
@@ -51,7 +50,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
     .filter(Boolean);
 
   return (
-    <AppShell>
+    <>
       <nav className="mb-6 flex flex-wrap items-center gap-2 text-xs text-ink-3">
         <Link
           href="/dashboard"
@@ -291,7 +290,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
         </span>
         <span className="caption">{(session?.user?.name ?? "—").toUpperCase()}</span>
       </footer>
-    </AppShell>
+    </>
   );
 }
 

@@ -97,7 +97,6 @@ export function Sidebar({
 
   return (
     <>
-      {/* Backdrop — mobile only when drawer open */}
       <div
         aria-hidden
         onClick={onCloseDrawer}

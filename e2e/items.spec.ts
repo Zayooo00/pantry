@@ -11,7 +11,7 @@ async function addItem(page: Page, roomId: string, name: string) {
   await page.waitForURL(/\/items\/[^/]+$/);
 }
 
-test("adds an item to a room — lands on item detail and shows up in the room list", async ({
+test("adds an item to a room - lands on item detail and shows up in the room list", async ({
   page,
 }) => {
   await loginAs(page);
@@ -28,7 +28,7 @@ test("adds an item to a room — lands on item detail and shows up in the room l
   await expect(page.getByRole("link", { name: new RegExp(itemName, "i") })).toBeVisible();
 });
 
-test("deletes an item — confirm dialog → redirects to room → item gone from list", async ({
+test("deletes an item - confirm dialog → redirects to room → item gone from list", async ({
   page,
 }) => {
   await loginAs(page);
@@ -44,7 +44,7 @@ test("deletes an item — confirm dialog → redirects to room → item gone fro
   await expect(page.getByRole("link", { name: new RegExp(itemName, "i") })).toHaveCount(0);
 });
 
-test("marks an item as opened — button label flips", async ({ page }) => {
+test("marks an item as opened - button label flips", async ({ page }) => {
   await loginAs(page);
   const itemName = `Open-me item ${Date.now()}`;
   await addItem(page, "pantry", itemName);
@@ -75,7 +75,7 @@ test("increments item count via stepper and the change persists across reload", 
   await expect(page.getByRole("textbox", { name: "Count" })).toHaveValue(persisted);
 });
 
-test("adds an item to the shopping list from item detail — sidebar count goes up", async ({
+test("adds an item to the shopping list from item detail - sidebar count goes up", async ({
   page,
 }) => {
   await loginAs(page);
@@ -95,7 +95,7 @@ test("adds an item to the shopping list from item detail — sidebar count goes 
   await expect(shoppingLink).toContainText(String(before + 1), { timeout: 15_000 });
 });
 
-test("edits an item via the modal — heading + room list reflect the new name", async ({ page }) => {
+test("edits an item via the modal - heading + room list reflect the new name", async ({ page }) => {
   await loginAs(page);
   const original = `Editable item ${Date.now()}`;
   await addItem(page, "pantry", original);
@@ -116,7 +116,7 @@ test("edits an item via the modal — heading + room list reflect the new name",
   await expect(page.getByRole("link", { name: new RegExp(renamed, "i") })).toBeVisible();
 });
 
-test("moves an item to another room — appears in target, gone from source", async ({ page }) => {
+test("moves an item to another room - appears in target, gone from source", async ({ page }) => {
   await loginAs(page);
   const itemName = `Movable ${Date.now()}`;
   await addItem(page, "pantry", itemName);

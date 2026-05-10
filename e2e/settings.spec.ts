@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { loginAs, SEED_USER } from "./auth";
 
-test("renames profile — sidebar updates with the new name; restores afterwards", async ({
+test("renames profile - sidebar updates with the new name; restores afterwards", async ({
   page,
 }) => {
   await loginAs(page);

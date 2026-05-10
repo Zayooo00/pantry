@@ -16,7 +16,7 @@ export type ApiClient = typeof apiClient;
 export const useQuery = createQueryHook(apiClient, SWR_PREFIX);
 export const useImmutable = createImmutableHook(apiClient, SWR_PREFIX);
 
-// `swr-openapi` keys queries as `[prefix, path, init]` — globalMutate's array
+// `swr-openapi` keys queries as `[prefix, path, init]` - globalMutate's array
 // match requires exact equality, so a 2-tuple never matches. Use a predicate.
 export function invalidateApi(...paths: string[]): Promise<unknown> {
   const wanted = new Set(paths);

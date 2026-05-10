@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { SEED_USER } from "./auth";
 
-test("forgot password — submitting an email yields a success or smtp-missing message", async ({
+test("forgot password - submitting an email yields a success or smtp-missing message", async ({
   page,
 }) => {
   await page.goto("/forgot-password");

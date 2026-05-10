@@ -21,7 +21,7 @@ export function appUrl(): string {
     return url;
   }
   if (process.env.NODE_ENV === "production") {
-    throw new Error("APP_URL is not set. Email links would point at localhost — refusing to send.");
+    throw new Error("APP_URL is not set. Email links would point at localhost - refusing to send.");
   }
   return "http://localhost:3000";
 }

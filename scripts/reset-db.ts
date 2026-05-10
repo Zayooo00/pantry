@@ -2,7 +2,7 @@ import { existsSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 
 // Only nukes a local SQLite file. If DATABASE_URL points at a remote libSQL
-// (Turso) we refuse — schema migrations on prod must go through `drizzle-kit`
+// (Turso) we refuse - schema migrations on prod must go through `drizzle-kit`
 // explicitly so we don't accidentally wipe a hosted database.
 const url = process.env.DATABASE_URL ?? "file:local.db";
 

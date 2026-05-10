@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { loginAs } from "./auth";
 
-test("marks all notifications as read — badge clears, button disables, empty state shows", async ({
+test("marks all notifications as read - badge clears, button disables, empty state shows", async ({
   page,
 }) => {
   await loginAs(page);
@@ -13,7 +13,7 @@ test("marks all notifications as read — badge clears, button disables, empty s
   await expect(page.getByText(/No unread notifications/i)).toBeVisible();
 });
 
-test("clears read notifications via confirm dialog — Clear-read button disables", async ({
+test("clears read notifications via confirm dialog - Clear-read button disables", async ({
   page,
 }) => {
   await loginAs(page);

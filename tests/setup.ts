@@ -5,6 +5,7 @@ import {
   users,
   rooms,
   roomMembers,
+  roomPositions,
   items,
   shoppingItems,
   shoppingTrips,
@@ -135,6 +136,13 @@ const SCHEMA_SQL = [
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS pending_invites_room_email_unique
     ON pending_invites (room_id, email)`,
+  `CREATE TABLE IF NOT EXISTS room_positions (
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    room_id TEXT NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
+    position INTEGER NOT NULL
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS room_positions_user_room_unique
+    ON room_positions (user_id, room_id)`,
 ];
 
 beforeAll(async () => {
@@ -158,6 +166,7 @@ beforeEach(async () => {
   await db.delete(shoppingItems);
   await db.delete(items);
   await db.delete(pendingInvites);
+  await db.delete(roomPositions);
   await db.delete(roomMembers);
   await db.delete(rooms);
   await db.delete(passwordResets);

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
-import { db, rooms, items, users, roomMembers } from "@/db";
+import { db, rooms, items, users, roomMembers, roomPositions } from "@/db";
 
 vi.mock("@/auth", () => ({
   auth: vi.fn(async () => ({ user: { id: "u1", name: "Alex", email: "alex@example.com" } })),
@@ -145,21 +145,56 @@ describe("DELETE /api/rooms/[id]", () => {
 });
 
 describe("POST /api/rooms/reorder", () => {
-  it("reassigns position based on supplied order, ignoring rooms not owned by the user", async () => {
+  it("writes per-user positions for owned and shared rooms; leaves rooms.position untouched", async () => {
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
     await db.insert(rooms).values([
       { id: "r1", ownerId: "u1", name: "A", glyph: "A", position: 0 },
       { id: "r2", ownerId: "u1", name: "B", glyph: "B", position: 1 },
-      { id: "r3", ownerId: "u1", name: "C", glyph: "C", position: 2 },
+      { id: "shared", ownerId: "u2", name: "S", glyph: "S", position: 9 },
     ]);
+    await db.insert(roomMembers).values({
+      id: "m1",
+      roomId: "shared",
+      userId: "u1",
+      role: "editor",
+      invitedBy: "u2",
+    });
 
     const res = await reorderRooms(
-      jsonReq("http://l/api/rooms/reorder", "POST", { order: ["r3", "r1", "r2"] }),
+      jsonReq("http://l/api/rooms/reorder", "POST", { order: ["shared", "r2", "r1"] }),
     );
     expect(res.status).toBe(200);
 
-    const all = await db.select().from(rooms);
-    expect(all.find((r) => r.id === "r3")!.position).toBe(0);
-    expect(all.find((r) => r.id === "r1")!.position).toBe(1);
-    expect(all.find((r) => r.id === "r2")!.position).toBe(2);
+    const positions = await db.select().from(roomPositions);
+    const byRoom = Object.fromEntries(positions.map((p) => [p.roomId, p.position]));
+    expect(byRoom).toEqual({ shared: 0, r2: 1, r1: 2 });
+    expect(positions.every((p) => p.userId === "u1")).toBe(true);
+
+    const roomRows = await db.select().from(rooms);
+    expect(roomRows.find((r) => r.id === "r1")!.position).toBe(0);
+    expect(roomRows.find((r) => r.id === "r2")!.position).toBe(1);
+    expect(roomRows.find((r) => r.id === "shared")!.position).toBe(9);
+  });
+
+  it("ignores room ids the user can't access", async () => {
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
+    await db.insert(rooms).values([
+      { id: "mine", ownerId: "u1", name: "Mine", glyph: "M", position: 0 },
+      { id: "theirs", ownerId: "u2", name: "Theirs", glyph: "T", position: 0 },
+    ]);
+
+    const res = await reorderRooms(
+      jsonReq("http://l/api/rooms/reorder", "POST", { order: ["theirs", "mine"] }),
+    );
+    expect(res.status).toBe(200);
+
+    const positions = await db.select().from(roomPositions);
+    expect(positions).toHaveLength(1);
+    expect(positions[0].roomId).toBe("mine");
+    expect(positions[0].position).toBe(0);
   });
 });

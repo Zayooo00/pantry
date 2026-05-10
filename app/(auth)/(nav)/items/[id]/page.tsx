@@ -66,17 +66,13 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
           Rooms
         </Link>
         <span>/</span>
-        {room && (
-          <>
-            <Link
-              href={`/rooms/${room.id}`}
-              className="border-b border-dotted border-ink-3 transition-colors hover:border-ink-1 hover:text-ink-1"
-            >
-              {room.name}
-            </Link>
-            <span>/</span>
-          </>
-        )}
+        <Link
+          href={`/rooms/${room.id}`}
+          className="border-b border-dotted border-ink-3 transition-colors hover:border-ink-1 hover:text-ink-1"
+        >
+          {room.name}
+        </Link>
+        <span>/</span>
         <span className="text-ink-1">{item.name}</span>
       </nav>
 
@@ -130,7 +126,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             <div>
               <div className={cn("caption", "mb-3")}>
                 {(item.category ?? "").toUpperCase()}
-                {room ? ` · ${room.name.toUpperCase()}` : ""}
+                {` · ${room.name.toUpperCase()}`}
                 {item.shelf ? ` / ${item.shelf.toUpperCase()}` : ""}
               </div>
               <h1 className="m-0 font-display text-3xl leading-[0.95] font-light tracking-display sm:text-4xl lg:text-6xl">
@@ -223,7 +219,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
               label="LOW-STOCK FLOOR"
               value={item.threshold ? `${formatCount(item.threshold)} ${item.unit}` : "—"}
             />
-            <Fact label="LOCATION" value={room ? room.name : "—"} sub={item.shelf ?? undefined} />
+            <Fact label="LOCATION" value={room.name} sub={item.shelf ?? undefined} />
             <Fact label="CATEGORY" value={item.category ?? "—"} />
             <Fact label="EXPIRES" value={item.expiresAt ? formatDate(item.expiresAt) : "—"} />
             <Fact label="OPENED" value={item.openedAt ? formatDate(item.openedAt) : "—"} />

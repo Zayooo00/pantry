@@ -67,7 +67,7 @@ cd pantry
 npm install
 cp .env.example .env       # set AUTH_SECRET to any 32+ char string
 npm run db:push            # creates local.db with the schema
-npm run db:seed            # 7 rooms, ~35 items, demo user
+npm run db:seed            # 9 rooms (1 archived, 1 shared in), ~46 items, 3 demo users, pending invite
 npm run dev
 ```
 
@@ -97,7 +97,8 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with **alex@pant
 | `e2e` / `e2e:ui` | Playwright end-to-end suite (seeds a dedicated test DB first) |
 | `lint` / `lint:fix` | ESLint |
 | `format` / `format:check` | Prettier (sorts Tailwind classes) |
-| `db:push` | Push Drizzle schema to the DB |
+| `db:push` | Push Drizzle schema to the local DB |
+| `db:push:prod` | Push Drizzle schema to the production DB. Reads `.env.production`. |
 | `db:seed` | Seed demo users, rooms, items, a pending invite, and sample notifications |
 | `db:seed:prod` | Same demo data, scoped to the three `*@pantry.local` accounts only — leaves real users untouched. Reads `.env.production` (pull with `npx vercel env pull .env.production --environment=production`). |
 | `db:reset` | Wipe local SQLite, push schema, re-seed |
@@ -138,9 +139,10 @@ lib/                            cn, cva variants, access checks, format,
                                 hashed tokens, OpenAPI registry + typed client
 
 db/
-  schema.ts                     users, rooms, room_members, items,
-                                shopping_items, item_events, notifications,
-                                password_resets, pending_invites
+  schema.ts                     users, rooms, room_members, room_positions,
+                                items, shopping_items, shopping_trips,
+                                item_events, notifications, password_resets,
+                                pending_invites
   index.ts                      drizzle client
 
 scripts/                        seed, reset-db, check-db, generate-openapi,

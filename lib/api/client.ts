@@ -30,6 +30,34 @@ export function invalidateApi(...paths: string[]): Promise<unknown> {
   );
 }
 
+// Optimistically update every cached entry whose key matches `path`. The
+// updater receives the cached data (typed by the response shape) and returns
+// the new data. With `revalidate: false`, no network call follows — use this
+// when you already know the new state (e.g. saving a reorder) and want the
+// UI to reflect it without waiting on the server roundtrip.
+export function mutateApi<P extends keyof paths>(
+  path: P,
+  updater: (current: PathGetData<P> | undefined) => PathGetData<P> | undefined,
+  opts: { revalidate?: boolean } = {},
+): Promise<unknown> {
+  return swrGlobalMutate(
+    (key) =>
+      Array.isArray(key) &&
+      key.length >= 2 &&
+      key[0] === SWR_PREFIX &&
+      typeof key[1] === "string" &&
+      key[1] === path,
+    updater as (current: unknown) => unknown,
+    { revalidate: opts.revalidate ?? false },
+  );
+}
+
+type PathGetData<P extends keyof paths> = paths[P] extends {
+  get: { responses: { 200: { content: { "application/json": infer D } } } };
+}
+  ? D
+  : unknown;
+
 type Method = Lowercase<HttpMethod>;
 
 type MutationOptions<M extends Method, P extends PathsWithMethod<paths, M>> = FetchOptions<

@@ -30,7 +30,7 @@ import { cn } from "@/lib/cn";
 import { badge } from "@/components/badge";
 import { button } from "@/components/button";
 import { roleBadge } from "@/components/role-badge";
-import { invalidateApi, useMutation } from "@/lib/api/client";
+import { invalidateApi, mutateApi, useMutation } from "@/lib/api/client";
 import { chip } from "@/components/chip";
 import type { Room as RoomRow } from "@/db/schema";
 
@@ -150,6 +150,18 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
       setSavingOrder(false);
     }
     setReorderActive(false);
+    const draftIds = reorderDraft.map((r) => r.id);
+    await mutateApi("/api/sidebar", (current) => {
+      if (!current?.rooms) {
+        return current;
+      }
+      const byId = new Map(current.rooms.map((r) => [r.id, r] as const));
+      const reordered = draftIds.flatMap((id) => {
+        const room = byId.get(id);
+        return room ? [room] : [];
+      });
+      return { ...current, rooms: reordered };
+    });
     await invalidateApi("/api/sidebar");
     toast(
       <>

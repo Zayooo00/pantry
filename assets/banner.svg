@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" role="img" aria-label="Pantry — a pantry tracker for the household. Every jar, every bottle, every bag, kept in its room.">
+  <defs>
+    <style>
+      .paper { fill: #f7f3ea; }
+      .ink { fill: #2b2620; }
+      .ink-muted { fill: #6b6354; }
+      .ink-soft { fill: #8a826f; }
+      .display { font-family: "Fraunces", "EB Garamond", Georgia, "Times New Roman", serif; }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+      .stroke-ink { stroke: #2b2620; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="360" class="paper"/>
+
+  <g transform="translate(56, 52)">
+    <rect x="0" y="0" width="22" height="22" class="stroke-ink" stroke-width="1.5" fill="none"/>
+    <path d="M0 11 H22" class="stroke-ink" stroke-width="1.5"/>
+    <circle cx="11" cy="15" r="1.4" fill="#5a6b3a"/>
+  </g>
+  <text x="92" y="68" class="mono ink" font-size="13" letter-spacing="0.6" font-weight="500">Pantry</text>
+  <text x="92" y="84" class="mono ink-soft" font-size="10" letter-spacing="2.2">EST. KITCHEN · NO. 0001</text>
+
+  <text x="1224" y="68" class="mono ink-muted" font-size="11" letter-spacing="2.4" text-anchor="end">A HOUSEHOLD</text>
+  <text x="1224" y="84" class="mono ink-muted" font-size="11" letter-spacing="2.4" text-anchor="end">INVENTORY</text>
+
+  <text x="56" y="200" class="display ink" font-size="92" font-weight="300" letter-spacing="-2.5">Every jar,</text>
+  <text x="56" y="270" class="display ink" font-size="92" font-weight="300" letter-spacing="-2.5">every bottle, <tspan font-style="italic" font-weight="400">kept</tspan>.</text>
+
+  <text x="56" y="316" class="display ink-muted" font-size="20" font-style="italic" font-weight="300">A pantry tracker for the household — auth-gated, multi-user, room-shared.</text>
+
+  <line x1="56" y1="332" x2="1224" y2="332" class="stroke-ink" stroke-width="0.5" opacity="0.35"/>
+
+  <g transform="translate(56, 348)" class="mono ink-soft" font-size="10" letter-spacing="2.4">
+    <text x="0" y="0">PANTRY</text>
+    <text x="80" y="0" fill="#5a6b3a">·</text>
+    <text x="92" y="0">BASEMENT</text>
+    <text x="190" y="0" fill="#b8412b">·</text>
+    <text x="202" y="0">KITCHEN</text>
+    <text x="290" y="0" fill="#c4892a">·</text>
+    <text x="302" y="0">FRIDGE</text>
+    <text x="378" y="0" fill="#5d3a52">·</text>
+    <text x="390" y="0">FREEZER</text>
+    <text x="478" y="0" fill="#5a6b3a">·</text>
+    <text x="490" y="0">SPICE RACK</text>
+    <text x="600" y="0" fill="#b8412b">·</text>
+    <text x="612" y="0">GARAGE</text>
+  </g>
+</svg>

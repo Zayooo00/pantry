@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="Pantry — every jar, every bottle, every bag, kept in its room." width="100%">
+</p>
+
 # Pantry
 
 A pantry tracker for the household — every jar, every bottle, every bag, kept in its room. Auth-gated, multi-user, with room-level sharing.
@@ -165,6 +169,17 @@ npm run e2e:ui        # same, in Playwright's UI runner
 Vitest tests use a real SQLite database (no mocks except `auth()`). Playwright spins up a dedicated dev server against a temp SQLite file under `e2e/.test-db-path`, with rate limiting bypassed via `E2E_BYPASS_RATE_LIMIT=1`.
 
 GitHub Actions runs three workflows on every push to `main`, every pull request, and on demand from the Actions tab: `test.yml` (lint + `next build`), `api-tests.yml` (Vitest), and `e2e-tests.yml` (Playwright). Prettier formatting is enforced via `eslint-plugin-prettier`, so the lint job covers it. See `.github/workflows/`.
+
+## Screenshots
+
+| | |
+|:---:|:---:|
+| ![Dashboard](screenshots/dashboard.png) | ![Rooms](screenshots/rooms.png) |
+| **Dashboard** — morning glance with low-stock, expiring strip, attention banner | **Rooms** — owned and shared rooms, drag-reorderable, filterable |
+| ![Room view](screenshots/room-view.png) | ![Shopping list](screenshots/shopping-list.png) |
+| **A room** — items grouped by shelf, status chips, quantity stepper | **Shopping** — receipt-style, grouped by aisle, mark trip complete |
+| ![Activity](screenshots/activity.png) | ![Notifications](screenshots/notifications.png) |
+| **Activity** — paginated feed, filterable by room and event kind | **Notifications** — in-app inbox with unread badge in the sidebar |
 
 ## License
 

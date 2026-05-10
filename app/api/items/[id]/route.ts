@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db, items } from "@/db";
+import { db, itemEvents, items, notifications, shoppingItems } from "@/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { canEditRoom, getItemRoomId } from "@/lib/access";
@@ -79,6 +79,12 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   if (!(await canEditRoom(session.user.id, roomId))) {
     return NextResponse.json({ error: "You can't delete this item." }, { status: 403 });
   }
+  // SQLite enforces FK cascades only with PRAGMA foreign_keys = ON, which we
+  // can't reliably set on libsql/Turso (each HTTP query is a fresh session).
+  // Mirror the schema's intended cascade/set-null clauses explicitly.
+  await db.delete(itemEvents).where(eq(itemEvents.itemId, id));
+  await db.update(shoppingItems).set({ itemId: null }).where(eq(shoppingItems.itemId, id));
+  await db.update(notifications).set({ itemId: null }).where(eq(notifications.itemId, id));
   await db.delete(items).where(eq(items.id, id));
   return NextResponse.json({ ok: true });
 }

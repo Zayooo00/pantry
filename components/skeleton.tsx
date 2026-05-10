@@ -59,7 +59,7 @@ export function BlockSkeleton({ className, ...rest }: React.HTMLAttributes<HTMLD
 }
 
 // Pill-shaped placeholder that inherits the real button's padding/radius/text-size
-// so its width auto-sizes to the (invisible) label inside — i.e. pass the same
+// so its width auto-sizes to the (invisible) label inside - i.e. pass the same
 // label the real button will have.
 export function ButtonSkeleton({
   size,

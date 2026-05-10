@@ -32,7 +32,7 @@ export function invalidateApi(...paths: string[]): Promise<unknown> {
 
 // Optimistically update every cached entry whose key matches `path`. The
 // updater receives the cached data (typed by the response shape) and returns
-// the new data. With `revalidate: false`, no network call follows — use this
+// the new data. With `revalidate: false`, no network call follows. Use this
 // when you already know the new state (e.g. saving a reorder) and want the
 // UI to reflect it without waiting on the server roundtrip.
 export function mutateApi<P extends keyof paths>(

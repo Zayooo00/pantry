@@ -12,8 +12,7 @@ export default async function SearchPage({
 }) {
   const userId = await requireUserId();
   const sp = await searchParams;
-  const rooms = await getRoomsWithCounts(userId);
-  const items = await getAllItems(userId);
+  const [rooms, items] = await Promise.all([getRoomsWithCounts(userId), getAllItems(userId)]);
 
   return (
     <SearchClient

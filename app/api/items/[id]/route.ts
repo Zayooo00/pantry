@@ -15,11 +15,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
   const { id } = await params;
-  const currentRoomId = await getItemRoomId(id);
-  if (!currentRoomId) {
+  const before = await getItem(id);
+  if (!before) {
     return NextResponse.json({ error: "Item not found." }, { status: 404 });
   }
-  if (!(await canEditRoom(session.user.id, currentRoomId))) {
+  if (!(await canEditRoom(session.user.id, before.roomId))) {
     return NextResponse.json({ error: "You can't edit this item." }, { status: 403 });
   }
   const body = await readJsonOr400(req);
@@ -31,14 +31,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
   const data = parsed.data;
-  if (data.roomId && data.roomId !== currentRoomId) {
+  if (data.roomId && data.roomId !== before.roomId) {
     if (!(await canEditRoom(session.user.id, data.roomId))) {
       return NextResponse.json({ error: "You can't move items to that room." }, { status: 403 });
     }
-  }
-  const before = await getItem(id);
-  if (!before) {
-    return NextResponse.json({ error: "Item not found." }, { status: 404 });
   }
   await db
     .update(items)

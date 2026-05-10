@@ -11,8 +11,10 @@ export default async function NewItemPage({
 }) {
   const userId = await requireUserId();
   const sp = await searchParams;
-  const allRooms = await getRoomsWithCounts(userId);
-  const roles = await getRoomRolesForUser(userId);
+  const [allRooms, roles] = await Promise.all([
+    getRoomsWithCounts(userId),
+    getRoomRolesForUser(userId),
+  ]);
   const editableRooms = allRooms.filter((r) => {
     const role = roles.get(r.id);
     return role === "owner" || role === "editor";

@@ -56,7 +56,6 @@ export function NewRoomForm({ onClose }: { onClose: () => void }) {
       setServerError(err instanceof Error ? err.message : "Could not create room.");
       return;
     }
-    await invalidateApi("/api/sidebar");
     toast(
       <>
         Room <em>{values.name}</em> opened.
@@ -64,6 +63,7 @@ export function NewRoomForm({ onClose }: { onClose: () => void }) {
     );
     onClose();
     router.refresh();
+    void invalidateApi("/api/sidebar");
   }
 
   return (

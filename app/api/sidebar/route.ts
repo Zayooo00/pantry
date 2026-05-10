@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { db, items, roomPositions, rooms, shoppingItems } from "@/db";
-import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { db, items, roomMembers, roomPositions, rooms, shoppingItems } from "@/db";
+import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { itemStatus } from "@/lib/format";
 import { auth } from "@/auth";
-import { getRoomRolesForUser } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
 
@@ -14,47 +13,45 @@ export async function GET() {
   }
   const userId = session.user.id;
 
-  const roleByRoom = await getRoomRolesForUser(userId);
-  const accessibleIds = Array.from(roleByRoom.keys());
-  if (accessibleIds.length === 0) {
-    const shopping = await db
-      .select()
+  const [sidebarRows, shopping] = await Promise.all([
+    db
+      .select({ room: rooms, memberRole: roomMembers.role })
+      .from(rooms)
+      .leftJoin(roomMembers, and(eq(roomMembers.roomId, rooms.id), eq(roomMembers.userId, userId)))
+      .leftJoin(
+        roomPositions,
+        and(eq(roomPositions.roomId, rooms.id), eq(roomPositions.userId, userId)),
+      )
+      .where(
+        and(
+          isNull(rooms.archivedAt),
+          or(eq(rooms.ownerId, userId), eq(roomMembers.userId, userId)),
+        ),
+      )
+      .orderBy(asc(sql`coalesce(${roomPositions.position}, ${rooms.position})`)),
+    db
+      .select({ id: shoppingItems.id })
       .from(shoppingItems)
-      .where(and(eq(shoppingItems.userId, userId), eq(shoppingItems.done, false)));
-    return NextResponse.json({ rooms: [], shoppingCount: shopping.length });
-  }
+      .where(and(eq(shoppingItems.userId, userId), eq(shoppingItems.done, false))),
+  ]);
 
-  const sidebarRows = await db
-    .select({ room: rooms })
-    .from(rooms)
-    .leftJoin(
-      roomPositions,
-      and(eq(roomPositions.roomId, rooms.id), eq(roomPositions.userId, userId)),
-    )
-    .where(and(inArray(rooms.id, accessibleIds), isNull(rooms.archivedAt)))
-    .orderBy(asc(sql`coalesce(${roomPositions.position}, ${rooms.position})`));
-  const allRooms = sidebarRows.map((r) => r.room);
-  const liveIds = allRooms.map((r) => r.id);
+  const liveIds = sidebarRows.map((r) => r.room.id);
   const allItems =
     liveIds.length === 0 ? [] : await db.select().from(items).where(inArray(items.roomId, liveIds));
-  const shopping = await db
-    .select()
-    .from(shoppingItems)
-    .where(and(eq(shoppingItems.userId, userId), eq(shoppingItems.done, false)));
 
-  const enriched = allRooms.map((r) => {
-    const roomItems = allItems.filter((i) => i.roomId === r.id);
+  const enriched = sidebarRows.map(({ room, memberRole }) => {
+    const roomItems = allItems.filter((i) => i.roomId === room.id);
     const low = roomItems.filter(
       (i) =>
         itemStatus({ count: i.count, threshold: i.threshold, expiresAt: i.expiresAt }) === "low",
     ).length;
     return {
-      id: r.id,
-      name: r.name,
-      glyph: r.glyph,
+      id: room.id,
+      name: room.name,
+      glyph: room.glyph,
       count: roomItems.length,
       low,
-      role: roleByRoom.get(r.id) ?? "viewer",
+      role: room.ownerId === userId ? "owner" : (memberRole ?? "viewer"),
     };
   });
 

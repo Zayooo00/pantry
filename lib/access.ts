@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { redirect } from "next/navigation";
 import { db, items, roomMembers, rooms, type Room, type RoomRole } from "@/db";
 import { auth } from "@/auth";
 
@@ -7,16 +8,9 @@ export type AccessRole = RoomRole | "owner";
 export async function requireUserId(): Promise<string> {
   const session = await auth();
   if (!session?.user?.id) {
-    throw new UnauthorizedError();
+    redirect("/sign-in");
   }
   return session.user.id;
-}
-
-export class UnauthorizedError extends Error {
-  constructor() {
-    super("Not signed in.");
-    this.name = "UnauthorizedError";
-  }
 }
 
 export class ForbiddenError extends Error {

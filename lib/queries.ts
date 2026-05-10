@@ -13,7 +13,7 @@ import {
 import { and, asc, desc, eq, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { itemStatus } from "./format";
 import { randomUUID } from "node:crypto";
-import { canEditRoom, ForbiddenError, getAccessibleRoomIds, getItemRoomId } from "./access";
+import { canEditRoom, ForbiddenError, getAccessibleRoomIds } from "./access";
 
 export async function getRoomsWithCounts(
   userId: string,
@@ -29,7 +29,7 @@ export async function getRoomsWithCounts(
       ? undefined
       : isNull(rooms.archivedAt);
   const rowsWithPos = await db
-    .select({ room: rooms, userPos: roomPositions.position })
+    .select({ room: rooms })
     .from(rooms)
     .leftJoin(
       roomPositions,
@@ -249,7 +249,7 @@ export async function getRecentEvents(
   return rows;
 }
 
-export async function searchItems(userId: string, q: string) {
+export async function searchItems(userId: string, q: string, limit = 20) {
   if (!q.trim()) {
     return [];
   }
@@ -281,7 +281,7 @@ export async function searchItems(userId: string, q: string) {
         ),
       ),
     )
-    .limit(50);
+    .limit(limit);
 }
 
 export async function recordCountChange(args: {
@@ -386,11 +386,7 @@ export async function addToShoppingList(itemId: string, userId: string) {
   if (!item) {
     throw new Error("Item not found");
   }
-  const roomId = await getItemRoomId(itemId);
-  if (!roomId) {
-    throw new Error("Item not found");
-  }
-  const allowed = await canEditRoom(userId, roomId);
+  const allowed = await canEditRoom(userId, item.roomId);
   if (!allowed) {
     throw new ForbiddenError();
   }

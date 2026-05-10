@@ -6,8 +6,10 @@ export const dynamic = "force-dynamic";
 
 export default async function RoomsPage() {
   const userId = await requireUserId();
-  const allRooms = await getRoomsWithCounts(userId, { includeArchived: true });
-  const roles = await getRoomRolesForUser(userId);
+  const [allRooms, roles] = await Promise.all([
+    getRoomsWithCounts(userId, { includeArchived: true }),
+    getRoomRolesForUser(userId),
+  ]);
   const enriched = allRooms.map((r) => ({
     ...r,
     role: roles.get(r.id) ?? "viewer",

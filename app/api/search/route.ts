@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q") ?? "";
   const items = await searchItems(session.user.id, q);
   return NextResponse.json({
-    items: items.slice(0, 20).map((i) => ({
+    items: items.map((i) => ({
       id: i.id,
       name: i.name,
       roomId: i.roomId,

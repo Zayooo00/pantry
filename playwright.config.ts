@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3200;
+const PORT = 3650;
 const BASE_URL = `http://localhost:${PORT}`;
 
 const DB_URL = (() => {

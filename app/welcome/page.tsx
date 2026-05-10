@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic";
 export default function WelcomePage() {
   return (
     <div className="grid min-h-screen grid-cols-1 bg-paper-0 md:grid-cols-2">
-      <div className="ml-auto flex w-full max-w-140 flex-col justify-center px-[clamp(24px,6vw,96px)] py-12">
-        <Link href="/" className="mb-16 flex items-center gap-3 text-inherit no-underline">
+      <div className="mx-auto flex w-full max-w-120 flex-col justify-center px-[clamp(24px,5vw,64px)] py-10">
+        <Link href="/" className="mb-10 flex items-center gap-3 text-inherit no-underline">
           <div className="grid h-9.5 w-9.5 place-items-center rounded-sm border-[1.5px] border-ink-1 bg-paper-0 text-ink-1">
             <JarMark size={22} />
           </div>
@@ -21,19 +21,19 @@ export default function WelcomePage() {
           </div>
         </Link>
 
-        <div className="mb-4 font-mono text-xs tracking-mono text-ink-4 uppercase">
+        <div className="mb-3 font-mono text-xs tracking-mono text-ink-4 uppercase">
           WELCOME · NO. 0000
         </div>
-        <h1 className="m-0 mb-3 font-display text-[clamp(56px,7vw,88px)] leading-[0.95] font-light tracking-display [&_em]:font-normal [&_em]:italic">
+        <h1 className="m-0 mb-3 font-display text-[clamp(40px,5vw,64px)] leading-none font-light tracking-display [&_em]:font-normal [&_em]:italic">
           A quiet inventory,
           <br />
           <em>kept honest</em>.
         </h1>
-        <p className="m-0 mb-10 font-display text-xl font-light text-ink-3 italic">
+        <p className="m-0 mb-6 font-display text-lg font-light text-ink-3 italic">
           Track what's in the pantry, what's running low, and what to pick up next.
         </p>
 
-        <div className="mt-8 flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <Link
             href="/sign-up"
             className={cn(button({ variant: "primary", size: "lg" }), "w-full text-center")}
@@ -48,10 +48,8 @@ export default function WelcomePage() {
           </Link>
         </div>
 
-        <div className="mt-8 border-t border-dashed border-paper-3 pt-6 font-display text-sm text-ink-3 italic">
-          <span className="font-mono text-xs tracking-mono text-ink-4 uppercase">
-            No setup required · works on mobile and desktop
-          </span>
+        <div className="mt-6 border-t border-dashed border-paper-3 pt-4 font-mono text-xs tracking-mono text-ink-4 uppercase">
+          No setup required · works on mobile and desktop
         </div>
       </div>
 

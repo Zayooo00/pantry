@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { mutate as globalMutate } from "swr";
 import { useToast } from "@/components/toast";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { button } from "@/components/button";
 import { chip } from "@/components/chip";
 import { cn } from "@/lib/cn";
 import { formatDate } from "@/lib/format";
+import { invalidateApi } from "@/lib/api/client";
 
 type N = {
   id: string;
@@ -41,7 +41,7 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
   const visible = view === "unread" ? items.filter((i) => !i.readAt) : items;
 
   function refreshBadge() {
-    globalMutate(["pantry", "/api/notifications/unread-count"]);
+    void invalidateApi("/api/notifications/unread-count");
   }
 
   async function markRead(id: string) {

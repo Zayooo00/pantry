@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "db:push": "drizzle-kit push",
+    "db:push:prod": "tsx --env-file=.env.production scripts/db-push-prod.ts",
     "db:seed": "tsx --env-file=.env scripts/seed.ts",
     "db:seed:prod": "tsx --env-file=.env.production scripts/seed-prod.ts",
     "db:studio": "drizzle-kit studio",

@@ -168,4 +168,91 @@ describe("POST /api/sign-up", () => {
     const found = await db.select().from(users).where(eq(users.email, "someone-else@example.com"));
     expect(found[0].emailVerifiedAt).toBeNull();
   });
+
+  it("does not pre-verify when the matching invite has expired", async () => {
+    const inviterId = randomUUID();
+    await db.insert(users).values({
+      id: inviterId,
+      email: "inviter@example.com",
+      name: "Inviter",
+      passwordHash: "x",
+      emailVerifiedAt: new Date(),
+    });
+    await db.insert(rooms).values({
+      id: "room-3",
+      ownerId: inviterId,
+      name: "Pantry",
+      glyph: "pantry",
+      subtitle: null,
+      tinted: false,
+      position: 0,
+    });
+    const token = generateToken();
+    await db.insert(pendingInvites).values({
+      id: randomUUID(),
+      roomId: "room-3",
+      email: "guest@example.com",
+      role: "viewer",
+      tokenHash: hashToken(token),
+      invitedBy: inviterId,
+      expiresAt: new Date(Date.now() - 60_000),
+    });
+
+    const res = await POST(
+      jsonReq({
+        name: "Guest",
+        email: "guest@example.com",
+        password: "hunter2hunter",
+        inviteToken: token,
+      }),
+    );
+    const json = await res.json();
+    expect(json).toMatchObject({ ok: true, verified: false });
+    const found = await db.select().from(users).where(eq(users.email, "guest@example.com"));
+    expect(found[0].emailVerifiedAt).toBeNull();
+  });
+
+  it("does not pre-verify when the matching invite was already accepted", async () => {
+    const inviterId = randomUUID();
+    await db.insert(users).values({
+      id: inviterId,
+      email: "inviter@example.com",
+      name: "Inviter",
+      passwordHash: "x",
+      emailVerifiedAt: new Date(),
+    });
+    await db.insert(rooms).values({
+      id: "room-4",
+      ownerId: inviterId,
+      name: "Pantry",
+      glyph: "pantry",
+      subtitle: null,
+      tinted: false,
+      position: 0,
+    });
+    const token = generateToken();
+    await db.insert(pendingInvites).values({
+      id: randomUUID(),
+      roomId: "room-4",
+      email: "guest@example.com",
+      role: "viewer",
+      tokenHash: hashToken(token),
+      invitedBy: inviterId,
+      expiresAt: new Date(Date.now() + 86_400_000),
+      acceptedAt: new Date(Date.now() - 1_000),
+    });
+
+    const res = await POST(
+      jsonReq({
+        name: "Guest",
+        email: "guest@example.com",
+        password: "hunter2hunter",
+        inviteToken: token,
+      }),
+    );
+    const json = await res.json();
+    expect(json).toMatchObject({ ok: true, verified: false });
+    const found = await db.select().from(users).where(eq(users.email, "guest@example.com"));
+    expect(found[0].emailVerifiedAt).toBeNull();
+  });
 });

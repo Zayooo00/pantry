@@ -52,7 +52,12 @@ export async function POST(req: NextRequest) {
       .from(pendingInvites)
       .where(eq(pendingInvites.tokenHash, hashToken(parsed.data.inviteToken)))
       .limit(1);
-    if (found.length > 0 && found[0].email.toLowerCase() === email) {
+    if (
+      found.length > 0 &&
+      found[0].email.toLowerCase() === email &&
+      found[0].acceptedAt === null &&
+      found[0].expiresAt.getTime() > Date.now()
+    ) {
       preVerified = true;
     }
   }

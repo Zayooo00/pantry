@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real, index, uniqueIndex } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 export const users = sqliteTable("users", {
@@ -139,34 +139,40 @@ export const roomPositions = sqliteTable(
 export type RoomPosition = typeof roomPositions.$inferSelect;
 export type RoomPositionInsert = typeof roomPositions.$inferInsert;
 
-export const items = sqliteTable("items", {
-  id: text("id").primaryKey(),
-  roomId: text("room_id")
-    .notNull()
-    .references(() => rooms.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  brand: text("brand"),
-  category: text("category"),
-  unit: text("unit").notNull(),
-  count: real("count").notNull().default(0),
-  threshold: real("threshold"),
-  reorderAmount: real("reorder_amount"),
-  shelf: text("shelf"),
-  expiresAt: integer("expires_at", { mode: "timestamp" }),
-  openedAt: integer("opened_at", { mode: "timestamp" }),
-  purchasedAt: integer("purchased_at", { mode: "timestamp" }),
-  lastPrice: real("last_price"),
-  barcode: text("barcode"),
-  notes: text("notes"),
-  tags: text("tags"),
-  photoUrl: text("photo_url"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-});
+export const items = sqliteTable(
+  "items",
+  {
+    id: text("id").primaryKey(),
+    roomId: text("room_id")
+      .notNull()
+      .references(() => rooms.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    brand: text("brand"),
+    category: text("category"),
+    unit: text("unit").notNull(),
+    count: real("count").notNull().default(0),
+    threshold: real("threshold"),
+    reorderAmount: real("reorder_amount"),
+    shelf: text("shelf"),
+    expiresAt: integer("expires_at", { mode: "timestamp" }),
+    openedAt: integer("opened_at", { mode: "timestamp" }),
+    purchasedAt: integer("purchased_at", { mode: "timestamp" }),
+    lastPrice: real("last_price"),
+    barcode: text("barcode"),
+    notes: text("notes"),
+    tags: text("tags"),
+    photoUrl: text("photo_url"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => ({
+    photoUrlIdx: index("items_photo_url_idx").on(t.photoUrl),
+  }),
+);
 
 export const shoppingItems = sqliteTable("shopping_items", {
   id: text("id").primaryKey(),

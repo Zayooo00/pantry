@@ -108,9 +108,9 @@ export function Sidebar({
 
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 flex h-screen w-70 max-w-[85vw] flex-col gap-6 overflow-y-auto border-r border-paper-3 bg-paper-1 px-4 py-6 transition-transform duration-200 ease-pantry",
+          "fixed top-0 left-0 z-50 flex h-dvh w-70 max-w-[85vw] flex-col gap-6 overflow-y-auto border-r border-paper-3 bg-paper-1 px-4 py-6 transition-transform duration-200 ease-pantry",
           drawerOpen ? "translate-x-0" : "-translate-x-full",
-          "md:sticky md:top-0 md:z-auto md:h-screen md:w-auto md:max-w-none md:translate-x-0 md:transition-none",
+          "md:sticky md:top-0 md:z-auto md:h-dvh md:w-auto md:max-w-none md:translate-x-0 md:transition-none",
         )}
       >
         <div className="flex items-center justify-between">

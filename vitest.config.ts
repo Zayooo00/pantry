@@ -18,5 +18,6 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     fileParallelism: false,
     pool: "forks",
+    unstubEnvs: true,
   },
 });

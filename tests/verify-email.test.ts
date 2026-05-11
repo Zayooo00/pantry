@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -121,13 +121,13 @@ describe("POST /api/verify-email (resend)", () => {
     expect(await res.json()).toMatchObject({ ok: true, sent: false });
   });
 
-  it("503 when email is not configured and a fresh token is needed", async () => {
-    delete process.env.SMTP_USER;
-    delete process.env.SMTP_PASS;
-    delete process.env.EMAIL_FROM;
+  it("returns ok (sent:false) when email is not configured, without leaking existence", async () => {
+    vi.stubEnv("SMTP_USER", "");
+    vi.stubEnv("SMTP_PASS", "");
+    vi.stubEnv("EMAIL_FROM", "");
     await createUser({ email: "pending@example.com" });
     const res = await POST(postReq({ email: "pending@example.com" }));
-    expect(res.status).toBe(503);
-    expect((await res.json()).error).toMatch(/email isn't configured/i);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, sent: false });
   });
 });

@@ -68,17 +68,8 @@ export async function POST(req: NextRequest) {
     );
   }
   const found = await db.select().from(users).where(eq(users.email, parsed.data.email)).limit(1);
-  if (found.length === 0 || found[0].emailVerifiedAt) {
+  if (found.length === 0 || found[0].emailVerifiedAt || !isEmailConfigured()) {
     return NextResponse.json({ ok: true, sent: false });
-  }
-  if (!isEmailConfigured()) {
-    return NextResponse.json(
-      {
-        error:
-          "Email isn't configured on this server. Ask the owner to set SMTP_USER, SMTP_PASS, and EMAIL_FROM.",
-      },
-      { status: 503 },
-    );
   }
   const token = await issueVerificationToken(found[0].id);
   const send = await sendVerificationEmail({
@@ -87,7 +78,8 @@ export async function POST(req: NextRequest) {
     token,
   });
   if (!send.ok) {
-    return NextResponse.json({ error: send.message }, { status: 500 });
+    console.error("verify-email resend: send failed", send.message);
+    return NextResponse.json({ ok: true, sent: false });
   }
   return NextResponse.json({ ok: true, sent: true });
 }

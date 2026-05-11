@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { db, notifications, pendingInvites, roomMembers, rooms, users } from "@/db";
 import { auth } from "@/auth";
@@ -66,6 +66,10 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ to
       { status: 403 },
     );
   }
+  await db
+    .update(users)
+    .set({ emailVerifiedAt: new Date() })
+    .where(and(eq(users.id, session.user.id), isNull(users.emailVerifiedAt)));
   await db
     .insert(roomMembers)
     .values({

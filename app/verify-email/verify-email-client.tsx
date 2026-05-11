@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/button";
 
 type ConfirmState =
@@ -20,7 +20,7 @@ export function VerifyEmailClient({
   email?: string;
   sent: boolean;
 }) {
-  const { update: updateSession } = useSession();
+  const { update: updateSession, status: sessionStatus } = useSession();
   const [confirm, setConfirm] = useState<ConfirmState>({
     status: token ? "confirming" : "idle",
   });
@@ -95,16 +95,12 @@ export function VerifyEmailClient({
     setResend({ status: "ok" });
   }
 
-  if (confirm.status === "confirming") {
-    return (
+  const body =
+    confirm.status === "confirming" ? (
       <div className="rounded-md border border-paper-3 bg-paper-1 px-4 py-4 font-display text-sm text-ink-3 italic">
         Confirming your email…
       </div>
-    );
-  }
-
-  if (confirm.status === "ok") {
-    return (
+    ) : confirm.status === "ok" ? (
       <div className="flex flex-col gap-4">
         <div className="rounded-md border border-olive-2 bg-olive-3 px-4 py-4 font-display text-sm text-ink-2">
           Confirmed <strong className="not-italic">{confirm.email}</strong>. Your account is ready.
@@ -113,11 +109,7 @@ export function VerifyEmailClient({
           <Link href="/dashboard">Continue →</Link>
         </Button>
       </div>
-    );
-  }
-
-  if (confirm.status === "error") {
-    return (
+    ) : confirm.status === "error" ? (
       <div className="flex flex-col gap-4">
         <div className="rounded-md border border-tomato-2 bg-tomato-3 px-4 py-4 font-display text-sm text-tomato-2">
           {confirm.message}
@@ -131,39 +123,60 @@ export function VerifyEmailClient({
           />
         )}
       </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-md border border-paper-3 bg-paper-1 px-4 py-4 font-display text-sm text-ink-2">
-        {sent && email ? (
-          <>
-            We sent a link to <strong className="not-italic">{email}</strong>. Click it to confirm
-            your email and finish creating your account.
-          </>
-        ) : email ? (
-          <>
-            Email isn't configured on this server yet, so we couldn't send a verification link to{" "}
-            <strong className="not-italic">{email}</strong>. Ask the owner to set SMTP_USER,
-            SMTP_PASS, and EMAIL_FROM, then resend.
-          </>
-        ) : (
-          <>
-            Enter the email from your sign-up to receive a fresh verification link, or follow the
-            link from the email we sent.
-          </>
+    ) : (
+      <div className="flex flex-col gap-4">
+        <div className="rounded-md border border-paper-3 bg-paper-1 px-4 py-4 font-display text-sm text-ink-2">
+          {sent && email ? (
+            <>
+              We sent a link to <strong className="not-italic">{email}</strong>. Click it to confirm
+              your email and finish creating your account.
+            </>
+          ) : email ? (
+            <>
+              Email isn't configured on this server yet, so we couldn't send a verification link to{" "}
+              <strong className="not-italic">{email}</strong>. Ask the owner to set SMTP_USER,
+              SMTP_PASS, and EMAIL_FROM, then resend.
+            </>
+          ) : (
+            <>
+              Enter the email from your sign-up to receive a fresh verification link, or follow the
+              link from the email we sent.
+            </>
+          )}
+        </div>
+        {email && (
+          <ResendBlock
+            email={email}
+            resend={resend}
+            onResend={onResend}
+            idleLabel="Resend verification link"
+          />
         )}
       </div>
-      {email && (
-        <ResendBlock
-          email={email}
-          resend={resend}
-          onResend={onResend}
-          idleLabel="Resend verification link"
-        />
-      )}
-    </div>
+    );
+
+  return (
+    <>
+      {body}
+      <div className="mt-6 border-t border-dashed border-paper-3 pt-4 font-display text-sm text-ink-3 italic">
+        {sessionStatus === "authenticated" ? (
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: "/sign-in" })}
+            className="cursor-pointer border-b border-ink-1 pb-px text-ink-1 not-italic transition-colors duration-150 ease-pantry hover:border-olive-2 hover:text-olive-2"
+          >
+            Sign out & use a different account →
+          </button>
+        ) : (
+          <Link
+            href="/sign-in"
+            className="border-b border-ink-1 pb-px text-ink-1 not-italic transition-colors duration-150 ease-pantry hover:border-olive-2 hover:text-olive-2"
+          >
+            ← Back to sign in
+          </Link>
+        )}
+      </div>
+    </>
   );
 }
 

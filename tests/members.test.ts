@@ -374,6 +374,19 @@ describe("POST /api/invites/[token] (accept)", () => {
     expect(inviterNotes[0].title).toContain("Pantry");
   });
 
+  it("auto-verifies the invitee if they signed up but never confirmed their email", async () => {
+    await db.update(users).set({ emailVerifiedAt: null }).where(eq(users.id, "u2"));
+    await seedInvite({ token: "tok-verify", email: "guest@example.com" });
+    sessionMock.value = { user: { id: "u2", name: "Guest", email: "guest@example.com" } };
+    const res = await acceptInvite(
+      new NextRequest("http://l/api/invites/tok-verify", { method: "POST" }),
+      tokenParams("tok-verify"),
+    );
+    expect(res.status).toBe(200);
+    const after = await db.select().from(users).where(eq(users.id, "u2"));
+    expect(after[0].emailVerifiedAt).not.toBeNull();
+  });
+
   it("rejects when the signed-in account doesn't match the invite email", async () => {
     await seedInvite({ token: "tok-mismatch", email: "guest@example.com" });
     sessionMock.value = { user: { id: "u3", name: "Third", email: "third@example.com" } };

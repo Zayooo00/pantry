@@ -15,7 +15,7 @@ test("uploads a photo on new item, photo persists on item detail", async ({ page
     buffer: Buffer.from(PIXEL_PNG_BASE64, "base64"),
   });
 
-  await expect(page.getByRole("button", { name: /^Replace from files$/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Replace photo$/ })).toBeVisible();
 
   const itemName = `Photo item ${Date.now()}`;
   const nameInput = page.getByRole("main").locator('input[name="name"]');
@@ -42,5 +42,5 @@ test("rejects non-image upload with a helpful error", async ({ page }) => {
   });
 
   await expect(page.getByText(/only image uploads are allowed/i)).toBeVisible();
-  await expect(page.getByRole("button", { name: /^Replace from files$/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Replace photo$/ })).toHaveCount(0);
 });

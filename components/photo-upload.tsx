@@ -12,8 +12,7 @@ export function PhotoUpload({
   value: string | null;
   onChange: (url: string | null) => void;
 }) {
-  const galleryRef = useRef<HTMLInputElement | null>(null);
-  const cameraRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,11 +39,8 @@ export function PhotoUpload({
       setError("Upload failed.");
     } finally {
       setUploading(false);
-      if (galleryRef.current) {
-        galleryRef.current.value = "";
-      }
-      if (cameraRef.current) {
-        cameraRef.current.value = "";
+      if (inputRef.current) {
+        inputRef.current.value = "";
       }
     }
   }
@@ -52,25 +48,14 @@ export function PhotoUpload({
   function remove() {
     onChange(null);
     setError(null);
-    if (galleryRef.current) {
-      galleryRef.current.value = "";
-    }
-    if (cameraRef.current) {
-      cameraRef.current.value = "";
+    if (inputRef.current) {
+      inputRef.current.value = "";
     }
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <input ref={galleryRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
-      <input
-        ref={cameraRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={onFile}
-        className="hidden"
-      />
+      <input ref={inputRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
       {value ? (
         <div className="flex items-start gap-4">
           <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-lg border border-paper-3 bg-paper-1">
@@ -84,25 +69,14 @@ export function PhotoUpload({
             />
           </div>
           <div className="flex flex-col gap-2">
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="md:hidden"
-                onClick={() => cameraRef.current?.click()}
-                disabled={uploading}
-              >
-                Take photo
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => galleryRef.current?.click()}
-                disabled={uploading}
-              >
-                {uploading ? "Uploading…" : "Replace from files"}
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? "Uploading…" : "Replace photo"}
+            </Button>
             <Button variant="ghost" size="sm" onClick={remove} disabled={uploading}>
               Remove photo
             </Button>
@@ -113,17 +87,8 @@ export function PhotoUpload({
           <Button
             variant="secondary"
             size="sm"
-            className={cn("md:hidden", uploading && "opacity-60")}
-            onClick={() => cameraRef.current?.click()}
-            disabled={uploading}
-          >
-            Take photo
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
             className={cn(uploading && "opacity-60")}
-            onClick={() => galleryRef.current?.click()}
+            onClick={() => inputRef.current?.click()}
             disabled={uploading}
           >
             {uploading ? "Uploading…" : "Choose photo"}

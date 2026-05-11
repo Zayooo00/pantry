@@ -21,9 +21,7 @@ function findFreePort(preferred: number): Promise<number> {
         srv.close(() => res(typeof addr === "object" && addr ? addr.port : null));
       });
     });
-  return tryListen(preferred).then(
-    (p) => p ?? tryListen(0).then((q) => q ?? preferred),
-  );
+  return tryListen(preferred).then((p) => p ?? tryListen(0).then((q) => q ?? preferred));
 }
 
 async function main() {

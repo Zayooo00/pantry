@@ -14,11 +14,11 @@ type ConfirmState =
 export function VerifyEmailClient({
   token,
   email,
-  sent,
+  sendStatus,
 }: {
   token?: string;
   email?: string;
-  sent: boolean;
+  sendStatus: "sent" | "not_configured" | null;
 }) {
   const { update: updateSession, status: sessionStatus } = useSession();
   const [confirm, setConfirm] = useState<ConfirmState>({
@@ -126,12 +126,17 @@ export function VerifyEmailClient({
     ) : (
       <div className="flex flex-col gap-4">
         <div className="rounded-md border border-paper-3 bg-paper-1 px-4 py-4 font-display text-sm text-ink-2">
-          {sent && email ? (
+          {!email ? (
+            <>
+              Enter the email from your sign-up to receive a fresh verification link, or follow the
+              link from the email we sent.
+            </>
+          ) : sendStatus === "sent" ? (
             <>
               We sent a link to <strong className="not-italic">{email}</strong>. Click it to confirm
               your email and finish creating your account.
             </>
-          ) : email ? (
+          ) : sendStatus === "not_configured" ? (
             <>
               Email isn't configured on this server yet, so we couldn't send a verification link to{" "}
               <strong className="not-italic">{email}</strong>. Ask the owner to set SMTP_USER,
@@ -139,8 +144,8 @@ export function VerifyEmailClient({
             </>
           ) : (
             <>
-              Enter the email from your sign-up to receive a fresh verification link, or follow the
-              link from the email we sent.
+              Confirm <strong className="not-italic">{email}</strong> by clicking the link we sent.
+              If it didn't arrive, resend below.
             </>
           )}
         </div>

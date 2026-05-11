@@ -31,10 +31,13 @@ export const authConfig = {
           path === "/sign-in" ||
           path === "/sign-up" ||
           path.startsWith("/forgot-password") ||
-          path.startsWith("/reset-password");
+          path.startsWith("/reset-password") ||
+          path.startsWith("/verify-email");
         if (isLoggedIn && isAuthGate) {
           const dest = emailVerified ? "/dashboard" : "/verify-email";
-          return Response.redirect(new URL(dest, nextUrl));
+          if (!path.startsWith(dest)) {
+            return Response.redirect(new URL(dest, nextUrl));
+          }
         }
         return true;
       }

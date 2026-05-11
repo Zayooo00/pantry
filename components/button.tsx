@@ -1,6 +1,9 @@
-import { cva } from "class-variance-authority";
+import { forwardRef } from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/cn";
 
-export const button = cva(
+const buttonStyles = cva(
   "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full border font-sans font-medium tracking-[0.01em] whitespace-nowrap no-underline transition-all duration-180 ease-pantry disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
@@ -23,3 +26,25 @@ export const button = cva(
     },
   },
 );
+
+export type ButtonVariantProps = VariantProps<typeof buttonStyles>;
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  ButtonVariantProps & {
+    asChild?: boolean;
+  };
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { variant, size, asChild, className, type, ...rest },
+  ref,
+) {
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      ref={ref}
+      type={asChild ? undefined : (type ?? "button")}
+      className={cn(buttonStyles({ variant, size }), className)}
+      {...rest}
+    />
+  );
+});

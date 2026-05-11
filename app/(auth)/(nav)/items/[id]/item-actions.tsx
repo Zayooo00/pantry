@@ -7,8 +7,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EditItemForm } from "@/components/edit-item-form";
 import { MoveItemForm } from "@/components/move-item-form";
 import { useToast } from "@/components/toast";
-import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Item as ItemRow, Room as RoomRow } from "@/db/schema";
 
@@ -39,30 +38,20 @@ export function ItemActions({ item, rooms }: { item: Item; rooms: RoomLite[] }) 
   return (
     <>
       <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => setEditOpen(true)}
-          className={button({ variant: "ghost", size: "sm" })}
-        >
+        <Button variant="ghost" size="sm" onClick={() => setEditOpen(true)}>
           Edit
-        </button>
-        <button
-          type="button"
-          onClick={() => setMoveOpen(true)}
-          className={button({ variant: "ghost", size: "sm" })}
-        >
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => setMoveOpen(true)}>
           Move
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!"
           onClick={() => setDeleteOpen(true)}
-          className={cn(
-            button({ variant: "ghost", size: "sm" }),
-            "text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!",
-          )}
         >
           Delete
-        </button>
+        </Button>
       </div>
 
       <Modal
@@ -138,13 +127,8 @@ export function MarkOpenedButton({
   }
 
   return (
-    <button
-      type="button"
-      onClick={mark}
-      disabled={isMutating}
-      className={button({ variant: "ghost", size: "sm" })}
-    >
+    <Button variant="ghost" size="sm" onClick={mark} disabled={isMutating}>
       {alreadyOpened ? "Re-mark opened" : "Mark opened"}
-    </button>
+    </Button>
   );
 }

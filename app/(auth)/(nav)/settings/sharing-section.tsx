@@ -5,8 +5,7 @@ import { useState } from "react";
 import { useToast } from "@/components/toast";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { RoomGlyph } from "@/icons";
-import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { invalidateApi, useMutation, useQuery } from "@/lib/api/client";
 
 type SharedWithMe = {
@@ -128,16 +127,14 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
                         {r.role.toUpperCase()} · FROM {r.ownerEmail.toUpperCase()}
                       </div>
                     </div>
-                    <button
-                      type="button"
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!"
                       onClick={() => setLeaveTarget(r)}
-                      className={cn(
-                        button({ variant: "ghost", size: "sm" }),
-                        "text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!",
-                      )}
                     >
                       Leave
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -189,16 +186,14 @@ export function SharingSection({ currentUserId }: { currentUserId: string }) {
                         <span className="rounded-full bg-paper-2 px-2 py-0.5 font-mono text-2xs tracking-eyebrow text-ink-4 uppercase">
                           {m.role.toUpperCase()}
                         </span>
-                        <button
-                          type="button"
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!"
                           onClick={() => setRevokeTarget({ room, member: m })}
-                          className={cn(
-                            button({ variant: "ghost", size: "sm" }),
-                            "text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!",
-                          )}
                         >
                           Revoke
-                        </button>
+                        </Button>
                       </div>
                     ))}
                   </div>

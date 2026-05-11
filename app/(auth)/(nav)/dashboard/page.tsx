@@ -6,9 +6,9 @@ import { getDashboardData } from "@/lib/queries";
 import { auth } from "@/auth";
 import { daysUntil, formatCount, formatDate, formatEventKind } from "@/lib/format";
 import { cn } from "@/lib/cn";
-import { badge } from "@/components/badge";
-import { button } from "@/components/button";
-import { level } from "@/components/level";
+import { Badge } from "@/components/badge";
+import { Button } from "@/components/button";
+import { Level } from "@/components/level";
 import { SectionTitle } from "@/components/section-title";
 import { ItemThumbnail } from "@/components/item-thumbnail";
 
@@ -70,12 +70,12 @@ export default async function DashboardPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/shopping" className={button({ variant: "secondary" })}>
-            Shopping list
-          </Link>
-          <Link href="/items/new" className={button({ variant: "primary" })}>
-            ＋ Add item
-          </Link>
+          <Button asChild variant="secondary">
+            <Link href="/shopping">Shopping list</Link>
+          </Button>
+          <Button asChild variant="primary">
+            <Link href="/items/new">＋ Add item</Link>
+          </Button>
         </div>
       </div>
 
@@ -101,18 +101,16 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href="/shopping" className={button({ variant: "olive" })}>
-              Build shopping list
-            </Link>
-            <Link
-              href="/search?status=low"
-              className={cn(
-                button({ variant: "ghost" }),
-                "border-paper-3! text-paper-0! hover:bg-paper-0/10!",
-              )}
+            <Button asChild variant="olive">
+              <Link href="/shopping">Build shopping list</Link>
+            </Button>
+            <Button
+              asChild
+              variant="ghost"
+              className="border-paper-3! text-paper-0! hover:bg-paper-0/10!"
             >
-              Review →
-            </Link>
+              <Link href="/search?status=low">Review →</Link>
+            </Button>
           </div>
         </div>
       )}
@@ -185,9 +183,7 @@ export default async function DashboardPage() {
                         </span>
                         <span className="caption text-tomato-2">{pct}%</span>
                       </div>
-                      <div className={cn(level({ tone: "low" }), "mt-1.5")}>
-                        <i style={{ width: `${pct}%` }} />
-                      </div>
+                      <Level tone="low" value={pct} className="mt-1.5" />
                     </div>
                   </div>
                   <div className="hidden w-35 sm:block">
@@ -197,12 +193,10 @@ export default async function DashboardPage() {
                       </span>
                       <span className="caption text-tomato-2">{pct}%</span>
                     </div>
-                    <div className={cn(level({ tone: "low" }), "mt-1.5")}>
-                      <i style={{ width: `${pct}%` }} />
-                    </div>
+                    <Level tone="low" value={pct} className="mt-1.5" />
                   </div>
                   <div className="relative z-10 flex items-center gap-2">
-                    <span className={badge({ tone: "low" })}>LOW</span>
+                    <Badge tone="low">LOW</Badge>
                     <AddToShoppingButton itemId={it.id} />
                   </div>
                 </div>
@@ -231,10 +225,10 @@ export default async function DashboardPage() {
                     href={`/items/${it.id}`}
                     className="flex min-h-35 flex-col gap-3 rounded-md border border-paper-3 bg-paper-0 p-4 text-inherit transition-[transform,box-shadow,border-color] duration-200 ease-pantry hover:-translate-y-0.5 hover:border-ink-3 hover:shadow-card-hover"
                   >
-                    <span className={badge({ tone: "soon" })}>
+                    <Badge tone="soon">
                       <i className="inline-block h-1.5 w-1.5 rounded-full bg-amber-pantry" />
                       {days} DAYS
-                    </span>
+                    </Badge>
                     <div className="font-display text-xl font-normal">
                       {it.name}
                       <br />
@@ -350,7 +344,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     {low > 0 ? (
-                      <span className={badge({ tone: "low" })}>{low} LOW</span>
+                      <Badge tone="low">{low} LOW</Badge>
                     ) : (
                       <span className="caption text-olive-2">OK</span>
                     )}

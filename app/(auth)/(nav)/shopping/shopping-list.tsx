@@ -11,9 +11,9 @@ import { Checkbox } from "@/components/checkbox";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
-import { chip } from "@/components/chip";
-import { stamp } from "@/components/stamp";
+import { Button } from "@/components/button";
+import { Chip } from "@/components/chip";
+import { Stamp } from "@/components/stamp";
 import { TextInput } from "@/components/text-input";
 import { Select } from "@/components/select";
 import { NumberStepper } from "@/components/stepper";
@@ -255,36 +255,31 @@ export function ShoppingList({
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <button
-            onClick={() => window.print()}
-            className={cn(button({ variant: "ghost" }), "no-print")}
-          >
+          <Button variant="ghost" className="no-print" onClick={() => window.print()}>
             Print
-          </button>
-          <button onClick={exportList} className={cn(button({ variant: "secondary" }), "no-print")}>
+          </Button>
+          <Button variant="secondary" className="no-print" onClick={exportList}>
             Export
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
+            className="no-print"
             onClick={() => setCompleteOpen(true)}
             disabled={checkedCount === 0}
-            className={cn(button({ variant: "primary" }), "no-print")}
           >
             Mark trip complete
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-2">
-          <button onClick={() => setView("all")} className={chip({ active: view === "all" })}>
+          <Chip active={view === "all"} onClick={() => setView("all")}>
             All ({items.length})
-          </button>
-          <button
-            onClick={() => setView("outstanding")}
-            className={chip({ active: view === "outstanding" })}
-          >
+          </Chip>
+          <Chip active={view === "outstanding"} onClick={() => setView("outstanding")}>
             Outstanding ({outstanding})
-          </button>
+          </Chip>
         </div>
         <span className="caption">
           AUTO-ADDED {auto} · MANUAL {manual}
@@ -344,18 +339,14 @@ export function ShoppingList({
             />
           )}
         />
-        <button
-          type="submit"
-          disabled={manualForm.formState.isSubmitting}
-          className={button({ variant: "primary" })}
-        >
+        <Button type="submit" variant="primary" disabled={manualForm.formState.isSubmitting}>
           {manualForm.formState.isSubmitting ? "Adding…" : "＋ Add"}
-        </button>
+        </Button>
       </form>
 
       <div className="relative mx-auto max-w-180 rounded-xl border border-paper-3 bg-paper-0 bg-[repeating-linear-gradient(0deg,transparent_0_31px,rgba(26,24,20,0.04)_31px_32px)] px-5 py-6 shadow-[0_2px_0_rgba(26,24,20,0.04),0_12px_40px_rgba(26,24,20,0.06)] md:px-12 md:py-12">
         <div className="no-print absolute top-4 right-4 hidden sm:block md:top-6 md:right-8">
-          <span className={stamp()}>No. {tripLabel}</span>
+          <Stamp>No. {tripLabel}</Stamp>
         </div>
         <div className="mb-6 border-b-[1.5px] border-ink-1 pb-4 text-center">
           <div className={cn("caption", "mb-2")}>PANTRY · SHOPPING LIST</div>

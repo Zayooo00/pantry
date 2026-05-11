@@ -1,5 +1,5 @@
 ﻿import Link from "next/link";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 
 export const dynamic = "force-dynamic";
 
@@ -17,12 +17,12 @@ export default function NotFound() {
           That page is missing from the pantry.
         </p>
         <div className="mt-6 flex gap-3">
-          <Link href="/dashboard" className={button({ variant: "primary" })}>
-            Back to dashboard
-          </Link>
-          <Link href="/rooms" className={button({ variant: "ghost" })}>
-            Browse rooms
-          </Link>
+          <Button asChild variant="primary">
+            <Link href="/dashboard">Back to dashboard</Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link href="/rooms">Browse rooms</Link>
+          </Button>
         </div>
       </div>
       <aside className="hidden items-center justify-center bg-ink-1 bg-[radial-gradient(rgba(247,243,234,0.04)_1px,transparent_1px),radial-gradient(circle_at_80%_20%,rgba(90,107,58,0.15),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(184,65,43,0.10),transparent_50%)] bg-size-[4px_4px,auto,auto] p-16 text-paper-0 md:flex">

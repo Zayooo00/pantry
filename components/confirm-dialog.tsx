@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Modal } from "./modal";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 
 export function ConfirmDialog({
   open,
@@ -40,24 +40,16 @@ export function ConfirmDialog({
       title={title}
       footer={
         <>
-          <button
-            type="button"
-            onClick={onClose}
-            className={button({ variant: "ghost" })}
-            disabled={pending}
-          >
+          <Button variant="ghost" onClick={onClose} disabled={pending}>
             Cancel
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant={variant === "danger" ? "tomato" : "primary"}
             onClick={handle}
-            className={
-              variant === "danger" ? button({ variant: "tomato" }) : button({ variant: "primary" })
-            }
             disabled={pending}
           >
             {pending ? "Working…" : confirmLabel}
-          </button>
+          </Button>
         </>
       }
     >

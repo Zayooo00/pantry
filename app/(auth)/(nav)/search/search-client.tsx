@@ -6,10 +6,10 @@ import { AddToShoppingButton } from "@/components/stepper";
 import { Checkbox } from "@/components/checkbox";
 import { ModKey } from "@/components/kbd";
 import { cn } from "@/lib/cn";
-import { badge } from "@/components/badge";
-import { button } from "@/components/button";
-import { chip } from "@/components/chip";
-import { level } from "@/components/level";
+import { Badge } from "@/components/badge";
+import { Button } from "@/components/button";
+import { Chip } from "@/components/chip";
+import { Level } from "@/components/level";
 
 import { formatCount, ItemStatus } from "@/lib/format";
 import { ItemThumbnail } from "@/components/item-thumbnail";
@@ -156,98 +156,68 @@ export function SearchClient({
             {filtered.length} RESULT{filtered.length === 1 ? "" : "S"}
           </span>
           {q && (
-            <button
-              type="button"
-              onClick={() => setQ("")}
-              className={button({ variant: "ghost", size: "sm" })}
-              aria-label="Clear search"
-            >
+            <Button variant="ghost" size="sm" onClick={() => setQ("")} aria-label="Clear search">
               Clear
-            </button>
+            </Button>
           )}
         </div>
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setActiveRooms(new Set())}
-          className={chip({ active: activeRooms.size === 0 })}
-        >
+        <Chip active={activeRooms.size === 0} onClick={() => setActiveRooms(new Set())}>
           All
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter(statusFilter === "low" ? "all" : "low")}
+        </Chip>
+        <Chip
           className={cn(
-            chip(),
             "border-tomato-2 text-tomato-2 hover:bg-tomato-3",
             statusFilter === "low" && "bg-tomato-2 text-paper-0 hover:bg-tomato-2",
           )}
+          onClick={() => setStatusFilter(statusFilter === "low" ? "all" : "low")}
         >
           Low ({facetStatus.low})
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter(statusFilter === "soon" ? "all" : "soon")}
+        </Chip>
+        <Chip
           className={cn(
-            chip(),
             "border-amber-pantry-2 text-amber-pantry-2 hover:bg-amber-pantry-3",
             statusFilter === "soon" && "bg-amber-pantry-2 text-paper-0 hover:bg-amber-pantry-2",
           )}
+          onClick={() => setStatusFilter(statusFilter === "soon" ? "all" : "soon")}
         >
           Expiring ({facetStatus.soon})
-        </button>
+        </Chip>
       </div>
 
       <div className="mb-6 hidden flex-wrap gap-2 lg:flex">
-        <button
-          type="button"
-          onClick={() => setActiveRooms(new Set())}
-          className={chip({ active: activeRooms.size === 0 })}
-        >
+        <Chip active={activeRooms.size === 0} onClick={() => setActiveRooms(new Set())}>
           All rooms
-        </button>
+        </Chip>
         {rooms.map((r) => (
-          <button
-            key={r.id}
-            type="button"
-            onClick={() => toggleRoom(r.id)}
-            className={chip({ active: activeRooms.has(r.id) })}
-          >
+          <Chip key={r.id} active={activeRooms.has(r.id)} onClick={() => toggleRoom(r.id)}>
             {r.name}
-          </button>
+          </Chip>
         ))}
         <span className="mx-1.5 h-6 w-px bg-paper-3" />
-        <button
-          type="button"
-          onClick={() => setStatusFilter("all")}
-          className={chip({ active: statusFilter === "all" })}
-        >
+        <Chip active={statusFilter === "all"} onClick={() => setStatusFilter("all")}>
           All status
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter(statusFilter === "low" ? "all" : "low")}
+        </Chip>
+        <Chip
           className={cn(
-            chip(),
             "border-tomato-2 text-tomato-2 hover:bg-tomato-3",
             statusFilter === "low" && "bg-tomato-2 text-paper-0 hover:bg-tomato-2",
           )}
+          onClick={() => setStatusFilter(statusFilter === "low" ? "all" : "low")}
         >
           Low only
-        </button>
-        <button
-          type="button"
-          onClick={() => setStatusFilter(statusFilter === "soon" ? "all" : "soon")}
+        </Chip>
+        <Chip
           className={cn(
-            chip(),
             "border-amber-pantry-2 text-amber-pantry-2 hover:bg-amber-pantry-3",
             statusFilter === "soon" && "bg-amber-pantry-2 text-paper-0 hover:bg-amber-pantry-2",
           )}
+          onClick={() => setStatusFilter(statusFilter === "soon" ? "all" : "soon")}
         >
           Expiring
-        </button>
+        </Chip>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px] lg:gap-12">
@@ -306,17 +276,11 @@ export function SearchClient({
                           {formatCount(it.count)}
                           {it.threshold ? ` / ${formatCount(it.threshold)}` : ""} {it.unit}
                         </div>
-                        <div
-                          className={cn(
-                            level({
-                              tone:
-                                it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok",
-                            }),
-                            "mt-1",
-                          )}
-                        >
-                          <i style={{ width: `${fill}%` }} />
-                        </div>
+                        <Level
+                          tone={it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok"}
+                          value={fill}
+                          className="mt-1"
+                        />
                       </div>
                     </div>
                     <div className="hidden sm:block">
@@ -324,35 +288,26 @@ export function SearchClient({
                         {formatCount(it.count)}
                         {it.threshold ? ` / ${formatCount(it.threshold)}` : ""} {it.unit}
                       </div>
-                      <div
-                        className={cn(
-                          level({
-                            tone:
-                              it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok",
-                          }),
-                          "mt-1",
-                        )}
-                      >
-                        <i style={{ width: `${fill}%` }} />
-                      </div>
+                      <Level
+                        tone={it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok"}
+                        value={fill}
+                        className="mt-1"
+                      />
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-2 sm:contents">
                       {it.status === "low" ? (
-                        <span className={badge({ tone: "low" })}>LOW</span>
+                        <Badge tone="low">LOW</Badge>
                       ) : it.status === "soon" ? (
-                        <span className={badge({ tone: "soon" })}>SOON</span>
+                        <Badge tone="soon">SOON</Badge>
                       ) : (
-                        <span className={badge({ tone: "ok" })}>OK</span>
+                        <Badge tone="ok">OK</Badge>
                       )}
                       {it.status === "low" ? (
                         <AddToShoppingButton itemId={it.id} />
                       ) : (
-                        <Link
-                          href={`/items/${it.id}`}
-                          className={button({ variant: "ghost", size: "sm" })}
-                        >
-                          View
-                        </Link>
+                        <Button asChild variant="ghost" size="sm">
+                          <Link href={`/items/${it.id}`}>View</Link>
+                        </Button>
                       )}
                     </div>
                   </div>

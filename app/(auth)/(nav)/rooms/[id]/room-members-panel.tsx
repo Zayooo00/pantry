@@ -7,8 +7,7 @@ import { z } from "zod";
 import { Select } from "@/components/select";
 import { useToast } from "@/components/toast";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { button } from "@/components/button";
-import { cn } from "@/lib/cn";
+import { Button } from "@/components/button";
 import { useMutation, useQuery } from "@/lib/api/client";
 
 type Member = {
@@ -164,13 +163,9 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
               )}
             />
           </div>
-          <button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className={button({ variant: "primary", size: "md" })}
-          >
+          <Button type="submit" variant="primary" size="md" disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? "Inviting…" : "Invite"}
-          </button>
+          </Button>
         </form>
         {inviteError && (
           <div className="mt-3 rounded-md border border-tomato-2 bg-tomato-3 px-3 py-2 text-sm text-tomato-2">
@@ -225,16 +220,14 @@ export function RoomMembersPanel({ roomId, roomName }: { roomId: string; roomNam
                   { value: "editor", label: "Editor" },
                 ]}
               />
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!"
                 onClick={() => setRemoveTarget(m)}
-                className={cn(
-                  button({ variant: "ghost", size: "sm" }),
-                  "text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!",
-                )}
               >
                 Revoke
-              </button>
+              </Button>
             </div>
           ))}
       </div>

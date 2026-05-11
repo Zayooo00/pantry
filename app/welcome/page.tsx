@@ -1,7 +1,6 @@
 ﻿import Link from "next/link";
 import { JarMark } from "@/icons";
-import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 
 export const dynamic = "force-dynamic";
 
@@ -34,18 +33,12 @@ export default function WelcomePage() {
         </p>
 
         <div className="flex flex-col gap-3">
-          <Link
-            href="/sign-up"
-            className={cn(button({ variant: "primary", size: "lg" }), "w-full text-center")}
-          >
-            Create an account
-          </Link>
-          <Link
-            href="/sign-in"
-            className={cn(button({ variant: "secondary", size: "lg" }), "w-full text-center")}
-          >
-            Sign in
-          </Link>
+          <Button asChild variant="primary" size="lg" className="w-full text-center">
+            <Link href="/sign-up">Create an account</Link>
+          </Button>
+          <Button asChild variant="secondary" size="lg" className="w-full text-center">
+            <Link href="/sign-in">Sign in</Link>
+          </Button>
         </div>
 
         <div className="mt-6 border-t border-dashed border-paper-3 pt-4 font-mono text-xs tracking-mono text-ink-4 uppercase">

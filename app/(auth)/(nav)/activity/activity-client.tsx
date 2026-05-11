@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Select } from "@/components/select";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { cn } from "@/lib/cn";
 import { formatCount, formatDate, formatEventKind } from "@/lib/format";
 
@@ -204,14 +204,9 @@ export function ActivityClient({
 
       {hasMore && (
         <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            onClick={loadMore}
-            disabled={loadingMore}
-            className={button({ variant: "secondary" })}
-          >
+          <Button variant="secondary" onClick={loadMore} disabled={loadingMore}>
             {loadingMore ? "Loading…" : "Load older events"}
-          </button>
+          </Button>
         </div>
       )}
 

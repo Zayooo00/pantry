@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
 
 const Schema = z
@@ -100,13 +99,9 @@ export function ResetPasswordForm({ token }: { token: string }) {
           </Link>
         </div>
       )}
-      <button
-        type="submit"
-        className={cn(button({ variant: "primary", size: "lg" }), "w-full")}
-        disabled={isSubmitting}
-      >
+      <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Updating…" : "Set password"}
-      </button>
+      </Button>
     </form>
   );
 }

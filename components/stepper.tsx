@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { ChevronIcon } from "@/icons";
 import { formatCount } from "@/lib/format";
 import { cn } from "@/lib/cn";
@@ -289,12 +289,8 @@ export function AddToShoppingButton({
   }
 
   return (
-    <button
-      onClick={add}
-      disabled={isMutating || done}
-      className={button({ variant: "ghost", size: "sm" })}
-    >
+    <Button variant="ghost" size="sm" onClick={add} disabled={isMutating || done}>
       {done ? "✓ added" : label}
-    </button>
+    </Button>
   );
 }

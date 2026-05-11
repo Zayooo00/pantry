@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Select } from "./select";
 import { useToast } from "./toast";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Room as RoomRow } from "@/db/schema";
 
@@ -115,16 +115,12 @@ export function MoveItemForm({
         </div>
       )}
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={onClose} className={button({ variant: "ghost" })}>
+        <Button variant="ghost" onClick={onClose}>
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isSubmitting || noChange}
-          className={button({ variant: "primary" })}
-        >
+        </Button>
+        <Button type="submit" variant="primary" disabled={isSubmitting || noChange}>
           {isSubmitting ? "Moving…" : "Move item"}
-        </button>
+        </Button>
       </div>
     </form>
   );

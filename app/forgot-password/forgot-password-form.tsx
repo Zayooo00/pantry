@@ -4,8 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
 
 const Schema = z.object({
@@ -74,13 +73,9 @@ export function ForgotPasswordForm() {
           {serverError}
         </div>
       )}
-      <button
-        type="submit"
-        className={cn(button({ variant: "primary", size: "lg" }), "w-full")}
-        disabled={isSubmitting}
-      >
+      <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Sending…" : "Send reset link"}
-      </button>
+      </Button>
     </form>
   );
 }

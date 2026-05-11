@@ -1,6 +1,8 @@
-import { cva } from "class-variance-authority";
+import { forwardRef } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/cn";
 
-export const stamp = cva(
+const stampStyles = cva(
   "inline-flex -rotate-[1.5deg] items-center gap-1.5 rounded-xs border-[1.5px] border-ink-1 bg-paper-0 px-2.5 py-1 font-mono text-2xs tracking-eyebrow-loose text-ink-1 uppercase",
   {
     variants: {
@@ -15,3 +17,12 @@ export const stamp = cva(
     },
   },
 );
+
+type StampProps = React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof stampStyles>;
+
+export const Stamp = forwardRef<HTMLSpanElement, StampProps>(function Stamp(
+  { tone, className, ...rest },
+  ref,
+) {
+  return <span ref={ref} className={cn(stampStyles({ tone }), className)} {...rest} />;
+});

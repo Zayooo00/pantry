@@ -6,10 +6,10 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import type { Item } from "@/db/schema";
 import { formatCount, ItemStatus } from "@/lib/format";
 import { cn } from "@/lib/cn";
-import { badge } from "@/components/badge";
-import { chip } from "@/components/chip";
-import { level } from "@/components/level";
-import { stamp } from "@/components/stamp";
+import { Badge } from "@/components/badge";
+import { Chip } from "@/components/chip";
+import { Level } from "@/components/level";
+import { Stamp } from "@/components/stamp";
 import { Select } from "@/components/select";
 import { ItemThumbnail } from "@/components/item-thumbnail";
 import { ShelfBoardTexture, ShelfWallTexture } from "./shelf-textures";
@@ -86,28 +86,26 @@ export function RoomViews({ items }: { items: EnrichedItem[] }) {
           {categories.map((c) => {
             const count = c === "All" ? items.length : items.filter((i) => i.category === c).length;
             return (
-              <button
+              <Chip
                 key={c}
-                type="button"
+                active={filter === c && !lowOnly}
                 onClick={() => {
                   setFilter(c);
                   setLowOnly(false);
                 }}
-                className={chip({ active: filter === c && !lowOnly })}
               >
                 {c}
                 {c === "All" && <span className="caption num ml-1.5 text-current">{count}</span>}
-              </button>
+              </Chip>
             );
           })}
           <span className="mx-1.5 h-6 w-px bg-paper-3" />
-          <button
-            type="button"
+          <Chip
+            className={cn("border-tomato-2 text-tomato-2", lowOnly && "bg-tomato-3")}
             onClick={() => setLowOnly(!lowOnly)}
-            className={cn(chip(), "border-tomato-2 text-tomato-2", lowOnly && "bg-tomato-3")}
           >
             Low only
-          </button>
+          </Chip>
         </div>
         <div className="flex items-center gap-3 self-end lg:self-auto">
           <span className={cn("caption", "hidden sm:inline")}>SORT</span>
@@ -187,25 +185,25 @@ function SortIconSelect({ value, onChange }: { value: string; onChange: (v: stri
 function StatusBadge({ status }: { status: ItemStatus }) {
   if (status === "low") {
     return (
-      <span className={badge({ tone: "low" })}>
-        <i className={"inline-block h-1.5 w-1.5 rounded-full bg-tomato"} />
+      <Badge tone="low">
+        <i className="inline-block h-1.5 w-1.5 rounded-full bg-tomato" />
         LOW
-      </span>
+      </Badge>
     );
   }
   if (status === "soon") {
     return (
-      <span className={badge({ tone: "soon" })}>
-        <i className={"inline-block h-1.5 w-1.5 rounded-full bg-amber-pantry"} />
+      <Badge tone="soon">
+        <i className="inline-block h-1.5 w-1.5 rounded-full bg-amber-pantry" />
         SOON
-      </span>
+      </Badge>
     );
   }
   return (
-    <span className={badge({ tone: "ok" })}>
-      <i className={"inline-block h-1.5 w-1.5 rounded-full bg-olive"} />
+    <Badge tone="ok">
+      <i className="inline-block h-1.5 w-1.5 rounded-full bg-olive" />
       OK
-    </span>
+    </Badge>
   );
 }
 
@@ -223,7 +221,7 @@ function GridView({ items }: { items: EnrichedItem[] }) {
         >
           {it.status === "low" && (
             <span className="absolute top-3 right-3 z-10">
-              <span className={stamp({ tone: "tomato" })}>RESTOCK</span>
+              <Stamp tone="tomato">RESTOCK</Stamp>
             </span>
           )}
           <ItemThumbnail
@@ -301,16 +299,11 @@ function ListView({ items }: { items: EnrichedItem[] }) {
               <div className="num caption">
                 {it.threshold ? `${formatCount(it.threshold)} ${it.unit} floor` : "—"}
               </div>
-              <div
-                className={cn(
-                  level({
-                    tone: it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok",
-                  }),
-                  "mt-1",
-                )}
-              >
-                <i style={{ width: `${fill}%` }} />
-              </div>
+              <Level
+                tone={it.status === "low" ? "low" : it.status === "soon" ? "soon" : "ok"}
+                value={fill}
+                className="mt-1"
+              />
             </div>
             <div className="num caption hidden lg:block">{it.upd}</div>
             <div>

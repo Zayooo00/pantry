@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { MenuIcon, SearchIcon } from "@/icons";
 import { Kbd, useIsMac } from "./kbd";
 import { ThemeToggle } from "./theme";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 
 export function Topbar({
   placeholder = "Search across all rooms…",
@@ -70,10 +70,12 @@ export function Topbar({
         </span>
         <span className="hidden h-5 w-px bg-paper-3 lg:inline" />
         <ThemeToggle />
-        <Link href="/items/new" className={button({ variant: "primary", size: "sm" })}>
-          <span className="hidden sm:inline">＋ Add item</span>
-          <span className="sm:hidden">＋</span>
-        </Link>
+        <Button asChild variant="primary" size="sm">
+          <Link href="/items/new">
+            <span className="hidden sm:inline">＋ Add item</span>
+            <span className="sm:hidden">＋</span>
+          </Link>
+        </Button>
       </div>
     </header>
   );

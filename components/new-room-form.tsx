@@ -9,7 +9,7 @@ import { Checkbox } from "./checkbox";
 import { ROOM_GLYPHS, RoomGlyph } from "@/icons";
 import { useToast } from "./toast";
 import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 
@@ -116,12 +116,12 @@ export function NewRoomForm({ onClose }: { onClose: () => void }) {
         </div>
       )}
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={onClose} className={button({ variant: "ghost" })}>
+        <Button variant="ghost" onClick={onClose}>
           Cancel
-        </button>
-        <button type="submit" disabled={isSubmitting} className={button({ variant: "primary" })}>
+        </Button>
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Creating…" : "Create room"}
-        </button>
+        </Button>
       </div>
     </form>
   );

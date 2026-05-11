@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useToast } from "@/components/toast";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { button } from "@/components/button";
-import { chip } from "@/components/chip";
+import { Button } from "@/components/button";
+import { Chip } from "@/components/chip";
 import { cn } from "@/lib/cn";
 import { formatDate } from "@/lib/format";
 import { invalidateApi } from "@/lib/api/client";
@@ -55,7 +55,6 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
     refreshBadge();
     let res: Response;
     try {
-      // keepalive lets the PATCH survive the navigation a notification-link click triggers.
       res = await fetch(`/api/notifications/${id}`, { method: "PATCH", keepalive: true });
     } catch {
       toast(<>Couldn't mark read — try again.</>);
@@ -143,40 +142,26 @@ export function NotificationsClient({ initial }: { initial: N[] }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={readAll}
-            disabled={unreadCount === 0}
-            className={button({ variant: "ghost" })}
-          >
+          <Button variant="ghost" onClick={readAll} disabled={unreadCount === 0}>
             Mark all read
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
             onClick={() => setClearOpen(true)}
             disabled={items.every((i) => !i.readAt)}
-            className={button({ variant: "ghost" })}
           >
             Clear read
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="mb-6 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setView("unread")}
-          className={chip({ active: view === "unread" })}
-        >
+        <Chip active={view === "unread"} onClick={() => setView("unread")}>
           Unread ({unreadCount})
-        </button>
-        <button
-          type="button"
-          onClick={() => setView("all")}
-          className={chip({ active: view === "all" })}
-        >
+        </Chip>
+        <Chip active={view === "all"} onClick={() => setView("all")}>
           All ({items.length})
-        </button>
+        </Chip>
       </div>
 
       {visible.length === 0 ? (

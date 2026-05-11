@@ -7,9 +7,8 @@ import { Modal } from "@/components/modal";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EditRoomForm } from "@/components/edit-room-form";
 import { useToast } from "@/components/toast";
-import { button } from "@/components/button";
-import { roleBadge } from "@/components/role-badge";
-import { cn } from "@/lib/cn";
+import { Button } from "@/components/button";
+import { RoleBadge } from "@/components/role-badge";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Room as RoomRow } from "@/db/schema";
 
@@ -99,7 +98,7 @@ export function RoomDetailHeader({
               ROOM {idx} / {total}
               {room.subtitle ? ` · ${room.subtitle.toUpperCase()}` : ""}
             </span>
-            <span className={roleBadge({ role })}>{ROLE_LABEL[role]}</span>
+            <RoleBadge role={role}>{ROLE_LABEL[role]}</RoleBadge>
             {archived && (
               <span className="rounded-full border border-paper-3 bg-paper-1 px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose text-ink-3 uppercase">
                 ARCHIVED
@@ -115,35 +114,28 @@ export function RoomDetailHeader({
         </div>
         <div className="flex flex-wrap gap-3">
           {canEdit && (
-            <button
-              type="button"
-              onClick={() => setEditOpen(true)}
-              className={button({ variant: "ghost" })}
-            >
+            <Button variant="ghost" onClick={() => setEditOpen(true)}>
               Edit room
-            </button>
+            </Button>
           )}
           {isOwner && (
-            <button type="button" onClick={toggleArchive} className={button({ variant: "ghost" })}>
+            <Button variant="ghost" onClick={toggleArchive}>
               {archived ? "Restore room" : "Archive room"}
-            </button>
+            </Button>
           )}
           {isOwner && (
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              className="text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!"
               onClick={() => setDeleteOpen(true)}
-              className={cn(
-                button({ variant: "ghost" }),
-                "text-tomato-2 hover:border-tomato-2! hover:bg-tomato-3!",
-              )}
             >
               Delete room
-            </button>
+            </Button>
           )}
           {canEdit && !archived && (
-            <Link href={`/items/new?room=${room.id}`} className={button({ variant: "primary" })}>
-              ＋ Add to {room.name.toLowerCase()}
-            </Link>
+            <Button asChild variant="primary">
+              <Link href={`/items/new?room=${room.id}`}>＋ Add to {room.name.toLowerCase()}</Link>
+            </Button>
           )}
         </div>
       </div>

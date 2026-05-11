@@ -27,11 +27,11 @@ import { RoomGlyph } from "@/icons";
 import { RoomRowActions } from "./rooms-actions";
 import { useToast } from "@/components/toast";
 import { cn } from "@/lib/cn";
-import { badge } from "@/components/badge";
-import { button } from "@/components/button";
-import { roleBadge } from "@/components/role-badge";
+import { Badge } from "@/components/badge";
+import { Button } from "@/components/button";
+import { RoleBadge } from "@/components/role-badge";
 import { invalidateApi, mutateApi, useMutation } from "@/lib/api/client";
-import { chip } from "@/components/chip";
+import { Chip } from "@/components/chip";
 import type { Room as RoomRow } from "@/db/schema";
 
 type Room = Pick<RoomRow, "id" | "name" | "glyph" | "subtitle" | "tinted"> & {
@@ -85,10 +85,6 @@ const palettes: Record<string, string[]> = {
 export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
   const router = useRouter();
   const { toast } = useToast();
-  // Local draft holds the displayed order from the moment the user enters
-  // reorder mode until the server props (initialRooms) catch up to it. Without
-  // this, the sidebar/grid would briefly snap back to the old order between
-  // "Save" and the router.refresh() landing.
   const [reorderDraft, setReorderDraft] = useState<Room[] | null>(null);
   const [reorderActive, setReorderActive] = useState(false);
   const reordering = reorderActive;
@@ -188,45 +184,34 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
         <div className="flex flex-wrap gap-3">
           {reordering ? (
             <>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                disabled={savingOrder}
                 onClick={() => {
                   setReorderActive(false);
                   setReorderDraft(null);
                 }}
-                className={button({ variant: "ghost" })}
-                disabled={savingOrder}
               >
                 Cancel
-              </button>
-              <button
-                type="button"
-                onClick={saveOrder}
-                className={button({ variant: "primary" })}
-                disabled={savingOrder}
-              >
+              </Button>
+              <Button variant="primary" disabled={savingOrder} onClick={saveOrder}>
                 {savingOrder ? "Saving…" : "Save order"}
-              </button>
+              </Button>
             </>
           ) : (
             <>
-              <button
-                type="button"
+              <Button
+                variant="secondary"
                 onClick={() => {
                   setReorderDraft(initialRooms);
                   setReorderActive(true);
                 }}
-                className={button({ variant: "secondary" })}
               >
                 Reorder
-              </button>
-              <button
-                type="button"
-                onClick={() => setNewRoomOpen(true)}
-                className={button({ variant: "primary" })}
-              >
+              </Button>
+              <Button variant="primary" onClick={() => setNewRoomOpen(true)}>
                 ＋ New room
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -242,16 +227,15 @@ export function RoomsPageClient({ initialRooms }: { initialRooms: Room[] }) {
             {tabs.map((t) => {
               const isActive = activeTab === t.key;
               return (
-                <button
+                <Chip
                   key={t.key}
-                  type="button"
                   role="tab"
                   aria-selected={isActive}
+                  active={isActive}
                   onClick={() => setActiveTab(t.key)}
-                  className={chip({ active: isActive })}
                 >
                   {t.label}
-                </button>
+                </Chip>
               );
             })}
           </div>
@@ -383,9 +367,9 @@ function RoomTileInner({
         <div className="flex items-center gap-2">
           <RoomGlyph name={room.glyph} size={28} />
           {room.role !== "owner" && (
-            <span className={roleBadge({ role: room.role })} title={`Shared · ${room.role}`}>
+            <RoleBadge role={room.role} title={`Shared · ${room.role}`}>
               {room.role === "editor" ? "SHARED · EDIT" : "SHARED · VIEW"}
-            </span>
+            </RoleBadge>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -433,7 +417,7 @@ function RoomTileInner({
       <div className="mt-3 flex items-baseline justify-between border-t border-dashed border-paper-3 pt-3">
         <span className={cn("font-mono text-xs tabular-nums", subTintCls)}>{room.count} ITEMS</span>
         {room.low > 0 ? (
-          <span className={badge({ tone: "low" })}>{room.low} LOW</span>
+          <Badge tone="low">{room.low} LOW</Badge>
         ) : (
           <span className={cn("caption", "text-olive-2")}>ALL OK</span>
         )}

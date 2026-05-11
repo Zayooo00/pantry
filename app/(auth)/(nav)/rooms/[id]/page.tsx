@@ -8,7 +8,7 @@ import { RoomMembersPanel } from "./room-members-panel";
 import { getItemsForRoom, getRoomsWithCounts } from "@/lib/queries";
 import { itemStatus, formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
-import { level } from "@/components/level";
+import { Level } from "@/components/level";
 
 export const dynamic = "force-dynamic";
 
@@ -110,9 +110,7 @@ export default async function RoomPage({ params }: { params: Promise<{ id: strin
                   <span className="truncate font-mono text-2xs tracking-label text-ink-3 uppercase">
                     {c.name}
                   </span>
-                  <div className={level()}>
-                    <i style={{ width: `${pct}%` }} className={colors[i % colors.length]} />
-                  </div>
+                  <Level value={pct} fillClassName={colors[i % colors.length]} />
                   <span className="num text-right font-mono text-xs text-ink-2">{c.count}</span>
                 </div>
               );

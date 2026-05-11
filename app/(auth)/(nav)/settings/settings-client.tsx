@@ -11,7 +11,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { SharingSection } from "./sharing-section";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
 import { Select } from "@/components/select";
 import { useMutation } from "@/lib/api/client";
@@ -181,13 +181,13 @@ export function SettingsClient({ user }: { user: User }) {
                 </div>
               )}
               <div className="flex justify-end md:col-span-2">
-                <button
+                <Button
                   type="submit"
+                  variant="primary"
                   disabled={profileForm.formState.isSubmitting || profileUnchanged}
-                  className={button({ variant: "primary" })}
                 >
                   {profileForm.formState.isSubmitting ? "Saving…" : "Save profile"}
-                </button>
+                </Button>
               </div>
             </form>
           </SettingsSection>
@@ -247,13 +247,13 @@ export function SettingsClient({ user }: { user: User }) {
                 </div>
               )}
               <div className="flex justify-end md:col-span-2">
-                <button
+                <Button
                   type="submit"
+                  variant="primary"
                   disabled={passwordForm.formState.isSubmitting}
-                  className={button({ variant: "primary" })}
                 >
                   {passwordForm.formState.isSubmitting ? "Updating…" : "Change password"}
-                </button>
+                </Button>
               </div>
             </form>
           </SettingsSection>
@@ -292,13 +292,9 @@ export function SettingsClient({ user }: { user: User }) {
             title="Session"
             lede="Sign out of this browser. Your pantry will still be here."
           >
-            <button
-              type="button"
-              onClick={() => setSignOutOpen(true)}
-              className={button({ variant: "secondary" })}
-            >
+            <Button variant="secondary" onClick={() => setSignOutOpen(true)}>
               Sign out
-            </button>
+            </Button>
           </SettingsSection>
 
           <SharingSection currentUserId={user.id} />

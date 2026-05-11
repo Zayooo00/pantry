@@ -8,8 +8,8 @@ import { z } from "zod";
 import { Select } from "./select";
 import { useToast } from "./toast";
 import { PhotoUpload } from "./photo-upload";
-import { button } from "@/components/button";
-import { chip } from "@/components/chip";
+import { Button } from "@/components/button";
+import { Chip } from "@/components/chip";
 import { TextArea, TextInput } from "@/components/text-input";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Item as ItemRow } from "@/db/schema";
@@ -265,14 +265,9 @@ export function EditItemForm({ item, onClose }: { item: ItemEditable; onClose: (
           <label className="field-label">Tags</label>
           <div className="flex flex-wrap gap-2">
             {tags.map((t) => (
-              <button
-                key={t}
-                type="button"
-                className={chip({ active: true })}
-                onClick={() => removeTag(t)}
-              >
+              <Chip key={t} active onClick={() => removeTag(t)}>
                 {t} ✕
-              </button>
+              </Chip>
             ))}
             <input
               value={tagInput}
@@ -307,12 +302,12 @@ export function EditItemForm({ item, onClose }: { item: ItemEditable; onClose: (
         </div>
       )}
       <div className="flex justify-end gap-3 border-t border-paper-3 pt-2">
-        <button type="button" onClick={onClose} className={button({ variant: "ghost" })}>
+        <Button variant="ghost" onClick={onClose}>
           Cancel
-        </button>
-        <button type="submit" disabled={isSubmitting} className={button({ variant: "primary" })}>
+        </Button>
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Saving…" : "Save changes"}
-        </button>
+        </Button>
       </div>
     </form>
   );

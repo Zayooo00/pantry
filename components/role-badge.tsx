@@ -1,6 +1,8 @@
-import { cva } from "class-variance-authority";
+import { forwardRef } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/cn";
 
-export const roleBadge = cva(
+const roleBadgeStyles = cva(
   "inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-3xs tracking-eyebrow-loose uppercase",
   {
     variants: {
@@ -12,3 +14,13 @@ export const roleBadge = cva(
     },
   },
 );
+
+type RoleBadgeProps = React.HTMLAttributes<HTMLSpanElement> &
+  Required<Pick<VariantProps<typeof roleBadgeStyles>, "role">>;
+
+export const RoleBadge = forwardRef<HTMLSpanElement, RoleBadgeProps>(function RoleBadge(
+  { role, className, ...rest },
+  ref,
+) {
+  return <span ref={ref} className={cn(roleBadgeStyles({ role }), className)} {...rest} />;
+});

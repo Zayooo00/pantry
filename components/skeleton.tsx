@@ -1,5 +1,5 @@
 import { cva } from "class-variance-authority";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { cn } from "@/lib/cn";
 
 const sizeClass = {
@@ -21,8 +21,6 @@ const sizeClass = {
 
 export type TextSkeletonSize = keyof typeof sizeClass;
 
-// A loading placeholder shaped like text. Wrapper takes one line-height per
-// line so swapping in real text causes no layout shift.
 export function TextSkeleton({
   size = "base",
   w = "60%",
@@ -58,9 +56,6 @@ export function BlockSkeleton({ className, ...rest }: React.HTMLAttributes<HTMLD
   );
 }
 
-// Pill-shaped placeholder that inherits the real button's padding/radius/text-size
-// so its width auto-sizes to the (invisible) label inside - i.e. pass the same
-// label the real button will have.
 export function ButtonSkeleton({
   size,
   children,
@@ -71,20 +66,21 @@ export function ButtonSkeleton({
   className?: string;
 }) {
   return (
-    <span
-      aria-hidden
+    <Button
+      asChild
+      size={size}
       className={cn(
-        button({ size }),
         "pointer-events-none animate-pulse cursor-default border-paper-3 bg-paper-3 text-paper-3",
         className,
       )}
     >
-      <span className="invisible">{children ?? "."}</span>
-    </span>
+      <span aria-hidden>
+        <span className="invisible">{children ?? "."}</span>
+      </span>
+    </Button>
   );
 }
 
-// Square-ish placeholder for badges (rounded-sm, small text).
 export const badgeSkeleton = cva("inline-flex animate-pulse items-center rounded-sm bg-paper-3", {
   variants: {
     size: {

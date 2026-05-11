@@ -53,8 +53,8 @@ export function SignUpForm() {
       router.push(`/sign-in?email=${encodeURIComponent(values.email)}${nextQuery}`);
       return;
     }
-    const sent = res?.emailSent ? "1" : "0";
-    router.push(`/verify-email?email=${encodeURIComponent(values.email)}&sent=${sent}${nextQuery}`);
+    const sentQuery = res?.emailSent ? "&sent=1" : "";
+    router.push(`/verify-email?email=${encodeURIComponent(values.email)}${sentQuery}${nextQuery}`);
   }
 
   return (

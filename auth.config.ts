@@ -33,11 +33,8 @@ export const authConfig = {
           path.startsWith("/forgot-password") ||
           path.startsWith("/reset-password") ||
           path.startsWith("/verify-email");
-        if (isLoggedIn && isAuthGate) {
-          const dest = emailVerified ? "/dashboard" : "/verify-email";
-          if (!path.startsWith(dest)) {
-            return Response.redirect(new URL(dest, nextUrl));
-          }
+        if (isLoggedIn && emailVerified && isAuthGate) {
+          return Response.redirect(new URL("/dashboard", nextUrl));
         }
         return true;
       }

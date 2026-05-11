@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/button";
 
 type ConfirmState =
@@ -14,13 +14,13 @@ type ConfirmState =
 export function VerifyEmailClient({
   token,
   email,
-  sendStatus,
+  sent,
 }: {
   token?: string;
   email?: string;
-  sendStatus: "sent" | "not_configured" | null;
+  sent: boolean;
 }) {
-  const { update: updateSession, status: sessionStatus } = useSession();
+  const { update: updateSession } = useSession();
   const [confirm, setConfirm] = useState<ConfirmState>({
     status: token ? "confirming" : "idle",
   });
@@ -131,16 +131,10 @@ export function VerifyEmailClient({
               Enter the email from your sign-up to receive a fresh verification link, or follow the
               link from the email we sent.
             </>
-          ) : sendStatus === "sent" ? (
+          ) : sent ? (
             <>
               We sent a link to <strong className="not-italic">{email}</strong>. Click it to confirm
               your email and finish creating your account.
-            </>
-          ) : sendStatus === "not_configured" ? (
-            <>
-              Email isn't configured on this server yet, so we couldn't send a verification link to{" "}
-              <strong className="not-italic">{email}</strong>. Ask the owner to set SMTP_USER,
-              SMTP_PASS, and EMAIL_FROM, then resend.
             </>
           ) : (
             <>
@@ -164,22 +158,12 @@ export function VerifyEmailClient({
     <>
       {body}
       <div className="mt-6 border-t border-dashed border-paper-3 pt-4 font-display text-sm text-ink-3 italic">
-        {sessionStatus === "authenticated" ? (
-          <button
-            type="button"
-            onClick={() => signOut({ callbackUrl: "/sign-in" })}
-            className="cursor-pointer border-b border-ink-1 pb-px text-ink-1 not-italic transition-colors duration-150 ease-pantry hover:border-olive-2 hover:text-olive-2"
-          >
-            Sign out & use a different account →
-          </button>
-        ) : (
-          <Link
-            href="/sign-in"
-            className="border-b border-ink-1 pb-px text-ink-1 not-italic transition-colors duration-150 ease-pantry hover:border-olive-2 hover:text-olive-2"
-          >
-            ← Back to sign in
-          </Link>
-        )}
+        <Link
+          href="/sign-in"
+          className="border-b border-ink-1 pb-px text-ink-1 not-italic transition-colors duration-150 ease-pantry hover:border-olive-2 hover:text-olive-2"
+        >
+          ← Back to sign in
+        </Link>
       </div>
     </>
   );

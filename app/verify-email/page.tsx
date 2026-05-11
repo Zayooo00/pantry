@@ -35,11 +35,7 @@ export default async function VerifyEmailPage({
           Confirm your email so we know you actually have the key.
         </p>
 
-        <VerifyEmailClient
-          token={sp.token}
-          email={sp.email}
-          sendStatus={sp.sent === "1" ? "sent" : sp.sent === "0" ? "not_configured" : null}
-        />
+        <VerifyEmailClient token={sp.token} email={sp.email} sent={sp.sent === "1"} />
       </div>
 
       <aside className="hidden items-center justify-center bg-ink-1 bg-[radial-gradient(rgba(247,243,234,0.04)_1px,transparent_1px),radial-gradient(circle_at_80%_20%,rgba(90,107,58,0.15),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(184,65,43,0.10),transparent_50%)] bg-size-[4px_4px,auto,auto] p-16 text-paper-0 md:flex">

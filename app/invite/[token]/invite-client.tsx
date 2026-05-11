@@ -77,7 +77,9 @@ export function InviteClient({ token }: { token: string }) {
       setAccepting(false);
       return;
     }
-    await updateSession();
+    if (!session?.user?.emailVerified) {
+      await updateSession();
+    }
     router.push(`/rooms/${json.roomId}`);
     void invalidateApi("/api/sidebar");
   }

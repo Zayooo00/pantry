@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/button";
@@ -20,7 +21,8 @@ export function VerifyEmailClient({
   email?: string;
   sent: boolean;
 }) {
-  const { update: updateSession } = useSession();
+  const router = useRouter();
+  const { data: session, update: updateSession, status: sessionStatus } = useSession();
   const [confirm, setConfirm] = useState<ConfirmState>({
     status: token ? "confirming" : "idle",
   });
@@ -28,6 +30,46 @@ export function VerifyEmailClient({
     status: "idle" | "sending" | "ok" | "error";
     message?: string;
   }>({ status: "idle" });
+  const [cooldownEndsAt, setCooldownEndsAt] = useState<number | null>(null);
+  const [remaining, setRemaining] = useState(0);
+
+  useEffect(() => {
+    if (sessionStatus !== "authenticated" || token) {
+      return;
+    }
+    const verifiedInSession = (session?.user as { emailVerified?: boolean } | undefined)
+      ?.emailVerified;
+    if (verifiedInSession) {
+      return;
+    }
+    let cancelled = false;
+    async function run() {
+      await updateSession();
+      if (!cancelled) {
+        router.refresh();
+      }
+    }
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionStatus, session, token, updateSession, router]);
+
+  useEffect(() => {
+    if (!cooldownEndsAt) {
+      return;
+    }
+    const tick = () => {
+      const secs = Math.max(0, Math.ceil((cooldownEndsAt - Date.now()) / 1000));
+      setRemaining(secs);
+      if (secs === 0) {
+        setCooldownEndsAt(null);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [cooldownEndsAt]);
 
   useEffect(() => {
     if (!token) {
@@ -93,6 +135,7 @@ export function VerifyEmailClient({
       return;
     }
     setResend({ status: "ok" });
+    setCooldownEndsAt(Date.now() + 60_000);
   }
 
   const body =
@@ -119,6 +162,7 @@ export function VerifyEmailClient({
             email={email}
             resend={resend}
             onResend={onResend}
+            remaining={remaining}
             idleLabel="Send a fresh link"
           />
         )}
@@ -148,6 +192,7 @@ export function VerifyEmailClient({
             email={email}
             resend={resend}
             onResend={onResend}
+            remaining={remaining}
             idleLabel="Resend verification link"
           />
         )}
@@ -173,21 +218,18 @@ function ResendBlock({
   email,
   resend,
   onResend,
+  remaining,
   idleLabel,
 }: {
   email: string;
   resend: { status: "idle" | "sending" | "ok" | "error"; message?: string };
   onResend: () => void;
+  remaining: number;
   idleLabel: string;
 }) {
-  if (resend.status === "ok") {
-    return (
-      <div className="rounded-md border border-olive-2 bg-olive-3 px-4 py-4 font-display text-sm text-ink-2">
-        If <strong className="not-italic">{email}</strong> needs verification, we've sent a fresh
-        link.
-      </div>
-    );
-  }
+  const cooling = remaining > 0;
+  const label =
+    resend.status === "sending" ? "Sending…" : cooling ? `Resend in ${remaining}s` : idleLabel;
   return (
     <div className="flex flex-col gap-2">
       <Button
@@ -195,10 +237,15 @@ function ResendBlock({
         size="md"
         className="w-full"
         onClick={onResend}
-        disabled={resend.status === "sending"}
+        disabled={resend.status === "sending" || cooling}
       >
-        {resend.status === "sending" ? "Sending…" : idleLabel}
+        {label}
       </Button>
+      {resend.status === "ok" && (
+        <div className="rounded-md border border-olive-2 bg-olive-3 px-3.5 py-2.5 font-display text-sm text-ink-2">
+          Sent. Check <strong className="not-italic">{email}</strong>.
+        </div>
+      )}
       {resend.status === "error" && resend.message && (
         <div className="rounded-md border border-tomato-2 bg-tomato-3 px-3.5 py-2.5 font-display text-sm text-tomato-2">
           {resend.message}

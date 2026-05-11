@@ -87,6 +87,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
                 sizes="(min-width: 1024px) 420px, 100vw"
                 priority
                 className="object-cover"
+                unoptimized={item.photoUrl.startsWith("/api/photos/")}
               />
             ) : (
               <div

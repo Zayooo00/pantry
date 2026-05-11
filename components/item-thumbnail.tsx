@@ -27,7 +27,14 @@ export function ItemThumbnail({
       )}
     >
       {photoUrl ? (
-        <Image src={photoUrl} alt={name} fill sizes={sizes} className="object-cover" />
+        <Image
+          src={photoUrl}
+          alt={name}
+          fill
+          sizes={sizes}
+          className="object-cover"
+          unoptimized={photoUrl.startsWith("/api/photos/")}
+        />
       ) : (
         shortLabel(name, abbrevLength)
       )}

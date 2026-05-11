@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -12,7 +12,8 @@ export function PhotoUpload({
   value: string | null;
   onChange: (url: string | null) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const galleryRef = useRef<HTMLInputElement | null>(null);
+  const cameraRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,8 +40,11 @@ export function PhotoUpload({
       setError("Upload failed.");
     } finally {
       setUploading(false);
-      if (inputRef.current) {
-        inputRef.current.value = "";
+      if (galleryRef.current) {
+        galleryRef.current.value = "";
+      }
+      if (cameraRef.current) {
+        cameraRef.current.value = "";
       }
     }
   }
@@ -48,28 +52,62 @@ export function PhotoUpload({
   function remove() {
     onChange(null);
     setError(null);
-    if (inputRef.current) {
-      inputRef.current.value = "";
+    if (galleryRef.current) {
+      galleryRef.current.value = "";
+    }
+    if (cameraRef.current) {
+      cameraRef.current.value = "";
     }
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <input ref={inputRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
+      <input
+        ref={galleryRef}
+        type="file"
+        accept="image/*"
+        onChange={onFile}
+        className="hidden"
+      />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={onFile}
+        className="hidden"
+      />
       {value ? (
         <div className="flex items-start gap-4">
           <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-lg border border-paper-3 bg-paper-1">
-            <Image src={value} alt="Item photo" fill sizes="112px" className="object-cover" />
+            <Image
+              src={value}
+              alt="Item photo"
+              fill
+              sizes="112px"
+              className="object-cover"
+              unoptimized={value.startsWith("/api/photos/")}
+            />
           </div>
           <div className="flex flex-col gap-2">
-            <button
-              type="button"
-              className={button({ variant: "ghost", size: "sm" })}
-              onClick={() => inputRef.current?.click()}
-              disabled={uploading}
-            >
-              {uploading ? "Uploading…" : "Replace photo"}
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className={button({ variant: "ghost", size: "sm" })}
+                onClick={() => galleryRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? "Uploading…" : "Replace from files"}
+              </button>
+              <button
+                type="button"
+                className={cn(button({ variant: "ghost", size: "sm" }), "md:hidden")}
+                onClick={() => cameraRef.current?.click()}
+                disabled={uploading}
+              >
+                Take photo
+              </button>
+            </div>
             <button
               type="button"
               className={button({ variant: "ghost", size: "sm" })}
@@ -81,14 +119,26 @@ export function PhotoUpload({
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={() => inputRef.current?.click()}
+            onClick={() => galleryRef.current?.click()}
             disabled={uploading}
             className={cn(button({ variant: "secondary", size: "sm" }), uploading && "opacity-60")}
           >
             {uploading ? "Uploading…" : "Choose photo"}
+          </button>
+          <button
+            type="button"
+            onClick={() => cameraRef.current?.click()}
+            disabled={uploading}
+            className={cn(
+              button({ variant: "secondary", size: "sm" }),
+              "md:hidden",
+              uploading && "opacity-60",
+            )}
+          >
+            Take photo
           </button>
           <span className="font-mono text-xs tracking-mono text-ink-4 uppercase">
             JPG / PNG / WEBP · UP TO 5MB

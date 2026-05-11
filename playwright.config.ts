@@ -2,18 +2,19 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3650;
-const BASE_URL = `http://localhost:${PORT}`;
-
-const DB_URL = (() => {
+const stateFile = (path: string) => {
   try {
-    return readFileSync(resolve("e2e/.test-db-path"), "utf8").trim();
+    return readFileSync(resolve(path), "utf8").trim();
   } catch {
     throw new Error(
       "[e2e] Run `npm run e2e` (which seeds the test DB), not `playwright test` directly.",
     );
   }
-})();
+};
+
+const DB_URL = stateFile("e2e/.test-db-path");
+const PORT = Number(stateFile("e2e/.test-port"));
+const BASE_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -42,6 +43,7 @@ export default defineConfig({
       AUTH_TRUST_HOST: "true",
       APP_URL: BASE_URL,
       E2E_BYPASS_RATE_LIMIT: "1",
+      E2E_BLOB_LOCAL: "1",
     },
   },
 });

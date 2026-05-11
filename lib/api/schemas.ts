@@ -10,6 +10,9 @@ const Iso = z.string();
 const Numeric = z.coerce.number();
 const NumericNullable = z.coerce.number().nullable();
 const DateNullable = z.coerce.date().nullable();
+const PhotoUrl = z.string().refine((s) => /^https?:\/\//.test(s) || s.startsWith("/api/photos/"), {
+  message: "Invalid photo URL.",
+});
 
 const SidebarRoom = z
   .object({
@@ -112,7 +115,7 @@ export const CreateItemRequest = z
     barcode: z.string().nullable().optional(),
     notes: z.string().nullable().optional(),
     tags: z.string().nullable().optional(),
-    photoUrl: z.string().url().nullable().optional(),
+    photoUrl: PhotoUrl.nullable().optional(),
   })
   .openapi("CreateItemRequest");
 
@@ -136,7 +139,7 @@ export const PatchItemRequest = z
     notes: z.string().nullable().optional(),
     tags: z.string().nullable().optional(),
     roomId: z.string().optional(),
-    photoUrl: z.string().url().nullable().optional(),
+    photoUrl: PhotoUrl.nullable().optional(),
   })
   .openapi("PatchItemRequest");
 

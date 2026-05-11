@@ -41,14 +41,19 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-zA-Z0-9-_]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "photo";
-  const filename = `items/${randomUUID()}-${base}${ext}`;
+  const id = randomUUID();
+  const pathname = `items/${id}-${base}${ext}`;
+
+  if (process.env.E2E_BLOB_LOCAL === "1") {
+    return NextResponse.json({ url: `/api/photos/${pathname}` });
+  }
 
   try {
-    const blob = await put(filename, file, {
-      access: "public",
+    const blob = await put(pathname, file, {
+      access: "private",
       contentType: file.type,
     });
-    return NextResponse.json({ url: blob.url });
+    return NextResponse.json({ url: `/api/photos/${blob.pathname}` });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Upload failed.";
     return NextResponse.json({ error: message }, { status: 500 });

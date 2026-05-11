@@ -465,6 +465,7 @@ export function AddItemForm({
                   fill
                   sizes="(min-width: 1024px) 320px, 100vw"
                   className="object-cover"
+                  unoptimized={values.photoUrl.startsWith("/api/photos/")}
                 />
               </div>
             ) : (

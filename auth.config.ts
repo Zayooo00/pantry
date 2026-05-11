@@ -6,12 +6,16 @@ export const authConfig = {
   callbacks: {
     session({ session, token }) {
       if (token?.id && session.user) {
-        Object.assign(session.user, {
-          id: token.id,
-          name: token.name ?? "",
-          email: token.email ?? "",
-          emailVerified: !!token.emailVerified,
-        });
+        const user = session.user as {
+          id?: string;
+          name?: string;
+          email?: string;
+          emailVerified?: boolean;
+        };
+        user.id = token.id;
+        user.name = token.name ?? "";
+        user.email = token.email ?? "";
+        user.emailVerified = !!token.emailVerified;
       } else if (session.user) {
         delete (session.user as { id?: string }).id;
       }
@@ -35,8 +39,7 @@ export const authConfig = {
         path.startsWith("/api/verify-email") ||
         path.startsWith("/api/invites") ||
         path.startsWith("/api/cron");
-      const emailVerified =
-        (auth?.user as { emailVerified?: boolean } | undefined)?.emailVerified ?? false;
+      const emailVerified = auth?.user?.emailVerified ?? false;
       if (isPublic) {
         const isAuthGate =
           path === "/" ||

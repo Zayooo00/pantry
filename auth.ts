@@ -18,6 +18,14 @@ class TooManyAttempts extends CredentialsSignin {
   code = "too_many_attempts";
 }
 
+type CredentialsUser = {
+  id: string;
+  email: string;
+  name: string;
+  passwordVersion: number;
+  emailVerified: boolean;
+};
+
 export const { auth, handlers, signIn, signOut } = NextAuth({
   ...authConfig,
   logger: {
@@ -61,19 +69,14 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         if (!ok) {
           return null;
         }
-        return {
+        const u: CredentialsUser = {
           id: found[0].id,
           email: found[0].email,
           name: found[0].name,
           passwordVersion: found[0].passwordVersion,
           emailVerified: !!found[0].emailVerifiedAt,
-        } as {
-          id: string;
-          email: string;
-          name: string;
-          passwordVersion: number;
-          emailVerified: boolean;
         };
+        return u;
       },
     }),
   ],
@@ -81,15 +84,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     ...authConfig.callbacks,
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.id = (user as { id: string }).id;
-        token.email = user.email ?? null;
-        token.name = user.name ?? null;
-        token.passwordVersion = (user as { passwordVersion?: number }).passwordVersion ?? 1;
-        token.emailVerified = (user as { emailVerified?: boolean }).emailVerified ?? false;
+        const u = user as Partial<CredentialsUser>;
+        token.id = u.id;
+        token.email = u.email ?? null;
+        token.name = u.name ?? null;
+        token.passwordVersion = u.passwordVersion ?? 1;
+        token.emailVerified = u.emailVerified ?? false;
         token.lastChecked = Date.now();
         return token;
       }
-      const id = token.id as string | undefined;
+      const id = token.id;
       if (!id) {
         return token;
       }
@@ -110,7 +114,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.lastChecked = Date.now();
         return token;
       }
-      const lastChecked = (token.lastChecked as number) ?? 0;
+      const lastChecked = token.lastChecked ?? 0;
       const due = Date.now() - lastChecked > REFRESH_INTERVAL_MS;
       if (trigger === "update" || due) {
         const found = await db

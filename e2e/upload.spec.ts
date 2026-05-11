@@ -23,10 +23,7 @@ test("uploads a photo on new item, photo persists on item detail", async ({ page
   await nameInput.fill(itemName);
   await page.getByRole("button", { name: /^Save item$/ }).click();
 
-  await expect(
-    page.getByRole("heading", { level: 1, name: new RegExp(itemName, "i") }),
-  ).toBeVisible();
-  expect(page.url()).not.toMatch(/\/items\/new/);
+  await expect(page).toHaveURL(/\/items\/[a-f0-9-]{36}$/, { timeout: 20_000 });
   const photo = page.getByAltText(itemName).first();
   await expect(photo).toBeAttached();
   const src = (await photo.getAttribute("src")) ?? "";

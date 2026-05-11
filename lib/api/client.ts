@@ -16,8 +16,6 @@ export type ApiClient = typeof apiClient;
 export const useQuery = createQueryHook(apiClient, SWR_PREFIX);
 export const useImmutable = createImmutableHook(apiClient, SWR_PREFIX);
 
-// `swr-openapi` keys queries as `[prefix, path, init]` - globalMutate's array
-// match requires exact equality, so a 2-tuple never matches. Use a predicate.
 export function invalidateApi(...paths: string[]): Promise<unknown> {
   const wanted = new Set(paths);
   return swrGlobalMutate(
@@ -30,11 +28,6 @@ export function invalidateApi(...paths: string[]): Promise<unknown> {
   );
 }
 
-// Optimistically update every cached entry whose key matches `path`. The
-// updater receives the cached data (typed by the response shape) and returns
-// the new data. With `revalidate: false`, no network call follows. Use this
-// when you already know the new state (e.g. saving a reorder) and want the
-// UI to reflect it without waiting on the server roundtrip.
 export function mutateApi<P extends keyof paths>(
   path: P,
   updater: (current: PathGetData<P> | undefined) => PathGetData<P> | undefined,

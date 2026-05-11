@@ -54,7 +54,6 @@ function defaultDdl(col: ReturnType<typeof getTableConfig>["columns"][number]): 
   if (col.default === undefined) {
     return null;
   }
-  // drizzle stores SQL defaults as SQL objects.
   if (typeof col.default === "object" && col.default !== null && "queryChunks" in col.default) {
     return `DEFAULT ${sqlToString(col.default as SQL)}`;
   }
@@ -104,14 +103,11 @@ function sqliteType(dataType: string): string {
     case "date":
       return "INTEGER";
     default:
-      // real, etc.
       return dataType.toUpperCase();
   }
 }
 
 function sqlToString(s: SQL): string {
-  // Reconstruct the SQL fragment from its chunks. We only emit literal text +
-  // simple values, which is all the project's defaults use (e.g. unixepoch()).
   const chunks = (s as unknown as { queryChunks: Array<{ value?: string[] | string }> })
     .queryChunks;
   let out = "";

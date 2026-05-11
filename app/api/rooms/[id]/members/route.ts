@@ -113,8 +113,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Already a member." }, { status: 409 });
     }
   }
-  // Email is required for unregistered invitees (the only delivery channel).
-  // For registered invitees we can fall back to the in-app notification.
   if (!target && !isEmailConfigured()) {
     return NextResponse.json(
       {
@@ -173,8 +171,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }),
       text: `${inviterName} invited you to ${roomName} on Pantry. Accept: ${url}\n\n${tail}`,
     });
-    // For registered invitees the in-app notification is enough — don't fail the request
-    // if SMTP hiccups. Unregistered invitees need the email; surface the error.
     if (!send.ok && !target) {
       return NextResponse.json({ error: send.message }, { status: 500 });
     }

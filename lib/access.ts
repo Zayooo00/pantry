@@ -115,10 +115,6 @@ export async function getRoomWithRole(
   return { room, role: memberRows[0].role as RoomRole };
 }
 
-// Append a per-user position for a newly accessible room (created or joined),
-// so it lands at the bottom of the user's sidebar without colliding with the
-// owner-set rooms.position fallback. No-op if the (userId, roomId) already
-// has a row.
 export async function appendRoomPosition(userId: string, roomId: string): Promise<void> {
   const max = await db
     .select({ max: sql<number | null>`max(${roomPositions.position})` })

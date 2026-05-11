@@ -67,8 +67,11 @@ export async function POST(req: NextRequest) {
       { status: 429, headers: { "Retry-After": String(limited.retryAfterSec) } },
     );
   }
+  if (!isEmailConfigured()) {
+    return NextResponse.json({ error: "Email isn't configured on this server." }, { status: 503 });
+  }
   const found = await db.select().from(users).where(eq(users.email, parsed.data.email)).limit(1);
-  if (found.length === 0 || found[0].emailVerifiedAt || !isEmailConfigured()) {
+  if (found.length === 0 || found[0].emailVerifiedAt) {
     return NextResponse.json({ ok: true, sent: false });
   }
   const token = await issueVerificationToken(found[0].id);

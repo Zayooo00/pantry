@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -103,6 +103,12 @@ describe("GET /api/verify-email", () => {
 });
 
 describe("POST /api/verify-email (resend)", () => {
+  beforeEach(() => {
+    vi.stubEnv("SMTP_USER", "pantry@example.com");
+    vi.stubEnv("SMTP_PASS", "test-app-password");
+    vi.stubEnv("EMAIL_FROM", "Pantry <pantry@example.com>");
+  });
+
   it("400 on invalid body", async () => {
     const res = await POST(postReq({ email: "not-an-email" }));
     expect(res.status).toBe(400);
@@ -121,13 +127,14 @@ describe("POST /api/verify-email (resend)", () => {
     expect(await res.json()).toMatchObject({ ok: true, sent: false });
   });
 
-  it("returns ok (sent:false) when email is not configured, without leaking existence", async () => {
+  it("503s when SMTP isn't configured, regardless of whether the email exists", async () => {
     vi.stubEnv("SMTP_USER", "");
     vi.stubEnv("SMTP_PASS", "");
     vi.stubEnv("EMAIL_FROM", "");
     await createUser({ email: "pending@example.com" });
-    const res = await POST(postReq({ email: "pending@example.com" }));
-    expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ ok: true, sent: false });
+    const existing = await POST(postReq({ email: "pending@example.com" }));
+    expect(existing.status).toBe(503);
+    const unknown = await POST(postReq({ email: "nobody-here@example.com" }));
+    expect(unknown.status).toBe(503);
   });
 });

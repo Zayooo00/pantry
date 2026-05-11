@@ -4,6 +4,19 @@ export const authConfig = {
   pages: { signIn: "/sign-in" },
   providers: [],
   callbacks: {
+    session({ session, token }) {
+      if (token?.id && session.user) {
+        Object.assign(session.user, {
+          id: token.id,
+          name: token.name ?? "",
+          email: token.email ?? "",
+          emailVerified: !!token.emailVerified,
+        });
+      } else if (session.user) {
+        delete (session.user as { id?: string }).id;
+      }
+      return session;
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const path = nextUrl.pathname;

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/button";
@@ -21,8 +20,7 @@ export function VerifyEmailClient({
   email?: string;
   sent: boolean;
 }) {
-  const router = useRouter();
-  const { data: session, update: updateSession, status: sessionStatus } = useSession();
+  const { update: updateSession } = useSession();
   const [confirm, setConfirm] = useState<ConfirmState>({
     status: token ? "confirming" : "idle",
   });
@@ -32,28 +30,6 @@ export function VerifyEmailClient({
   }>({ status: "idle" });
   const [cooldownEndsAt, setCooldownEndsAt] = useState<number | null>(null);
   const [remaining, setRemaining] = useState(0);
-
-  useEffect(() => {
-    if (sessionStatus !== "authenticated" || token) {
-      return;
-    }
-    const verifiedInSession = (session?.user as { emailVerified?: boolean } | undefined)
-      ?.emailVerified;
-    if (verifiedInSession) {
-      return;
-    }
-    let cancelled = false;
-    async function run() {
-      await updateSession();
-      if (!cancelled) {
-        router.refresh();
-      }
-    }
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionStatus, session, token, updateSession, router]);
 
   useEffect(() => {
     if (!cooldownEndsAt) {
@@ -91,8 +67,6 @@ export function VerifyEmailClient({
           });
           return;
         }
-        // Tell next-auth to re-fetch the user so middleware sees emailVerified.
-        // Safe to call when unauthenticated — it's a no-op then.
         await updateSession();
         if (cancelled) {
           return;

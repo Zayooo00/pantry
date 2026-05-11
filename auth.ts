@@ -133,17 +133,5 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       return token;
     },
-    session({ session, token }) {
-      if (token?.id && session.user) {
-        session.user.id = token.id as string;
-        session.user.name = (token.name as string) ?? "";
-        session.user.email = (token.email as string) ?? "";
-        (session.user as unknown as { emailVerified: boolean }).emailVerified =
-          (token.emailVerified as boolean | undefined) ?? false;
-      } else if (session.user) {
-        delete (session.user as { id?: string }).id;
-      }
-      return session;
-    },
   },
 });

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { get } from "@vercel/blob";
 import { auth } from "@/auth";
+import { db, items } from "@/db";
+import { canViewRoom } from "@/lib/access";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +18,22 @@ export async function GET(_req: Request, { params }: { params: Promise<{ path: s
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
 
+  const { path } = await params;
+  const pathname = path.join("/");
+  const photoUrl = `/api/photos/${pathname}`;
+
+  const isUploader = path[0] === "items" && path[1] === session.user.id;
+  if (!isUploader) {
+    const owning = await db
+      .select({ roomId: items.roomId })
+      .from(items)
+      .where(eq(items.photoUrl, photoUrl))
+      .limit(1);
+    if (owning.length === 0 || !(await canViewRoom(session.user.id, owning[0].roomId))) {
+      return new NextResponse(null, { status: 404 });
+    }
+  }
+
   if (process.env.E2E_BLOB_LOCAL === "1") {
     return new NextResponse(TEST_PIXEL_PNG, {
       headers: {
@@ -23,9 +42,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ path: s
       },
     });
   }
-
-  const { path } = await params;
-  const pathname = path.join("/");
 
   const result = await get(pathname, { access: "private" });
   if (!result) {

@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "photo";
   const id = randomUUID();
-  const pathname = `items/${id}-${base}${ext}`;
+  const pathname = `items/${session.user.id}/${id}-${base}${ext}`;
 
   if (process.env.E2E_BLOB_LOCAL === "1") {
     return NextResponse.json({ url: `/api/photos/${pathname}` });

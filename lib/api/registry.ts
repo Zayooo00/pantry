@@ -24,6 +24,9 @@ import {
   ShoppingPostResponse,
   SidebarResponse,
   SignUpRequest,
+  SignUpResponse,
+  ResendVerificationRequest,
+  VerifyEmailResponse,
   UploadResponse,
 } from "./schemas";
 
@@ -300,9 +303,33 @@ export function buildRegistry() {
     path: "/api/sign-up",
     request: { body: json(SignUpRequest) },
     responses: {
-      200: { description: "Signed up", ...json(OkResponse) },
+      200: { description: "Signed up", ...json(SignUpResponse) },
       400: { description: "Invalid", ...json(ErrorResponse) },
       409: { description: "Email taken", ...json(ErrorResponse) },
+      429: { description: "Rate limited", ...json(ErrorResponse) },
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/verify-email",
+    request: { query: z.object({ token: z.string() }) },
+    responses: {
+      200: { description: "Verified", ...json(VerifyEmailResponse) },
+      400: { description: "Invalid / expired token", ...json(ErrorResponse) },
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/verify-email",
+    request: { body: json(ResendVerificationRequest) },
+    responses: {
+      200: { description: "Resent (if applicable)", ...json(OkResponse) },
+      400: { description: "Invalid", ...json(ErrorResponse) },
+      429: { description: "Rate limited", ...json(ErrorResponse) },
+      500: { description: "Send failed", ...json(ErrorResponse) },
+      503: { description: "Email not configured", ...json(ErrorResponse) },
     },
   });
 

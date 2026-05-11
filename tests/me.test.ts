@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
-import { db, users } from "@/db";
+import { db, emailVerifications, users } from "@/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
 
 const sessionMock = vi.hoisted(() => ({ value: null as { user?: { id: string } } | null }));
@@ -22,9 +22,14 @@ function jsonReq(body: unknown) {
 
 beforeEach(async () => {
   const passwordHash = await hashPassword("hunter2hunter");
-  await db
-    .insert(users)
-    .values({ id: "u1", email: "alex@example.com", name: "Alex", passwordHash });
+  await db.insert(users).values({
+    id: "u1",
+    email: "alex@example.com",
+    name: "Alex",
+    passwordHash,
+    emailVerifiedAt: new Date(),
+    passwordVersion: 3,
+  });
   sessionMock.value = { user: { id: "u1" } };
 });
 
@@ -49,6 +54,35 @@ describe("PATCH /api/me", () => {
     expect(res.status).toBe(200);
     const found = await db.select().from(users).where(eq(users.id, "u1"));
     expect(found[0].email).toBe("alex2@example.com");
+  });
+
+  it("resets verification and bumps passwordVersion when the email changes", async () => {
+    const res = await PATCH(
+      jsonReq({ email: "alex2@example.com", currentPassword: "hunter2hunter" }),
+    );
+    expect(res.status).toBe(200);
+    const found = await db.select().from(users).where(eq(users.id, "u1"));
+    expect(found[0].emailVerifiedAt).toBeNull();
+    expect(found[0].passwordVersion).toBe(4);
+    const tokens = await db
+      .select()
+      .from(emailVerifications)
+      .where(eq(emailVerifications.userId, "u1"));
+    expect(tokens).toHaveLength(1);
+    expect(tokens[0].usedAt).toBeNull();
+  });
+
+  it("leaves verification intact when only the name changes", async () => {
+    const res = await PATCH(jsonReq({ name: "Alexander" }));
+    expect(res.status).toBe(200);
+    const found = await db.select().from(users).where(eq(users.id, "u1"));
+    expect(found[0].emailVerifiedAt).not.toBeNull();
+    expect(found[0].passwordVersion).toBe(3);
+    const tokens = await db
+      .select()
+      .from(emailVerifications)
+      .where(eq(emailVerifications.userId, "u1"));
+    expect(tokens).toHaveLength(0);
   });
 
   it("rejects email change to one already in use", async () => {

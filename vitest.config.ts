@@ -13,6 +13,7 @@ export default defineConfig({
     env: {
       DATABASE_URL: process.env.CI ? ":memory:" : "file:test.db",
       AUTH_SECRET: "test-secret-not-real-just-for-vitest",
+      E2E_BYPASS_RATE_LIMIT: "1",
     },
     include: ["tests/**/*.test.ts"],
     fileParallelism: false,

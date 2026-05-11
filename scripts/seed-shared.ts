@@ -47,6 +47,7 @@ export async function seedDemoData(opts: { password: string }): Promise<SeedResu
       email: u.email,
       name: u.name,
       passwordHash: await hashPassword(u.password),
+      emailVerifiedAt: new Date(),
       notifyDigest: u.email === "alex@pantry.local" ? "weekly" : "off",
     });
     userIdByEmail.set(u.email, id);
@@ -174,8 +175,6 @@ export async function seedDemoData(opts: { password: string }): Promise<SeedResu
     { id: randomUUID(), roomId: "maya-pantry", userId: alexId, role: "editor", invitedBy: mayaId },
   ]);
 
-  // Per-user room positions - gives each demo user a deterministic order that
-  // includes their shared rooms (instead of relying on owner-set positions).
   const alexRoomOrder = [
     "pantry",
     "basement",

@@ -6,8 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
 import { safeNext } from "@/lib/safe-next";
 
@@ -23,22 +22,25 @@ const DEV_DEFAULTS: SignInValues =
     ? { email: "alex@pantry.local", password: "password123" }
     : { email: "", password: "" };
 
+type SignInError = { kind: "credentials" } | { kind: "rate_limit" };
+
 export function SignInForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = safeNext(params.get("next"));
-  const [serverError, setServerError] = useState<string | null>(null);
+  const presetEmail = params.get("email") ?? "";
+  const [signInError, setSignInError] = useState<SignInError | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignInValues>({
     resolver: zodResolver(SignInSchema),
-    defaultValues: DEV_DEFAULTS,
+    defaultValues: presetEmail ? { email: presetEmail, password: "" } : DEV_DEFAULTS,
   });
 
   async function onSubmit(values: SignInValues) {
-    setServerError(null);
+    setSignInError(null);
     const res = await signIn("credentials", {
       email: values.email,
       password: values.password,
@@ -46,9 +48,9 @@ export function SignInForm() {
     });
     if (res?.error) {
       if (res.code === "too_many_attempts") {
-        setServerError("Too many attempts. Try again in a few minutes.");
+        setSignInError({ kind: "rate_limit" });
       } else {
-        setServerError("That email and password don't match. Try again.");
+        setSignInError({ kind: "credentials" });
       }
       return;
     }
@@ -76,18 +78,19 @@ export function SignInForm() {
           </div>
         )}
       </div>
-      {serverError && (
+      {signInError?.kind === "credentials" && (
         <div className="rounded-md border border-tomato-2 bg-tomato-3 px-3.5 py-2.5 font-display text-sm text-tomato-2">
-          {serverError}
+          That email and password don't match. Try again.
         </div>
       )}
-      <button
-        type="submit"
-        className={cn(button({ variant: "primary", size: "lg" }), "w-full")}
-        disabled={isSubmitting}
-      >
+      {signInError?.kind === "rate_limit" && (
+        <div className="rounded-md border border-tomato-2 bg-tomato-3 px-3.5 py-2.5 font-display text-sm text-tomato-2">
+          Too many attempts. Try again in a few minutes.
+        </div>
+      )}
+      <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Signing in…" : "Sign in"}
-      </button>
+      </Button>
     </form>
   );
 }

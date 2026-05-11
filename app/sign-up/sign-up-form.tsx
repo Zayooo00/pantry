@@ -1,13 +1,11 @@
-﻿"use client";
+"use client";
 
-import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { TextInput } from "@/components/text-input";
 import { useMutation } from "@/lib/api/client";
 import { safeNext } from "@/lib/safe-next";
@@ -23,8 +21,9 @@ type SignUpValues = z.infer<typeof SignUpSchema>;
 export function SignUpForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = safeNext(params.get("next"));
   const presetEmail = params.get("email") ?? "";
+  const inviteToken = params.get("inviteToken") ?? undefined;
+  const next = safeNext(params.get("next"));
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
@@ -39,23 +38,23 @@ export function SignUpForm() {
 
   async function onSubmit(values: SignUpValues) {
     setServerError(null);
+    let res: { verified?: boolean; emailSent?: boolean } | undefined;
     try {
-      await trigger({ body: values });
+      res = (await trigger({ body: { ...values, inviteToken } })) as {
+        verified?: boolean;
+        emailSent?: boolean;
+      };
     } catch (err) {
       setServerError(err instanceof Error ? err.message : "Could not create account.");
       return;
     }
-    const signed = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
-    if (signed?.error) {
-      setServerError("Account created, but sign-in failed. Try logging in.");
+    const nextQuery = next === "/dashboard" ? "" : `&next=${encodeURIComponent(next)}`;
+    if (res?.verified) {
+      router.push(`/sign-in?email=${encodeURIComponent(values.email)}${nextQuery}`);
       return;
     }
-    router.push(next);
-    router.refresh();
+    const sent = res?.emailSent ? "1" : "0";
+    router.push(`/verify-email?email=${encodeURIComponent(values.email)}&sent=${sent}${nextQuery}`);
   }
 
   return (
@@ -102,13 +101,9 @@ export function SignUpForm() {
           {serverError}
         </div>
       )}
-      <button
-        type="submit"
-        className={cn(button({ variant: "primary", size: "lg" }), "w-full")}
-        disabled={isSubmitting}
-      >
+      <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Creating…" : "Create account"}
-      </button>
+      </Button>
     </form>
   );
 }

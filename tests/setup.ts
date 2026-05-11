@@ -14,6 +14,7 @@ import {
   notifications,
   passwordResets,
   pendingInvites,
+  emailVerifications,
 } from "@/db";
 import * as schema from "@/db/schema";
 import { applySchemaToSqlite } from "./schema-sync";
@@ -45,6 +46,7 @@ beforeEach(async () => {
   await db.delete(roomMembers);
   await db.delete(rooms);
   await db.delete(passwordResets);
+  await db.delete(emailVerifications);
   await db.delete(users);
 });
 

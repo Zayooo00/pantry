@@ -14,12 +14,16 @@ export const authConfig = {
         path.startsWith("/sign-up") ||
         path.startsWith("/forgot-password") ||
         path.startsWith("/reset-password") ||
+        path.startsWith("/verify-email") ||
         path.startsWith("/invite") ||
         path.startsWith("/api/auth") ||
         path.startsWith("/api/sign-up") ||
         path.startsWith("/api/password-reset") ||
+        path.startsWith("/api/verify-email") ||
         path.startsWith("/api/invites") ||
         path.startsWith("/api/cron");
+      const emailVerified =
+        (auth?.user as { emailVerified?: boolean } | undefined)?.emailVerified ?? false;
       if (isPublic) {
         const isAuthGate =
           path === "/" ||
@@ -29,11 +33,22 @@ export const authConfig = {
           path.startsWith("/forgot-password") ||
           path.startsWith("/reset-password");
         if (isLoggedIn && isAuthGate) {
-          return Response.redirect(new URL("/dashboard", nextUrl));
+          const dest = emailVerified ? "/dashboard" : "/verify-email";
+          return Response.redirect(new URL(dest, nextUrl));
         }
         return true;
       }
-      return isLoggedIn;
+      if (!isLoggedIn) {
+        return false;
+      }
+      if (!emailVerified) {
+        const url = new URL("/verify-email", nextUrl);
+        if (auth?.user?.email) {
+          url.searchParams.set("email", auth.user.email);
+        }
+        return Response.redirect(url);
+      }
+      return true;
     },
   },
   session: { strategy: "jwt" },

@@ -5,6 +5,8 @@ import { auth } from "@/auth";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { PatchMeRequest } from "@/lib/api/schemas";
 import { readJsonOr400 } from "@/lib/json";
+import { isEmailConfigured } from "@/lib/email";
+import { issueVerificationToken, sendVerificationEmail } from "@/lib/verify-email";
 
 export const dynamic = "force-dynamic";
 
@@ -55,10 +57,12 @@ export async function PATCH(req: NextRequest) {
       );
     }
     update.email = email;
+    update.emailVerifiedAt = null;
+    update.passwordVersion = (me[0].passwordVersion ?? 1) + 1;
   }
   if (wantsPasswordChange) {
     update.passwordHash = await hashPassword(parsed.data.newPassword!);
-    update.passwordVersion = (me[0].passwordVersion ?? 1) + 1;
+    update.passwordVersion = (update.passwordVersion ?? me[0].passwordVersion ?? 1) + 1;
   }
   if (parsed.data.notifyDigest) {
     update.notifyDigest = parsed.data.notifyDigest;
@@ -67,5 +71,18 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
   await db.update(users).set(update).where(eq(users.id, me[0].id));
-  return NextResponse.json({ ok: true });
+
+  let emailVerificationSent = false;
+  if (wantsEmailChange) {
+    const token = await issueVerificationToken(me[0].id);
+    if (isEmailConfigured()) {
+      const sent = await sendVerificationEmail({
+        to: parsed.data.email!,
+        name: (update.name as string | undefined) ?? me[0].name,
+        token,
+      });
+      emailVerificationSent = sent.ok;
+    }
+  }
+  return NextResponse.json({ ok: true, emailVerificationSent });
 }

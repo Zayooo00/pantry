@@ -7,6 +7,7 @@ export const users = sqliteTable("users", {
   name: text("name").notNull(),
   passwordHash: text("password_hash").notNull(),
   passwordVersion: integer("password_version").notNull().default(1),
+  emailVerifiedAt: integer("email_verified_at", { mode: "timestamp" }),
   notifyDigest: text("notify_digest").notNull().default("off"),
   lastDigestSentAt: integer("last_digest_sent_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" })
@@ -34,6 +35,22 @@ export const passwordResets = sqliteTable("password_resets", {
 
 export type PasswordReset = typeof passwordResets.$inferSelect;
 export type PasswordResetInsert = typeof passwordResets.$inferInsert;
+
+export const emailVerifications = sqliteTable("email_verifications", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  usedAt: integer("used_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+export type EmailVerification = typeof emailVerifications.$inferSelect;
+export type EmailVerificationInsert = typeof emailVerifications.$inferInsert;
 
 export const pendingInvites = sqliteTable(
   "pending_invites",

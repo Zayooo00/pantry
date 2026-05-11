@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
+import { Button } from "@/components/button";
 import { invalidateApi } from "@/lib/api/client";
 
 type InviteState =
@@ -92,12 +91,9 @@ export function InviteClient({ token }: { token: string }) {
     return (
       <div className="w-full max-w-md rounded-xl border border-tomato-2 bg-tomato-3 p-8 text-center">
         <div className="font-display text-2xl text-tomato-2">{state.message}</div>
-        <Link
-          href="/dashboard"
-          className={cn(button({ variant: "secondary" }), "mt-6 inline-block")}
-        >
-          Back to Pantry
-        </Link>
+        <Button asChild variant="secondary" className="mt-6 inline-block">
+          <Link href="/dashboard">Back to Pantry</Link>
+        </Button>
       </div>
     );
   }
@@ -140,18 +136,16 @@ export function InviteClient({ token }: { token: string }) {
                 You'll need a Pantry account first.
               </p>
               <div className="flex flex-wrap gap-2">
-                <Link
-                  href={`/sign-up?email=${encodeURIComponent(invite.email)}&next=${encodeURIComponent(callbackPath)}`}
-                  className={button({ variant: "primary" })}
-                >
-                  Create account
-                </Link>
-                <Link
-                  href={`/sign-in?next=${encodeURIComponent(callbackPath)}`}
-                  className={button({ variant: "secondary" })}
-                >
-                  Sign in
-                </Link>
+                <Button asChild variant="primary">
+                  <Link
+                    href={`/sign-up?email=${encodeURIComponent(invite.email)}&inviteToken=${encodeURIComponent(token)}&next=${encodeURIComponent(callbackPath)}`}
+                  >
+                    Create account
+                  </Link>
+                </Button>
+                <Button asChild variant="secondary">
+                  <Link href={`/sign-in?next=${encodeURIComponent(callbackPath)}`}>Sign in</Link>
+                </Button>
               </div>
             </div>
           )}
@@ -161,25 +155,21 @@ export function InviteClient({ token }: { token: string }) {
               <div className="rounded-md border border-tomato-2 bg-tomato-3 px-3 py-2 font-display text-sm text-tomato-2">
                 You're signed in as {session?.user?.email}, but this invite is for {invite.email}.
               </div>
-              <Link
-                href={`/api/auth/signout?callbackUrl=${encodeURIComponent(`/sign-in?next=${encodeURIComponent(callbackPath)}`)}`}
-                className={cn(button({ variant: "secondary" }), "mt-3 inline-block")}
-              >
-                Sign out & switch
-              </Link>
+              <Button asChild variant="secondary" className="mt-3 inline-block">
+                <Link
+                  href={`/api/auth/signout?callbackUrl=${encodeURIComponent(`/sign-in?next=${encodeURIComponent(callbackPath)}`)}`}
+                >
+                  Sign out & switch
+                </Link>
+              </Button>
             </div>
           )}
 
           {sessionStatus === "authenticated" && !wrongAccount && (
             <div className="mt-6">
-              <button
-                type="button"
-                onClick={accept}
-                disabled={accepting}
-                className={button({ variant: "primary" })}
-              >
+              <Button variant="primary" onClick={accept} disabled={accepting}>
                 {accepting ? "Accepting…" : `Accept & open ${room.name}`}
-              </button>
+              </Button>
               {acceptError && (
                 <div className="mt-3 rounded-md border border-tomato-2 bg-tomato-3 px-3 py-2 font-display text-sm text-tomato-2">
                   {acceptError}

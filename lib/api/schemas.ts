@@ -252,8 +252,25 @@ export const SignUpRequest = z
     email: z.string().trim().toLowerCase().email().max(160),
     name: z.string().min(1).max(80),
     password: z.string().min(8).max(200),
+    inviteToken: z.string().min(1).max(200).optional(),
   })
   .openapi("SignUpRequest");
+
+export const SignUpResponse = z
+  .object({
+    ok: z.literal(true),
+    verified: z.boolean(),
+    emailSent: z.boolean(),
+  })
+  .openapi("SignUpResponse");
+
+export const ResendVerificationRequest = z
+  .object({ email: z.string().trim().toLowerCase().email().max(160) })
+  .openapi("ResendVerificationRequest");
+
+export const VerifyEmailResponse = z
+  .object({ ok: z.literal(true), email: z.string() })
+  .openapi("VerifyEmailResponse");
 
 export const UploadResponse = z.object({ url: z.string() }).openapi("UploadResponse");
 

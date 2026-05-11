@@ -66,7 +66,14 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           email: found[0].email,
           name: found[0].name,
           passwordVersion: found[0].passwordVersion,
-        } as { id: string; email: string; name: string; passwordVersion: number };
+          emailVerified: !!found[0].emailVerifiedAt,
+        } as {
+          id: string;
+          email: string;
+          name: string;
+          passwordVersion: number;
+          emailVerified: boolean;
+        };
       },
     }),
   ],
@@ -78,6 +85,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         token.email = user.email ?? null;
         token.name = user.name ?? null;
         token.passwordVersion = (user as { passwordVersion?: number }).passwordVersion ?? 1;
+        token.emailVerified = (user as { emailVerified?: boolean }).emailVerified ?? false;
         token.lastChecked = Date.now();
         return token;
       }
@@ -110,6 +118,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             email: users.email,
             name: users.name,
             passwordVersion: users.passwordVersion,
+            emailVerifiedAt: users.emailVerifiedAt,
           })
           .from(users)
           .where(eq(users.id, id))
@@ -119,6 +128,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
         token.email = found[0].email;
         token.name = found[0].name;
+        token.emailVerified = !!found[0].emailVerifiedAt;
         token.lastChecked = Date.now();
       }
       return token;
@@ -128,6 +138,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.id = token.id as string;
         session.user.name = (token.name as string) ?? "";
         session.user.email = (token.email as string) ?? "";
+        (session.user as unknown as { emailVerified: boolean }).emailVerified =
+          (token.emailVerified as boolean | undefined) ?? false;
       } else if (session.user) {
         delete (session.user as { id?: string }).id;
       }

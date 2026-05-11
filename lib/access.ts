@@ -135,3 +135,14 @@ export async function getItemRoomId(itemId: string): Promise<string | null> {
     .limit(1);
   return row.length === 0 ? null : row[0].roomId;
 }
+
+export function canAttachPhotoUrl(url: string, userId: string): boolean {
+  if (/^https?:\/\//.test(url)) {
+    return true;
+  }
+  if (url.startsWith("/api/photos/")) {
+    const segs = url.slice("/api/photos/".length).split("/");
+    return segs[0] === "items" && segs[1] === userId;
+  }
+  return false;
+}

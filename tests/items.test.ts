@@ -210,3 +210,92 @@ describe("POST /api/items/[id]/open", () => {
     expect(events[0].userId).toBe("u1");
   });
 });
+
+describe("photoUrl ownership on items", () => {
+  it("POST accepts a photoUrl whose path segment matches the requester", async () => {
+    const res = await createItem(
+      jsonReq("http://l/api/items", "POST", {
+        roomId: "r1",
+        name: "Olive oil",
+        unit: "bottles",
+        count: 1,
+        photoUrl: "/api/photos/items/u1/abc-olive.png",
+      }),
+    );
+    expect(res.status).toBe(200);
+  });
+
+  it("POST accepts external https photoUrls", async () => {
+    const res = await createItem(
+      jsonReq("http://l/api/items", "POST", {
+        roomId: "r1",
+        name: "Olive oil",
+        unit: "bottles",
+        count: 1,
+        photoUrl: "https://world.openfoodfacts.org/images/products/123.jpg",
+      }),
+    );
+    expect(res.status).toBe(200);
+  });
+
+  it("POST rejects a /api/photos URL belonging to another user", async () => {
+    const res = await createItem(
+      jsonReq("http://l/api/items", "POST", {
+        roomId: "r1",
+        name: "Olive oil",
+        unit: "bottles",
+        count: 1,
+        photoUrl: "/api/photos/items/someone-else/abc-olive.png",
+      }),
+    );
+    expect(res.status).toBe(403);
+  });
+
+  it("PATCH allows keeping an existing photoUrl that was uploaded by someone else", async () => {
+    await db
+      .insert(users)
+      .values({ id: "u2", email: "b@example.com", name: "B", passwordHash: "x" });
+    await db.insert(rooms).values({ id: "r2", ownerId: "u2", name: "Shared", glyph: "🥫" });
+    await db.insert(roomMembers).values({
+      id: "m1",
+      roomId: "r2",
+      userId: "u1",
+      role: "editor",
+      invitedBy: "u2",
+    });
+    await db.insert(items).values({
+      id: "i1",
+      roomId: "r2",
+      name: "Salt",
+      unit: "g",
+      count: 100,
+      photoUrl: "/api/photos/items/u2/abc-salt.png",
+    });
+    const res = await patchItem(
+      jsonReq("http://l/api/items/i1", "PATCH", {
+        count: 50,
+        photoUrl: "/api/photos/items/u2/abc-salt.png",
+      }),
+      idParams("i1"),
+    );
+    expect(res.status).toBe(200);
+  });
+
+  it("PATCH rejects a swap to a photoUrl the requester didn't upload", async () => {
+    await db.insert(items).values({
+      id: "i1",
+      roomId: "r1",
+      name: "Salt",
+      unit: "g",
+      count: 100,
+      photoUrl: "/api/photos/items/u1/old.png",
+    });
+    const res = await patchItem(
+      jsonReq("http://l/api/items/i1", "PATCH", {
+        photoUrl: "/api/photos/items/someone-else/abc-salt.png",
+      }),
+      idParams("i1"),
+    );
+    expect(res.status).toBe(403);
+  });
+});

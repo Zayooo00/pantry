@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, items, itemEvents } from "@/db";
 import { randomUUID } from "node:crypto";
 import { auth } from "@/auth";
-import { canEditRoom } from "@/lib/access";
+import { canAttachPhotoUrl, canEditRoom } from "@/lib/access";
 import { CreateItemRequest } from "@/lib/api/schemas";
 import { readJsonOr400 } from "@/lib/json";
 
@@ -23,6 +23,12 @@ export async function POST(req: NextRequest) {
   }
   if (!(await canEditRoom(session.user.id, parsed.data.roomId))) {
     return NextResponse.json({ error: "You can't add items to that room." }, { status: 403 });
+  }
+  if (parsed.data.photoUrl && !canAttachPhotoUrl(parsed.data.photoUrl, session.user.id)) {
+    return NextResponse.json(
+      { error: "You can only attach photos you uploaded." },
+      { status: 403 },
+    );
   }
   const id = randomUUID();
   await db.insert(items).values({

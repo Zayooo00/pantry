@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, itemEvents, items, notifications, shoppingItems } from "@/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
-import { canEditRoom, getItemRoomId } from "@/lib/access";
+import { canAttachPhotoUrl, canEditRoom, getItemRoomId } from "@/lib/access";
 import { getItem, maybeNotifyThresholdCross, recordCountChange } from "@/lib/queries";
 import { PatchItemRequest } from "@/lib/api/schemas";
 import { readJsonOr400 } from "@/lib/json";
@@ -35,6 +35,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!(await canEditRoom(session.user.id, data.roomId))) {
       return NextResponse.json({ error: "You can't move items to that room." }, { status: 403 });
     }
+  }
+  if (
+    data.photoUrl &&
+    data.photoUrl !== before.photoUrl &&
+    !canAttachPhotoUrl(data.photoUrl, session.user.id)
+  ) {
+    return NextResponse.json(
+      { error: "You can only attach photos you uploaded." },
+      { status: 403 },
+    );
   }
   await db
     .update(items)

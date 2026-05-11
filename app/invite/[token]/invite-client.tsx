@@ -19,7 +19,7 @@ type InviteState =
 
 export function InviteClient({ token }: { token: string }) {
   const router = useRouter();
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: session, status: sessionStatus, update: updateSession } = useSession();
   const [state, setState] = useState<InviteState>({ status: "loading" });
   const [accepting, setAccepting] = useState(false);
   const [acceptError, setAcceptError] = useState<string | null>(null);
@@ -77,6 +77,7 @@ export function InviteClient({ token }: { token: string }) {
       setAccepting(false);
       return;
     }
+    await updateSession();
     router.push(`/rooms/${json.roomId}`);
     void invalidateApi("/api/sidebar");
   }

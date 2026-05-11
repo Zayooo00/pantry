@@ -359,10 +359,7 @@ describe("POST /api/invites/[token] (accept)", () => {
     expect(members[0].userId).toBe("u2");
     expect(members[0].role).toBe("editor");
 
-    const updatedInvite = await db
-      .select()
-      .from(pendingInvites)
-      .where(eq(pendingInvites.id, "p1"));
+    const updatedInvite = await db.select().from(pendingInvites).where(eq(pendingInvites.id, "p1"));
     expect(updatedInvite[0].acceptedAt).not.toBeNull();
 
     const inviterNotes = await db

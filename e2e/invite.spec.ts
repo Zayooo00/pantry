@@ -56,9 +56,7 @@ test("invite + accept: registered invitee gets a notification, can accept, invit
     await expect(noraPage.locator("aside").getByRole("link", { name: /Pantry/ })).toBeVisible();
 
     await alexPage.goto("/notifications");
-    await expect(
-      alexPage.getByText(new RegExp(`${NORA.name} joined Pantry`, "i")),
-    ).toBeVisible();
+    await expect(alexPage.getByText(new RegExp(`${NORA.name} joined Pantry`, "i"))).toBeVisible();
   } finally {
     await removeNoraIfPresent(alexPage.request).catch(() => undefined);
     await alexCtx.close();

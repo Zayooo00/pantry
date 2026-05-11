@@ -10,9 +10,9 @@ import { Select } from "@/components/select";
 import { useToast } from "@/components/toast";
 import { PhotoUpload } from "@/components/photo-upload";
 import { cn } from "@/lib/cn";
-import { badge } from "@/components/badge";
-import { button } from "@/components/button";
-import { chip } from "@/components/chip";
+import { Badge } from "@/components/badge";
+import { Button } from "@/components/button";
+import { Chip } from "@/components/chip";
 import { TextArea, TextInput } from "@/components/text-input";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 import { formatCount } from "@/lib/format";
@@ -207,24 +207,15 @@ export function AddItemForm({
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className={button({ variant: "ghost" })}
-          >
+          <Button variant="ghost" onClick={() => router.back()}>
             Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onSubmitAndStay}
-            disabled={isSubmitting}
-            className={button({ variant: "secondary" })}
-          >
+          </Button>
+          <Button variant="secondary" onClick={onSubmitAndStay} disabled={isSubmitting}>
             Save &amp; add another
-          </button>
-          <button type="submit" disabled={isSubmitting} className={button({ variant: "primary" })}>
+          </Button>
+          <Button type="submit" variant="primary" disabled={isSubmitting}>
             {isSubmitting ? "Saving…" : "Save item"}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -238,8 +229,8 @@ export function AddItemForm({
           </div>
         </div>
         <div className="flex justify-end gap-2">
-          <button
-            type="button"
+          <Button
+            variant="olive"
             onClick={() => {
               const el = document.getElementById("barcode-field");
               if (el) {
@@ -247,10 +238,9 @@ export function AddItemForm({
                 (el as HTMLInputElement).focus();
               }
             }}
-            className={button({ variant: "olive" })}
           >
             ▣ Type barcode
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -289,14 +279,9 @@ export function AddItemForm({
                 <label className="field-label">Tags</label>
                 <div className="flex flex-wrap gap-2">
                   {values.tags.map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      className={chip({ active: true })}
-                      onClick={() => removeTag(t)}
-                    >
+                    <Chip key={t} active onClick={() => removeTag(t)}>
                       {t} ✕
-                    </button>
+                    </Chip>
                   ))}
                   <input
                     value={tagInput}
@@ -486,15 +471,15 @@ export function AddItemForm({
                 <em className="text-md text-ink-3 italic">{values.unit}</em>
               </div>
               {isLow ? (
-                <span className={badge({ tone: "low" })}>
-                  <i className={"inline-block h-1.5 w-1.5 rounded-full bg-tomato"} />
+                <Badge tone="low">
+                  <i className="inline-block h-1.5 w-1.5 rounded-full bg-tomato" />
                   LOW
-                </span>
+                </Badge>
               ) : (
-                <span className={badge({ tone: "ok" })}>
-                  <i className={"inline-block h-1.5 w-1.5 rounded-full bg-olive"} />
+                <Badge tone="ok">
+                  <i className="inline-block h-1.5 w-1.5 rounded-full bg-olive" />
                   OK
-                </span>
+                </Badge>
               )}
             </div>
             <div className={cn("caption", "mt-4")}>SAVED ITEMS APPEAR IMMEDIATELY IN THE ROOM.</div>

@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { Button } from "@/components/button";
 import { cn } from "@/lib/cn";
-import { button } from "@/components/button";
 
 export function PhotoUpload({
   value,
@@ -62,13 +62,7 @@ export function PhotoUpload({
 
   return (
     <div className="flex flex-col gap-3">
-      <input
-        ref={galleryRef}
-        type="file"
-        accept="image/*"
-        onChange={onFile}
-        className="hidden"
-      />
+      <input ref={galleryRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
       <input
         ref={cameraRef}
         type="file"
@@ -91,55 +85,49 @@ export function PhotoUpload({
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
-              <button
-                type="button"
-                className={button({ variant: "ghost", size: "sm" })}
-                onClick={() => galleryRef.current?.click()}
-                disabled={uploading}
-              >
-                {uploading ? "Uploading…" : "Replace from files"}
-              </button>
-              <button
-                type="button"
-                className={cn(button({ variant: "ghost", size: "sm" }), "md:hidden")}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
                 onClick={() => cameraRef.current?.click()}
                 disabled={uploading}
               >
                 Take photo
-              </button>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => galleryRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? "Uploading…" : "Replace from files"}
+              </Button>
             </div>
-            <button
-              type="button"
-              className={button({ variant: "ghost", size: "sm" })}
-              onClick={remove}
-              disabled={uploading}
-            >
+            <Button variant="ghost" size="sm" onClick={remove} disabled={uploading}>
               Remove photo
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => galleryRef.current?.click()}
-            disabled={uploading}
-            className={cn(button({ variant: "secondary", size: "sm" }), uploading && "opacity-60")}
-          >
-            {uploading ? "Uploading…" : "Choose photo"}
-          </button>
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
+            className={cn("md:hidden", uploading && "opacity-60")}
             onClick={() => cameraRef.current?.click()}
             disabled={uploading}
-            className={cn(
-              button({ variant: "secondary", size: "sm" }),
-              "md:hidden",
-              uploading && "opacity-60",
-            )}
           >
             Take photo
-          </button>
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            className={cn(uploading && "opacity-60")}
+            onClick={() => galleryRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? "Uploading…" : "Choose photo"}
+          </Button>
           <span className="font-mono text-xs tracking-mono text-ink-4 uppercase">
             JPG / PNG / WEBP · UP TO 5MB
           </span>

@@ -8,8 +8,8 @@ import { ItemActions, MarkOpenedButton } from "./item-actions";
 import { getItem, getItemEvents, getRoomsWithCounts } from "@/lib/queries";
 import { formatCount, formatDate, formatEventKind, itemStatus, shortLabel } from "@/lib/format";
 import { cn } from "@/lib/cn";
-import { badge } from "@/components/badge";
-import { stamp } from "@/components/stamp";
+import { Badge } from "@/components/badge";
+import { Stamp } from "@/components/stamp";
 import { SectionTitle } from "@/components/section-title";
 
 export const dynamic = "force-dynamic";
@@ -101,7 +101,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             )}
             {isLow && (
               <div className="absolute top-4 left-4">
-                <span className={stamp({ tone: "tomato" })}>RESTOCK</span>
+                <Stamp tone="tomato">RESTOCK</Stamp>
               </div>
             )}
             {item.barcode && (
@@ -142,9 +142,9 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
               {tags.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-3">
                   {tags.map((t) => (
-                    <span key={t} className={badge({ tone: "tag" })}>
+                    <Badge key={t} tone="tag">
                       {t.toUpperCase()}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               )}

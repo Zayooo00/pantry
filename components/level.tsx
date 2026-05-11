@@ -1,31 +1,19 @@
 import { forwardRef } from "react";
-import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
-const levelStyles = cva("relative h-1.5 overflow-hidden rounded-full bg-paper-3", {
-  variants: {
-    tone: {
-      ok: "",
-      low: "",
-      soon: "",
-    },
-  },
-  defaultVariants: {
-    tone: "ok",
-  },
-});
+type Tone = "ok" | "low" | "soon";
 
-const fillTone = {
+const fillTone: Record<Tone, string> = {
   ok: "bg-olive",
   low: "bg-tomato",
   soon: "bg-amber-pantry",
-} as const;
+};
 
-type LevelProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> &
-  VariantProps<typeof levelStyles> & {
-    value: number;
-    fillClassName?: string;
-  };
+type LevelProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  tone?: Tone;
+  value: number;
+  fillClassName?: string;
+};
 
 export const Level = forwardRef<HTMLDivElement, LevelProps>(function Level(
   { tone = "ok", value, className, fillClassName, ...rest },
@@ -33,11 +21,15 @@ export const Level = forwardRef<HTMLDivElement, LevelProps>(function Level(
 ) {
   const pct = Math.max(0, Math.min(100, value));
   return (
-    <div ref={ref} className={cn(levelStyles({ tone }), className)} {...rest}>
+    <div
+      ref={ref}
+      className={cn("relative h-1.5 overflow-hidden rounded-full bg-paper-3", className)}
+      {...rest}
+    >
       <i
         className={cn(
           "absolute top-0 bottom-0 left-0 rounded-full",
-          fillClassName ?? fillTone[tone ?? "ok"],
+          fillClassName ?? fillTone[tone],
         )}
         style={{ width: `${pct}%` }}
       />

@@ -120,7 +120,7 @@ export function buildRegistry() {
       body: json(InviteMemberRequest),
     },
     responses: {
-      200: { description: "Invited or pending", ...json(InviteMemberResponse) },
+      200: { description: "Invite created (pending acceptance)", ...json(InviteMemberResponse) },
       400: { description: "Invalid", ...json(ErrorResponse) },
       401: { description: "Unauthorized", ...json(ErrorResponse) },
       403: { description: "Forbidden", ...json(ErrorResponse) },

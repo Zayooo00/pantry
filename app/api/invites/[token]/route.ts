@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
-import { db, pendingInvites, roomMembers, rooms, users } from "@/db";
+import { db, notifications, pendingInvites, roomMembers, rooms, users } from "@/db";
 import { auth } from "@/auth";
 import { appendRoomPosition } from "@/lib/access";
 import { hashToken } from "@/lib/tokens";
@@ -84,5 +84,19 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ to
     .update(pendingInvites)
     .set({ acceptedAt: new Date() })
     .where(eq(pendingInvites.id, invite.id));
+  const room = await db
+    .select({ name: rooms.name })
+    .from(rooms)
+    .where(eq(rooms.id, invite.roomId))
+    .limit(1);
+  await db.insert(notifications).values({
+    id: randomUUID(),
+    userId: invite.invitedBy,
+    kind: "invite_accepted",
+    title: `${session.user.name || invite.email} joined ${room[0]?.name ?? "your room"}`,
+    body: `Role: ${invite.role}.`,
+    link: `/rooms/${invite.roomId}`,
+    roomId: invite.roomId,
+  });
   return NextResponse.json({ ok: true, roomId: invite.roomId });
 }

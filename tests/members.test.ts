@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
-import { db, pendingInvites, rooms, roomMembers, users } from "@/db";
+import { db, notifications, pendingInvites, rooms, roomMembers, users } from "@/db";
+import { hashToken } from "@/lib/tokens";
 
 const sessionMock = vi.hoisted(() => ({
   value: { user: { id: "u1", name: "Owner", email: "owner@example.com" } } as {
@@ -42,6 +43,7 @@ import {
   DELETE as deleteMember,
 } from "@/app/api/rooms/[id]/members/[userId]/route";
 import { GET as getShared } from "@/app/api/me/shared/route";
+import { POST as acceptInvite } from "@/app/api/invites/[token]/route";
 
 function jsonReq(url: string, method: string, body: unknown) {
   return new NextRequest(url, {
@@ -59,6 +61,10 @@ function memberParams(id: string, userId: string) {
   return { params: Promise.resolve({ id, userId }) };
 }
 
+function tokenParams(token: string) {
+  return { params: Promise.resolve({ token }) };
+}
+
 beforeEach(async () => {
   sessionMock.value = { user: { id: "u1", name: "Owner", email: "owner@example.com" } };
   await db.insert(users).values([
@@ -70,7 +76,7 @@ beforeEach(async () => {
 });
 
 describe("POST /api/rooms/[id]/members", () => {
-  it("invites an existing user by email", async () => {
+  it("creates a pending invite + email + in-app notification when invitee is registered", async () => {
     const res = await inviteMember(
       jsonReq("http://l/api/rooms/r1/members", "POST", {
         email: "guest@example.com",
@@ -79,11 +85,46 @@ describe("POST /api/rooms/[id]/members", () => {
       roomParams("r1"),
     );
     expect(res.status).toBe(200);
-    const all = await db.select().from(roomMembers).where(eq(roomMembers.roomId, "r1"));
-    expect(all).toHaveLength(1);
-    expect(all[0].userId).toBe("u2");
-    expect(all[0].role).toBe("viewer");
-    expect(all[0].invitedBy).toBe("u1");
+    const json = await res.json();
+    expect(json.pending).toEqual({
+      email: "guest@example.com",
+      role: "viewer",
+      registered: true,
+    });
+    expect(await db.select().from(roomMembers).where(eq(roomMembers.roomId, "r1"))).toHaveLength(0);
+    const invites = await db
+      .select()
+      .from(pendingInvites)
+      .where(eq(pendingInvites.email, "guest@example.com"));
+    expect(invites).toHaveLength(1);
+    expect(invites[0].role).toBe("viewer");
+    expect(invites[0].acceptedAt).toBeNull();
+    expect(sendMailMock).toHaveBeenCalledTimes(1);
+    expect(sendMailMock.mock.calls[0][0].to).toBe("guest@example.com");
+    const notes = await db.select().from(notifications).where(eq(notifications.userId, "u2"));
+    expect(notes).toHaveLength(1);
+    expect(notes[0].kind).toBe("invite_received");
+    expect(notes[0].link).toMatch(/^\/invite\//);
+    expect(notes[0].roomId).toBe("r1");
+  });
+
+  it("still notifies registered invitees in-app when SMTP isn't configured", async () => {
+    vi.stubEnv("SMTP_USER", "");
+    vi.stubEnv("SMTP_PASS", "");
+    vi.stubEnv("EMAIL_FROM", "");
+    const res = await inviteMember(
+      jsonReq("http://l/api/rooms/r1/members", "POST", {
+        email: "guest@example.com",
+        role: "editor",
+      }),
+      roomParams("r1"),
+    );
+    expect(res.status).toBe(200);
+    expect(sendMailMock).not.toHaveBeenCalled();
+    expect(await db.select().from(pendingInvites)).toHaveLength(1);
+    const notes = await db.select().from(notifications).where(eq(notifications.userId, "u2"));
+    expect(notes).toHaveLength(1);
+    expect(notes[0].kind).toBe("invite_received");
   });
 
   it("creates a pending invite and emails the address when not registered", async () => {
@@ -96,7 +137,11 @@ describe("POST /api/rooms/[id]/members", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.pending).toEqual({ email: "stranger@example.com", role: "editor" });
+    expect(json.pending).toEqual({
+      email: "stranger@example.com",
+      role: "editor",
+      registered: false,
+    });
     const invites = await db
       .select()
       .from(pendingInvites)
@@ -108,9 +153,10 @@ describe("POST /api/rooms/[id]/members", () => {
     expect(invites[0].acceptedAt).toBeNull();
     expect(sendMailMock).toHaveBeenCalledTimes(1);
     expect(sendMailMock.mock.calls[0][0].to).toBe("stranger@example.com");
+    expect(await db.select().from(notifications)).toHaveLength(0);
   });
 
-  it("503s on pending invite when email isn't configured", async () => {
+  it("503s on pending invite when email isn't configured and invitee is unregistered", async () => {
     vi.stubEnv("SMTP_USER", "");
     vi.stubEnv("SMTP_PASS", "");
     vi.stubEnv("EMAIL_FROM", "");
@@ -276,6 +322,101 @@ describe("GET /api/rooms/[id]/members", () => {
       roomParams("r1"),
     );
     expect(res.status).toBe(404);
+  });
+});
+
+describe("POST /api/invites/[token] (accept)", () => {
+  async function seedInvite(opts: {
+    token: string;
+    email: string;
+    role?: "viewer" | "editor";
+    expiresAt?: Date;
+  }) {
+    await db.insert(pendingInvites).values({
+      id: "p1",
+      roomId: "r1",
+      email: opts.email,
+      role: opts.role ?? "viewer",
+      tokenHash: hashToken(opts.token),
+      invitedBy: "u1",
+      expiresAt: opts.expiresAt ?? new Date(Date.now() + 60_000),
+    });
+  }
+
+  it("adds the invitee as a member and notifies the inviter", async () => {
+    await seedInvite({ token: "tok-good", email: "guest@example.com", role: "editor" });
+    sessionMock.value = { user: { id: "u2", name: "Guest", email: "guest@example.com" } };
+    const res = await acceptInvite(
+      new NextRequest("http://l/api/invites/tok-good", { method: "POST" }),
+      tokenParams("tok-good"),
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json).toEqual({ ok: true, roomId: "r1" });
+
+    const members = await db.select().from(roomMembers).where(eq(roomMembers.roomId, "r1"));
+    expect(members).toHaveLength(1);
+    expect(members[0].userId).toBe("u2");
+    expect(members[0].role).toBe("editor");
+
+    const updatedInvite = await db
+      .select()
+      .from(pendingInvites)
+      .where(eq(pendingInvites.id, "p1"));
+    expect(updatedInvite[0].acceptedAt).not.toBeNull();
+
+    const inviterNotes = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, "u1"));
+    expect(inviterNotes).toHaveLength(1);
+    expect(inviterNotes[0].kind).toBe("invite_accepted");
+    expect(inviterNotes[0].link).toBe("/rooms/r1");
+    expect(inviterNotes[0].roomId).toBe("r1");
+    expect(inviterNotes[0].title).toContain("Guest");
+    expect(inviterNotes[0].title).toContain("Pantry");
+  });
+
+  it("rejects when the signed-in account doesn't match the invite email", async () => {
+    await seedInvite({ token: "tok-mismatch", email: "guest@example.com" });
+    sessionMock.value = { user: { id: "u3", name: "Third", email: "third@example.com" } };
+    const res = await acceptInvite(
+      new NextRequest("http://l/api/invites/tok-mismatch", { method: "POST" }),
+      tokenParams("tok-mismatch"),
+    );
+    expect(res.status).toBe(403);
+    expect(await db.select().from(roomMembers)).toHaveLength(0);
+    expect(await db.select().from(notifications)).toHaveLength(0);
+  });
+
+  it("rejects an expired invite", async () => {
+    await seedInvite({
+      token: "tok-old",
+      email: "guest@example.com",
+      expiresAt: new Date(Date.now() - 1000),
+    });
+    sessionMock.value = { user: { id: "u2", name: "Guest", email: "guest@example.com" } };
+    const res = await acceptInvite(
+      new NextRequest("http://l/api/invites/tok-old", { method: "POST" }),
+      tokenParams("tok-old"),
+    );
+    expect(res.status).toBe(410);
+    expect(await db.select().from(roomMembers)).toHaveLength(0);
+  });
+
+  it("rejects a re-accept attempt", async () => {
+    await seedInvite({ token: "tok-twice", email: "guest@example.com" });
+    sessionMock.value = { user: { id: "u2", name: "Guest", email: "guest@example.com" } };
+    const first = await acceptInvite(
+      new NextRequest("http://l/api/invites/tok-twice", { method: "POST" }),
+      tokenParams("tok-twice"),
+    );
+    expect(first.status).toBe(200);
+    const second = await acceptInvite(
+      new NextRequest("http://l/api/invites/tok-twice", { method: "POST" }),
+      tokenParams("tok-twice"),
+    );
+    expect(second.status).toBe(409);
   });
 });
 

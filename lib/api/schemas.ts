@@ -82,28 +82,14 @@ export const InviteMemberRequest = z
   })
   .openapi("InviteMemberRequest");
 
-const InviteMemberAdded = z
-  .object({
-    member: z.object({
-      userId: z.string(),
-      name: z.string(),
-      email: z.string(),
-      role: MemberRole,
-    }),
-  })
-  .openapi("InviteMemberAdded");
-
-const InviteMemberPending = z
+export const InviteMemberResponse = z
   .object({
     pending: z.object({
       email: z.string(),
       role: MemberRole,
+      registered: z.boolean(),
     }),
   })
-  .openapi("InviteMemberPending");
-
-export const InviteMemberResponse = z
-  .union([InviteMemberAdded, InviteMemberPending])
   .openapi("InviteMemberResponse");
 
 export const PatchMemberRequest = z.object({ role: MemberRole }).openapi("PatchMemberRequest");

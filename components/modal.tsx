@@ -46,7 +46,7 @@ export function Modal({
       className="pantry-modal w-[95vw]"
       style={{ maxWidth: width }}
     >
-      <div className="flex max-h-[92vh] flex-col overflow-hidden rounded-lg border border-ink-1 bg-paper-0 shadow-[0_24px_80px_rgba(0,0,0,0.18),0_4px_0_rgba(0,0,0,0.04)]">
+      <div className="flex max-h-[92dvh] flex-col overflow-hidden rounded-lg border border-ink-1 bg-paper-0 shadow-[0_24px_80px_rgba(0,0,0,0.18),0_4px_0_rgba(0,0,0,0.04)]">
         {title && (
           <div className="flex items-baseline justify-between gap-4 border-b border-paper-3 px-6 py-5">
             <h3 className="m-0 font-display text-xl font-normal tracking-display-sm [&_em]:font-light [&_em]:italic">

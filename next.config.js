@@ -11,6 +11,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "picsum.photos",
       },
+      {
+        protocol: "https",
+        hostname: "images.openfoodfacts.org",
+      },
+      {
+        protocol: "https",
+        hostname: "world.openfoodfacts.org",
+      },
     ],
   },
 };

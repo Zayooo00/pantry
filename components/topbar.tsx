@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { MenuIcon, SearchIcon } from "@/icons";
+import { MenuIcon, ScanIcon, SearchIcon } from "@/icons";
 import { Kbd, useIsMac } from "./kbd";
 import { ThemeToggle } from "./theme";
 import { Button } from "@/components/button";
@@ -70,6 +70,12 @@ export function Topbar({
         </span>
         <span className="hidden h-5 w-px bg-paper-3 lg:inline" />
         <ThemeToggle />
+        <Button asChild variant="secondary" size="sm" aria-label="Scan a barcode">
+          <Link href="/scan">
+            <ScanIcon size={14} />
+            <span className="hidden sm:inline">Scan</span>
+          </Link>
+        </Button>
         <Button asChild variant="primary" size="sm">
           <Link href="/items/new">
             <span className="hidden sm:inline">＋ Add item</span>

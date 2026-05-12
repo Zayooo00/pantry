@@ -14,6 +14,7 @@ import {
   GridIcon,
   HomeIcon,
   ListIcon,
+  ScanIcon,
   SearchIcon,
   SettingsIcon,
   RoomGlyph,
@@ -166,6 +167,14 @@ export function Sidebar({
           >
             <SearchIcon />
             <span>Search</span>
+          </Link>
+          <Link
+            href="/scan"
+            onClick={handleNavClick}
+            className={navItem({ active: isActive("/scan") })}
+          >
+            <ScanIcon />
+            <span>Scan</span>
           </Link>
           <Link
             href="/activity"

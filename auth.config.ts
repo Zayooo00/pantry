@@ -22,7 +22,7 @@ export const authConfig = {
       return session;
     },
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
+      const isLoggedIn = !!auth?.user?.id;
       const path = nextUrl.pathname;
       const isPublic =
         path === "/" ||

@@ -278,4 +278,36 @@ export const NotificationsUnreadCountResponse = z
   .object({ count: z.number() })
   .openapi("NotificationsUnreadCountResponse");
 
+const BarcodeMatch = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    brand: z.string().nullable(),
+    photoUrl: z.string().nullable(),
+    roomId: z.string(),
+    roomName: z.string(),
+    roomGlyph: z.string(),
+    count: z.number(),
+    unit: z.string(),
+    openedAt: z.string().nullable(),
+  })
+  .openapi("BarcodeMatch");
+
+const BarcodeOffProduct = z
+  .object({
+    name: z.string(),
+    brand: z.string().nullable(),
+    imageUrl: z.string().nullable(),
+    quantity: z.string().nullable(),
+  })
+  .openapi("BarcodeOffProduct");
+
+export const BarcodeLookupResponse = z
+  .object({
+    code: z.string(),
+    match: BarcodeMatch.nullable(),
+    off: BarcodeOffProduct.nullable(),
+  })
+  .openapi("BarcodeLookupResponse");
+
 export const ErrorResponse = z.object({ error: z.unknown() }).openapi("ErrorResponse");

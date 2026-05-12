@@ -28,6 +28,7 @@ import {
   ResendVerificationRequest,
   VerifyEmailResponse,
   UploadResponse,
+  BarcodeLookupResponse,
 } from "./schemas";
 
 export function buildRegistry() {
@@ -328,8 +329,18 @@ export function buildRegistry() {
       200: { description: "Resent (if applicable)", ...json(OkResponse) },
       400: { description: "Invalid", ...json(ErrorResponse) },
       429: { description: "Rate limited", ...json(ErrorResponse) },
-      500: { description: "Send failed", ...json(ErrorResponse) },
       503: { description: "Email not configured", ...json(ErrorResponse) },
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/barcode/{code}",
+    request: { params: z.object({ code: z.string() }) },
+    responses: {
+      200: { description: "Barcode lookup", ...json(BarcodeLookupResponse) },
+      400: { description: "Invalid", ...json(ErrorResponse) },
+      401: { description: "Unauthorized", ...json(ErrorResponse) },
     },
   });
 

@@ -2,6 +2,18 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
+
+const sendMailMock = vi.hoisted(() =>
+  vi.fn<(opts: { to?: string | string[] }) => Promise<{ messageId: string }>>(async () => ({
+    messageId: "msg_1",
+  })),
+);
+
+vi.mock("nodemailer", () => ({
+  default: { createTransport: () => ({ sendMail: sendMailMock }) },
+  createTransport: () => ({ sendMail: sendMailMock }),
+}));
+
 import { GET, POST } from "@/app/api/verify-email/route";
 import { db, users, emailVerifications } from "@/db";
 import { generateToken, hashToken } from "@/lib/tokens";
@@ -114,17 +126,24 @@ describe("POST /api/verify-email (resend)", () => {
     expect(res.status).toBe(400);
   });
 
-  it("returns ok without leaking unknown emails", async () => {
-    const res = await POST(postReq({ email: "nobody@example.com" }));
-    expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ ok: true, sent: false });
+  it("returns the same body for unknown emails, verified users, and pending users", async () => {
+    await createUser({ email: "done@example.com", verified: true });
+    const unknown = await POST(postReq({ email: "nobody@example.com" }));
+    const verified = await POST(postReq({ email: "done@example.com" }));
+    expect(unknown.status).toBe(200);
+    expect(verified.status).toBe(200);
+    const unknownBody = await unknown.json();
+    const verifiedBody = await verified.json();
+    expect(unknownBody).toEqual({ ok: true });
+    expect(verifiedBody).toEqual({ ok: true });
+    expect(unknownBody).toEqual(verifiedBody);
   });
 
-  it("returns ok (sent:false) when the user is already verified", async () => {
-    await createUser({ email: "done@example.com", verified: true });
-    const res = await POST(postReq({ email: "done@example.com" }));
+  it("returns ok immediately for an unverified user (send is deferred)", async () => {
+    await createUser({ email: "pending@example.com" });
+    const res = await POST(postReq({ email: "pending@example.com" }));
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({ ok: true, sent: false });
+    expect(await res.json()).toEqual({ ok: true });
   });
 
   it("503s when SMTP isn't configured, regardless of whether the email exists", async () => {

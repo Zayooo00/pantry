@@ -44,6 +44,22 @@ export default defineConfig({
       APP_URL: BASE_URL,
       E2E_BYPASS_RATE_LIMIT: "1",
       E2E_BLOB_LOCAL: "1",
+      E2E_OFF_FIXTURES: JSON.stringify({
+        "8014203778124": null,
+        "0000000000017": {
+          name: "Mock olive oil",
+          brand: "Mock Brand",
+          imageUrl: "https://images.openfoodfacts.org/mock.jpg",
+          quantity: "500 ml",
+        },
+        "0000000000024": null,
+        "0000000000031": {
+          name: "Mock pasta",
+          brand: "Mock Co",
+          imageUrl: "https://images.openfoodfacts.org/mock.jpg",
+          quantity: "500 g",
+        },
+      }),
     },
   },
 });

@@ -16,13 +16,63 @@ export async function applySchemaToSqlite(
   db: LibSQLDatabase<Record<string, unknown>>,
 ): Promise<void> {
   const tables = Object.values(schema).filter((t): t is SQLiteTable => is(t, SQLiteTable));
-  for (const table of tables) {
+  const sorted = topologicalSort(tables);
+  for (const table of sorted) {
     const ddl = createTableSql(table);
     await db.run(sql.raw(ddl));
     for (const indexDdl of createIndexSqls(table)) {
       await db.run(sql.raw(indexDdl));
     }
   }
+}
+
+function topologicalSort(tables: SQLiteTable[]): SQLiteTable[] {
+  const nameToTable = new Map<string, SQLiteTable>();
+  const nameToForeignTables = new Map<string, Set<string>>();
+
+  for (const table of tables) {
+    const cfg = getTableConfig(table);
+    nameToTable.set(cfg.name, table);
+    const deps = new Set<string>();
+    for (const fk of cfg.foreignKeys) {
+      const ref = fk.reference();
+      const foreignTable = getTableConfig(ref.foreignTable).name;
+      deps.add(foreignTable);
+    }
+    nameToForeignTables.set(cfg.name, deps);
+  }
+
+  const sorted: SQLiteTable[] = [];
+  const visited = new Set<string>();
+  const visiting = new Set<string>();
+
+  function visit(name: string) {
+    if (visited.has(name)) {
+      return;
+    }
+    if (visiting.has(name)) {
+      return;
+    }
+    visiting.add(name);
+    const deps = nameToForeignTables.get(name) || new Set();
+    for (const dep of deps) {
+      if (nameToTable.has(dep)) {
+        visit(dep);
+      }
+    }
+    visiting.delete(name);
+    visited.add(name);
+    const table = nameToTable.get(name);
+    if (table) {
+      sorted.push(table);
+    }
+  }
+
+  for (const name of nameToTable.keys()) {
+    visit(name);
+  }
+
+  return sorted;
 }
 
 function createTableSql(table: SQLiteTable): string {

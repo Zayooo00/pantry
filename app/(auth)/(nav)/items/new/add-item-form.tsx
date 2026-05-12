@@ -147,7 +147,7 @@ export function AddItemForm({
   const values = watch();
   const { trigger: triggerCreate } = useMutation("post", "/api/items");
 
-  async function runLookup(rawCode: string, { autoApplyOff = false } = {}) {
+  async function runLookup(rawCode: string, { autoApplyOff = false, fromScanner = false } = {}) {
     const code = rawCode.replace(/\D/g, "");
     if (!/^\d{8,14}$/.test(code)) {
       setLookup(null);
@@ -167,7 +167,9 @@ export function AddItemForm({
       const data = (await res.json()) as BarcodeLookup;
       setLookup(data);
       if (autoApplyOff && data.off && !data.match) {
-        applyOffPrefill(data.off);
+        applyOffPrefill(data.off, { silent: true });
+      } else if (fromScanner && data.match) {
+        setScannerOpen(false);
       }
     } catch {
       setLookupError("Lookup failed.");
@@ -176,7 +178,7 @@ export function AddItemForm({
     }
   }
 
-  function applyOffPrefill(off: NonNullable<BarcodeLookup["off"]>) {
+  function applyOffPrefill(off: NonNullable<BarcodeLookup["off"]>, { silent = false } = {}) {
     if (!values.name && off.name) {
       setValue("name", off.name, { shouldDirty: true });
     }
@@ -187,13 +189,17 @@ export function AddItemForm({
       setValue("photoUrl", off.imageUrl, { shouldDirty: true });
     }
     setLookup(null);
-    toast(<>Filled from Open Food Facts.</>);
+    if (!silent) {
+      setScannerOpen(false);
+    }
+    if (!silent) {
+      toast(<>Filled from Open Food Facts.</>);
+    }
   }
 
   function handleScannerDetect(code: string) {
     setValue("barcode", code, { shouldDirty: true });
-    setScannerOpen(false);
-    void runLookup(code);
+    void runLookup(code, { fromScanner: true });
   }
 
   useEffect(() => {
@@ -676,7 +682,65 @@ export function AddItemForm({
         width={520}
       >
         {scannerOpen && (
-          <BarcodeScanner onDetect={handleScannerDetect} onCancel={() => setScannerOpen(false)} />
+          <div className="flex flex-col gap-4">
+            {lookupLoading && (
+              <div className="flex items-center justify-center gap-2 rounded-md bg-paper-1 px-3 py-3 text-sm">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-paper-3 border-t-ink-2" />
+                Looking up barcode…
+              </div>
+            )}
+            {lookup?.match && (
+              <div className="rounded-md border border-olive-2 bg-olive/10 px-3 py-2.5 text-sm">
+                <div className="font-display">
+                  Found: <em className="italic">{lookup.match.name}</em>
+                </div>
+                <div className="mt-0.5 font-mono text-2xs tracking-mono text-ink-3 uppercase">
+                  {lookup.match.roomName} · {formatCount(lookup.match.count)} {lookup.match.unit}
+                </div>
+                <div className="mt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setScannerOpen(false)}
+                    className="p-0"
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            )}
+            {lookup?.off && !lookup.match && !lookupLoading && (
+              <div className="rounded-md border border-paper-3 bg-paper-1 px-3 py-2.5">
+                <div className="font-display text-sm">Open Food Facts match</div>
+                {lookup.off.imageUrl && (
+                  <div className="relative mt-2 mb-2 h-16 w-16 overflow-hidden rounded-md border border-paper-3 bg-paper-0">
+                    <Image
+                      src={lookup.off.imageUrl}
+                      alt=""
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+                <div className="font-display text-sm">{lookup.off.name}</div>
+                <div className="mt-0.5 font-mono text-2xs tracking-mono text-ink-3 uppercase">
+                  {lookup.off.brand ?? "Open Food Facts"}
+                </div>
+                <div className="mt-2">
+                  <Button variant="primary" size="sm" onClick={() => applyOffPrefill(lookup.off!)}>
+                    Fill from OFF
+                  </Button>
+                </div>
+              </div>
+            )}
+            {lookup && !lookup.match && !lookup.off && !lookupLoading && (
+              <div className="rounded-md border border-paper-3 bg-paper-1 px-3 py-2.5 text-sm">
+                Not found. Add it manually.
+              </div>
+            )}
+            <BarcodeScanner onDetect={handleScannerDetect} onCancel={() => setScannerOpen(false)} />
+          </div>
         )}
       </Modal>
     </form>

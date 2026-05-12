@@ -39,6 +39,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ path: s
       headers: {
         "Content-Type": "image/png",
         "Cache-Control": "private, max-age=60",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'none'",
       },
     });
   }
@@ -52,6 +54,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ path: s
     headers: {
       "Content-Type": result.blob.contentType ?? "application/octet-stream",
       "Cache-Control": "private, max-age=3600",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'none'",
     },
   });
 }

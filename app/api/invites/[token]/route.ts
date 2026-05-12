@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
-import { db, notifications, pendingInvites, roomMembers, rooms, users } from "@/db";
+import { db, notifications, pendingInvites, roomMembers, roomPositions, rooms, users } from "@/db";
 import { auth } from "@/auth";
-import { appendRoomPosition } from "@/lib/access";
 import { hashToken } from "@/lib/tokens";
 
 export const dynamic = "force-dynamic";
@@ -66,41 +65,52 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ to
       { status: 403 },
     );
   }
-  await db
-    .update(users)
-    .set({ emailVerifiedAt: new Date() })
-    .where(and(eq(users.id, session.user.id), isNull(users.emailVerifiedAt)));
-  await db
-    .insert(roomMembers)
-    .values({
-      id: randomUUID(),
-      roomId: invite.roomId,
-      userId: session.user.id,
-      role: invite.role,
-      invitedBy: invite.invitedBy,
-    })
-    .onConflictDoUpdate({
-      target: [roomMembers.roomId, roomMembers.userId],
-      set: { role: invite.role, invitedBy: invite.invitedBy },
-    });
-  await appendRoomPosition(session.user.id, invite.roomId);
-  await db
-    .update(pendingInvites)
-    .set({ acceptedAt: new Date() })
-    .where(eq(pendingInvites.id, invite.id));
+  const userId = session.user.id;
+  const userName = session.user.name;
   const room = await db
     .select({ name: rooms.name })
     .from(rooms)
     .where(eq(rooms.id, invite.roomId))
     .limit(1);
-  await db.insert(notifications).values({
-    id: randomUUID(),
-    userId: invite.invitedBy,
-    kind: "invite_accepted",
-    title: `${session.user.name || invite.email} joined ${room[0]?.name ?? "your room"}`,
-    body: `Role: ${invite.role}.`,
-    link: `/rooms/${invite.roomId}`,
-    roomId: invite.roomId,
+  await db.transaction(async (tx) => {
+    await tx
+      .update(users)
+      .set({ emailVerifiedAt: new Date() })
+      .where(and(eq(users.id, userId), isNull(users.emailVerifiedAt)));
+    await tx
+      .insert(roomMembers)
+      .values({
+        id: randomUUID(),
+        roomId: invite.roomId,
+        userId,
+        role: invite.role,
+        invitedBy: invite.invitedBy,
+      })
+      .onConflictDoUpdate({
+        target: [roomMembers.roomId, roomMembers.userId],
+        set: { role: invite.role, invitedBy: invite.invitedBy },
+      });
+    const max = await tx
+      .select({ max: sql<number | null>`max(${roomPositions.position})` })
+      .from(roomPositions)
+      .where(eq(roomPositions.userId, userId));
+    await tx
+      .insert(roomPositions)
+      .values({ userId, roomId: invite.roomId, position: (max[0]?.max ?? -1) + 1 })
+      .onConflictDoNothing({ target: [roomPositions.userId, roomPositions.roomId] });
+    await tx
+      .update(pendingInvites)
+      .set({ acceptedAt: new Date() })
+      .where(eq(pendingInvites.id, invite.id));
+    await tx.insert(notifications).values({
+      id: randomUUID(),
+      userId: invite.invitedBy,
+      kind: "invite_accepted",
+      title: `${userName || invite.email} joined ${room[0]?.name ?? "your room"}`,
+      body: `Role: ${invite.role}.`,
+      link: `/rooms/${invite.roomId}`,
+      roomId: invite.roomId,
+    });
   });
   return NextResponse.json({ ok: true, roomId: invite.roomId });
 }

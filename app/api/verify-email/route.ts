@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { eq } from "drizzle-orm";
 import { db, emailVerifications, users } from "@/db";
 import { hashToken } from "@/lib/tokens";
@@ -71,18 +71,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email isn't configured on this server." }, { status: 503 });
   }
   const found = await db.select().from(users).where(eq(users.email, parsed.data.email)).limit(1);
-  if (found.length === 0 || found[0].emailVerifiedAt) {
-    return NextResponse.json({ ok: true, sent: false });
+  if (found.length > 0 && !found[0].emailVerifiedAt) {
+    const recipient = { id: found[0].id, email: found[0].email, name: found[0].name };
+    const deferred = async () => {
+      try {
+        const token = await issueVerificationToken(recipient.id);
+        const send = await sendVerificationEmail({
+          to: recipient.email,
+          name: recipient.name,
+          token,
+        });
+        if (!send.ok) {
+          console.error("verify-email resend: send failed", send.message);
+        }
+      } catch (err) {
+        console.error("verify-email resend: deferred send error", err);
+      }
+    };
+    try {
+      after(deferred);
+    } catch {
+      // No request scope (test/non-Next contexts) — run fire-and-forget.
+      void deferred();
+    }
   }
-  const token = await issueVerificationToken(found[0].id);
-  const send = await sendVerificationEmail({
-    to: found[0].email,
-    name: found[0].name,
-    token,
-  });
-  if (!send.ok) {
-    console.error("verify-email resend: send failed", send.message);
-    return NextResponse.json({ ok: true, sent: false });
-  }
-  return NextResponse.json({ ok: true, sent: true });
+  return NextResponse.json({ ok: true });
 }

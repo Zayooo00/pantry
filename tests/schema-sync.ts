@@ -28,7 +28,8 @@ export async function applySchemaToSqlite(
 function createTableSql(table: SQLiteTable): string {
   const cfg = getTableConfig(table);
   const colDefs = cfg.columns.map(columnDdl);
-  return `CREATE TABLE IF NOT EXISTS ${quoteId(cfg.name)} (\n  ${colDefs.join(",\n  ")}\n)`;
+  const fkDefs = cfg.foreignKeys.map(foreignKeyDdl);
+  return `CREATE TABLE IF NOT EXISTS ${quoteId(cfg.name)} (\n  ${[...colDefs, ...fkDefs].join(",\n  ")}\n)`;
 }
 
 function columnDdl(col: ReturnType<typeof getTableConfig>["columns"][number]): string {
@@ -66,6 +67,21 @@ function defaultDdl(col: ReturnType<typeof getTableConfig>["columns"][number]): 
     return `DEFAULT '${col.default.replace(/'/g, "''")}'`;
   }
   return null;
+}
+
+function foreignKeyDdl(fk: ReturnType<typeof getTableConfig>["foreignKeys"][number]): string {
+  const ref = fk.reference();
+  const cols = ref.columns.map((c) => quoteId(c.name)).join(", ");
+  const foreignTable = getTableConfig(ref.foreignTable).name;
+  const foreignCols = ref.foreignColumns.map((c) => quoteId(c.name)).join(", ");
+  let clause = `FOREIGN KEY (${cols}) REFERENCES ${quoteId(foreignTable)}(${foreignCols})`;
+  if (fk.onDelete) {
+    clause += ` ON DELETE ${fk.onDelete.toUpperCase()}`;
+  }
+  if (fk.onUpdate) {
+    clause += ` ON UPDATE ${fk.onUpdate.toUpperCase()}`;
+  }
+  return clause;
 }
 
 function createIndexSqls(table: SQLiteTable): string[] {

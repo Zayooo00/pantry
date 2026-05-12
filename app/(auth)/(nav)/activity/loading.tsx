@@ -10,11 +10,11 @@ export default function ActivityLoading() {
           <TextSkeleton size="md" w="22em" className="mt-3 sm:text-xl" />
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-end">
-          <div className="w-50">
+          <div className="w-full max-w-50">
             <TextSkeleton size="xs" w="3em" className="mb-2" />
             <BlockSkeleton className="h-9 w-full rounded-md" />
           </div>
-          <div className="w-50">
+          <div className="w-full max-w-50">
             <TextSkeleton size="xs" w="3em" className="mb-2" />
             <BlockSkeleton className="h-9 w-full rounded-md" />
           </div>

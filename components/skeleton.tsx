@@ -41,7 +41,7 @@ export function TextSkeleton({
           <span key={i} className="block">
             <span
               className="inline-block h-[0.7em] animate-pulse rounded-sm bg-paper-3 align-middle"
-              style={{ width: lineWidth }}
+              style={{ width: lineWidth, maxWidth: "100%" }}
             />
           </span>
         );

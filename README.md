@@ -15,6 +15,12 @@ A pantry tracker for the household — every jar, every bottle, every bag, kept 
 - **Sort** items per room by recently updated, name, count, or expiry.
 - **Dashboard** — morning glance with low-stock list, expiring strip, recent activity, room glance, and an attention banner.
 
+### Barcode scanning
+- **Scan page** (`/scan`) — point the device camera at any EAN-8, EAN-13, or UPC-A barcode.
+- If the code matches an existing item in your pantry, you can open it, bump the count by one, or mark it opened — all without leaving the scan flow.
+- Unknown barcodes are looked up on **Open Food Facts**. Found products can pre-fill the add-item form (name, brand, image, quantity); unrecognised codes drop you into a manual add form with the barcode pre-set.
+- Barcode scanning is also accessible inline from the **add-item form** via a modal scanner button.
+
 ### Search & shopping
 - **Full-text search** across all items with multi-room, category, and status facets.
 - **Shopping list** in receipt style, grouped by aisle. Add items from any item's stepper or as free-form manual entries, mark trip complete, export as text, browser print.
@@ -22,6 +28,7 @@ A pantry tracker for the household — every jar, every bottle, every bag, kept 
 ### Sharing (multi-user)
 - Rooms are owned by a user. Owners invite collaborators by email at **viewer** or **editor** role.
 - If the invitee already has an account they're added immediately. Otherwise they receive an email with a tokenized accept link (`/invite/<token>`) that walks them through sign-up and joins them on accept.
+- Each room has a **QR code** button that generates a styled QR pointing at the invite link — downloadable as PNG or copy-to-clipboard, useful for printing shelf labels.
 - Shared rooms appear in the invitee's sidebar with a `◇` glyph.
 - Editors can mutate items; viewers are read-only. Manage from the per-room Members panel or `/settings → Sharing`.
 
@@ -36,7 +43,8 @@ A pantry tracker for the household — every jar, every bottle, every bag, kept 
 
 ### Auth & accounts
 - Email + password sign-in (NextAuth, scrypt hashing, JWT sessions).
-- Sign-up flow, profile + email + password change in `/settings`. Email or password change requires the current password; password rotation invalidates all other sessions via a per-user password version.
+- Sign-up flow with **email verification** — a one-time token is emailed on registration; `/verify-email` confirms it before the account is fully active.
+- Profile + email + password change in `/settings`. Email or password change requires the current password; password rotation invalidates all other sessions via a per-user password version.
 - Forgot-password / reset-password flow via one-time email tokens.
 - Rate limiting on signin, signup, invite, and password-reset endpoints.
 - Session middleware gates every page; safe-redirect helper guards the `?next=` parameter.
@@ -124,13 +132,17 @@ app/                            routes (App Router) + api/
   rooms/                        grid + per-room detail + members panel
   items/                        detail + new-item form
   search/  shopping/  activity/ feature pages
+  scan/                         barcode scanner + Open Food Facts lookup
   notifications/                in-app notifications inbox
   settings/                     profile + password + sharing + digest
+  verify-email/                 email verification landing page
   api/                          REST handlers
     notifications/              list, mark-read, unread count
     cron/digest/                low-stock email digest endpoint
     invites/[token]/            preview + accept pending invites
     password-reset/             request + confirm reset
+    barcode/[code]/             pantry match + Open Food Facts lookup
+    verify-email/               confirm email-verification token
 
 components/                     app shell, sidebar, topbar, command palette,
                                 modals, toasts, forms, photo upload, stepper

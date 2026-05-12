@@ -55,6 +55,15 @@ export function SearchClient({
 
   const roomById = useMemo(() => new Map(rooms.map((r) => [r.id, r])), [rooms]);
 
+  const barcodeTopHit = useMemo(() => {
+    const trimmed = q.trim();
+    if (!/^\d{8,14}$/.test(trimmed)) {
+      return null;
+    }
+    const hit = items.find((i) => i.barcode === trimmed);
+    return hit ?? null;
+  }, [items, q]);
+
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return items.filter((i) => {
@@ -236,6 +245,18 @@ export function SearchClient({
               <ModKey /> K FOR QUICK SEARCH
             </span>
           </div>
+
+          {barcodeTopHit && (
+            <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-olive-2 bg-olive/10 px-4 py-3">
+              <span className="font-mono text-2xs tracking-mono text-olive-2 uppercase">
+                Barcode match
+              </span>
+              <span className="font-display text-lg">{barcodeTopHit.name}</span>
+              <Button asChild variant="primary" size="sm" className="ml-auto">
+                <Link href={`/items/${barcodeTopHit.id}`}>Open item →</Link>
+              </Button>
+            </div>
+          )}
 
           <div className="overflow-hidden rounded-xl border border-paper-3 bg-paper-0">
             {filtered.length === 0 ? (

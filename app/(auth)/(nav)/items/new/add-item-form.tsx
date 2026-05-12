@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +10,8 @@ import { z } from "zod";
 import { Select } from "@/components/select";
 import { useToast } from "@/components/toast";
 import { PhotoUpload } from "@/components/photo-upload";
+import { BarcodeScanner } from "@/components/barcode-scanner";
+import { Modal } from "@/components/modal";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/badge";
 import { Button } from "@/components/button";
@@ -17,6 +20,25 @@ import { TextArea, TextInput } from "@/components/text-input";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 import { formatCount } from "@/lib/format";
 import type { Room as RoomRow } from "@/db/schema";
+
+type BarcodeLookup = {
+  code: string;
+  match: {
+    id: string;
+    name: string;
+    roomId: string;
+    roomName: string;
+    roomGlyph: string;
+    count: number;
+    unit: string;
+  } | null;
+  off: {
+    name: string;
+    brand: string | null;
+    imageUrl: string | null;
+    quantity: string | null;
+  } | null;
+};
 
 const PH =
   "relative bg-[repeating-linear-gradient(45deg,var(--color-paper-2)_0_6px,var(--color-paper-1)_6px_12px)] border border-paper-3 rounded-md grid place-items-center text-ink-4 font-mono text-2xs tracking-widest uppercase overflow-hidden";
@@ -74,14 +96,22 @@ function nullableDate(s: string): string | null {
 export function AddItemForm({
   rooms,
   initialRoomId,
+  initialBarcode = "",
+  prefillFromOff = false,
 }: {
   rooms: RoomLite[];
   initialRoomId: string;
+  initialBarcode?: string;
+  prefillFromOff?: boolean;
 }) {
   const router = useRouter();
   const { toast } = useToast();
   const [serverError, setServerError] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [lookup, setLookup] = useState<BarcodeLookup | null>(null);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
 
   const {
     register,
@@ -107,7 +137,7 @@ export function AddItemForm({
       openedAt: "",
       purchasedAt: "",
       lastPrice: "",
-      barcode: "",
+      barcode: initialBarcode,
       notes: "",
       tags: [],
       photoUrl: null,
@@ -116,6 +146,63 @@ export function AddItemForm({
 
   const values = watch();
   const { trigger: triggerCreate } = useMutation("post", "/api/items");
+
+  async function runLookup(rawCode: string, { autoApplyOff = false } = {}) {
+    const code = rawCode.replace(/\D/g, "");
+    if (!/^\d{8,14}$/.test(code)) {
+      setLookup(null);
+      setLookupError("Enter 8–14 digits.");
+      return;
+    }
+    setLookupLoading(true);
+    setLookupError(null);
+    setLookup(null);
+    try {
+      const res = await fetch(`/api/barcode/${encodeURIComponent(code)}`);
+      if (!res.ok) {
+        const json = (await res.json().catch(() => ({}))) as { error?: string };
+        setLookupError(typeof json.error === "string" ? json.error : "Lookup failed.");
+        return;
+      }
+      const data = (await res.json()) as BarcodeLookup;
+      setLookup(data);
+      if (autoApplyOff && data.off && !data.match) {
+        applyOffPrefill(data.off);
+      }
+    } catch {
+      setLookupError("Lookup failed.");
+    } finally {
+      setLookupLoading(false);
+    }
+  }
+
+  function applyOffPrefill(off: NonNullable<BarcodeLookup["off"]>) {
+    if (!values.name && off.name) {
+      setValue("name", off.name, { shouldDirty: true });
+    }
+    if (!values.brand && off.brand) {
+      setValue("brand", off.brand, { shouldDirty: true });
+    }
+    if (!values.photoUrl && off.imageUrl) {
+      setValue("photoUrl", off.imageUrl, { shouldDirty: true });
+    }
+    setLookup(null);
+    toast(<>Filled from Open Food Facts.</>);
+  }
+
+  function handleScannerDetect(code: string) {
+    setValue("barcode", code, { shouldDirty: true });
+    setScannerOpen(false);
+    void runLookup(code);
+  }
+
+  useEffect(() => {
+    if (prefillFromOff && initialBarcode) {
+      void runLookup(initialBarcode, { autoApplyOff: true });
+    }
+    // intentionally one-shot on mount — re-running on prop change would surprise the user
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot mount effect
+  }, []);
 
   function addTag() {
     const t = tagInput.trim();
@@ -222,15 +309,18 @@ export function AddItemForm({
       <div className="mb-8 grid grid-cols-1 items-center gap-3 rounded-xl bg-ink-1 p-5 text-paper-0 md:grid-cols-[1fr_auto] md:p-6">
         <div>
           <div className="font-display text-lg">
-            Have a barcode? <em className="italic">Type it in.</em>
+            Have a barcode? <em className="italic">Scan or type it.</em>
           </div>
           <div className="mt-1 font-mono text-2xs tracking-[0.14em] text-paper-3 uppercase">
-            Stored alongside the item — searchable from anywhere.
+            We'll look it up and offer to prefill the name and photo.
           </div>
         </div>
         <div className="flex justify-end gap-2">
+          <Button variant="olive" onClick={() => setScannerOpen(true)}>
+            ▣ Scan
+          </Button>
           <Button
-            variant="olive"
+            variant="ghost"
             onClick={() => {
               const el = document.getElementById("barcode-field");
               if (el) {
@@ -238,8 +328,9 @@ export function AddItemForm({
                 (el as HTMLInputElement).focus();
               }
             }}
+            className="border-paper-3 text-paper-0 hover:bg-paper-0/10"
           >
-            ▣ Type barcode
+            Type
           </Button>
         </div>
       </div>
@@ -406,12 +497,94 @@ export function AddItemForm({
               </div>
               <div className="md:col-span-2">
                 <label className="field-label">Barcode</label>
-                <TextInput
-                  id="barcode-field"
-                  className="font-mono"
-                  placeholder="e.g. 8 014203 778124"
-                  {...register("barcode")}
-                />
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                  <TextInput
+                    id="barcode-field"
+                    className="font-mono"
+                    placeholder="e.g. 8 014203 778124"
+                    {...register("barcode")}
+                  />
+                  <div className="flex gap-2 sm:shrink-0">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setScannerOpen(true)}
+                      type="button"
+                    >
+                      ▣ Scan
+                    </Button>
+                    {values.barcode && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        type="button"
+                        onClick={() => runLookup(values.barcode)}
+                        disabled={
+                          lookupLoading || !/^\d{8,14}$/.test(values.barcode.replace(/\D/g, ""))
+                        }
+                      >
+                        {lookupLoading ? "Looking up…" : "Look up"}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                {lookupError && (
+                  <div className="mt-2 font-display text-sm text-tomato-2">{lookupError}</div>
+                )}
+                {lookup?.match && (
+                  <div className="mt-3 rounded-md border border-olive-2 bg-olive/10 px-3 py-2.5 text-sm">
+                    <div className="font-display">
+                      Already in your pantry: <em className="italic">{lookup.match.name}</em>
+                    </div>
+                    <div className="mt-0.5 font-mono text-2xs tracking-mono text-ink-3 uppercase">
+                      {lookup.match.roomName} · {formatCount(lookup.match.count)}{" "}
+                      {lookup.match.unit}
+                    </div>
+                    <div className="mt-2">
+                      <Link
+                        href={`/items/${lookup.match.id}`}
+                        className="font-display text-sm text-olive-2 underline hover:no-underline"
+                      >
+                        Open item →
+                      </Link>
+                    </div>
+                  </div>
+                )}
+                {lookup?.off && !lookup.match && (
+                  <div className="mt-3 flex flex-wrap items-center gap-3 rounded-md border border-paper-3 bg-paper-1 px-3 py-2.5">
+                    {lookup.off.imageUrl && (
+                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md border border-paper-3 bg-paper-0">
+                        <Image
+                          src={lookup.off.imageUrl}
+                          alt=""
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-display text-sm">{lookup.off.name}</div>
+                      <div className="mt-0.5 font-mono text-2xs tracking-mono text-ink-3 uppercase">
+                        {lookup.off.brand ?? "Open Food Facts"}
+                        {lookup.off.quantity ? ` · ${lookup.off.quantity}` : ""}
+                      </div>
+                    </div>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      type="button"
+                      onClick={() => applyOffPrefill(lookup.off!)}
+                    >
+                      Fill from OFF
+                    </Button>
+                  </div>
+                )}
+                {lookup && !lookup.match && !lookup.off && (
+                  <div className="mt-2 font-mono text-2xs tracking-mono text-ink-3 uppercase">
+                    Not in your pantry, and Open Food Facts doesn't know this one. Add it manually.
+                  </div>
+                )}
               </div>
             </div>
           </Section>
@@ -491,6 +664,21 @@ export function AddItemForm({
         <span className="caption">DRAFT · NOT YET SAVED</span>
         <span className="caption">↵ ON TAG INPUT TO ADD</span>
       </footer>
+
+      <Modal
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        title={
+          <>
+            Scan a <em>barcode</em>.
+          </>
+        }
+        width={520}
+      >
+        {scannerOpen && (
+          <BarcodeScanner onDetect={handleScannerDetect} onCancel={() => setScannerOpen(false)} />
+        )}
+      </Modal>
     </form>
   );
 }

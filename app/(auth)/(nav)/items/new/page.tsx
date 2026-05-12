@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function NewItemPage({
   searchParams,
 }: {
-  searchParams: Promise<{ room?: string }>;
+  searchParams: Promise<{ room?: string; barcode?: string; prefillFromOff?: string }>;
 }) {
   const userId = await requireUserId();
   const sp = await searchParams;
@@ -19,7 +19,13 @@ export default async function NewItemPage({
     const role = roles.get(r.id);
     return role === "owner" || role === "editor";
   });
+  const initialBarcode = sp.barcode && /^\d{8,14}$/.test(sp.barcode) ? sp.barcode : "";
   return (
-    <AddItemForm rooms={editableRooms} initialRoomId={sp.room ?? editableRooms[0]?.id ?? ""} />
+    <AddItemForm
+      rooms={editableRooms}
+      initialRoomId={sp.room ?? editableRooms[0]?.id ?? ""}
+      initialBarcode={initialBarcode}
+      prefillFromOff={sp.prefillFromOff === "1" && initialBarcode !== ""}
+    />
   );
 }

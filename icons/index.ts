@@ -2,6 +2,8 @@ export type { IconProps } from "./types";
 export { HomeIcon } from "./home";
 export { GridIcon } from "./grid";
 export { SearchIcon } from "./search";
+export { ScanIcon } from "./scan";
+export { QrIcon } from "./qr";
 export { ListIcon } from "./list";
 export { ActivityIcon } from "./activity";
 export { BellIcon } from "./bell";

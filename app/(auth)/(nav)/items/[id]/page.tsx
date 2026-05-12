@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { kebabCase } from "lodash-es";
 import { auth } from "@/auth";
 import { getRoomWithRole } from "@/lib/access";
 import { Stepper, AddToShoppingButton } from "@/components/stepper";
@@ -9,6 +10,7 @@ import { getItem, getItemEvents, getRoomsWithCounts } from "@/lib/queries";
 import { formatCount, formatDate, formatEventKind, itemStatus, shortLabel } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/badge";
+import { QrPopover } from "@/components/qr-popover";
 import { Stamp } from "@/components/stamp";
 import { SectionTitle } from "@/components/section-title";
 
@@ -149,9 +151,20 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
                 </div>
               )}
             </div>
-            {canEdit && (
-              <ItemActions item={item} rooms={allRooms.map((r) => ({ id: r.id, name: r.name }))} />
-            )}
+            <div className="flex flex-wrap items-start gap-2">
+              <QrPopover
+                path={`/items/${item.id}`}
+                title={`${item.name.toUpperCase()} · QR`}
+                filename={`pantry-item-${kebabCase(item.name) || item.id}`}
+                size="sm"
+              />
+              {canEdit && (
+                <ItemActions
+                  item={item}
+                  rooms={allRooms.map((r) => ({ id: r.id, name: r.name }))}
+                />
+              )}
+            </div>
           </div>
 
           <div

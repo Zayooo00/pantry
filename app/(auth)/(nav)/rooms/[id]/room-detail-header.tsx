@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { kebabCase } from "lodash-es";
 import { Modal } from "@/components/modal";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EditRoomForm } from "@/components/edit-room-form";
 import { useToast } from "@/components/toast";
 import { Button } from "@/components/button";
+import { QrPopover } from "@/components/qr-popover";
 import { RoleBadge } from "@/components/role-badge";
 import { invalidateApi, useMutation } from "@/lib/api/client";
 import type { Room as RoomRow } from "@/db/schema";
@@ -113,6 +115,11 @@ export function RoomDetailHeader({
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
+          <QrPopover
+            path={`/rooms/${room.id}`}
+            title={`${room.name.toUpperCase()} · QR`}
+            filename={`pantry-room-${kebabCase(room.name) || room.id}`}
+          />
           {canEdit && (
             <Button variant="ghost" onClick={() => setEditOpen(true)}>
               Edit room
